@@ -1,0 +1,107 @@
+{
+  "knowledge_graph_core.json": {
+    "meta": {
+      "generated_from": [
+        "JD_Catalog.json",
+        "Person_Profiles_Linked.verbose_backup.json"
+      ],
+      "activity_sources_included": [],
+      "graph_scope": "Core enterprise knowledge graph without GitHub or Jira activity",
+      "node_count": 566,
+      "relationship_count": 751
+    },
+    "node_labels": [
+      "Country",
+      "Department",
+      "JobDescription",
+      "Person",
+      "Role",
+      "Site",
+      "Skill",
+      "System",
+      "Team",
+      "Topic"
+    ],
+    "relationship_types": [
+      "APPLIES_TO_COUNTRY",
+      "APPLIES_TO_SITE",
+      "AT_SITE",
+      "BELONGS_TO_DEPARTMENT",
+      "DESCRIBED_BY",
+      "HAS_ROLE",
+      "HAS_SKILL",
+      "IN_COUNTRY",
+      "KNOWS_SYSTEM",
+      "LINKED_TO_JD",
+      "LOCATED_IN",
+      "MEMBER_OF",
+      "OWNS_TOPIC",
+      "REPORTS_TO",
+      "REQUIRES_SKILL",
+      "SCOPES_TO_DEPARTMENT"
+    ]
+  },
+  "knowledge_graph_school_mvp.json": {
+    "meta": {
+      "generated_from": [
+        "knowledge_graph_core.json",
+        "github_activity_mapped.json",
+        "jira_synthetic.json"
+      ],
+      "activity_sources_included": [
+        "GitHub public activity",
+        "Synthetic Jira"
+      ],
+      "graph_scope": "School MVP knowledge graph with HR baseline plus GitHub and Jira activity",
+      "node_count": 678,
+      "relationship_count": 1108
+    },
+    "node_labels": [
+      "Commit",
+      "Country",
+      "Department",
+      "JiraIssue",
+      "JobDescription",
+      "Person",
+      "Project",
+      "PullRequest",
+      "Repository",
+      "Role",
+      "Site",
+      "Skill",
+      "System",
+      "Team",
+      "Topic"
+    ],
+    "relationship_types": [
+      "APPLIES_TO_COUNTRY",
+      "APPLIES_TO_SITE",
+      "AT_SITE",
+      "AUTHORED_COMMIT",
+      "BELONGS_TO_DEPARTMENT",
+      "BELONGS_TO_PROJECT",
+      "COMMENTED_ON_TICKET",
+      "CONTRIBUTED_TO_REPOSITORY",
+      "DESCRIBED_BY",
+      "EVIDENCES_SKILL",
+      "HAS_ROLE",
+      "HAS_SKILL",
+      "IMPACTS_SYSTEM",
+      "IN_COUNTRY",
+      "IN_REPOSITORY",
+      "KNOWS_SYSTEM",
+      "LINKED_TO_JD",
+      "LOCATED_IN",
+      "MEMBER_OF",
+      "OPENED_PULL_REQUEST",
+      "OWNS_TOPIC",
+      "REPORTED_TICKET",
+      "REPORTS_TO",
+      "REQUIRES_SKILL",
+      "SCOPES_TO_DEPARTMENT",
+      "TAGGED_WITH_TOPIC",
+      "USES_TECHNOLOGY",
+      "WORKED_ON_TICKET"
+    ]
+  }
+}
