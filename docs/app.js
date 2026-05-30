@@ -1,10 +1,10 @@
 const DATASETS = {
   core: {
-    name: "Core Graph",
+    name: "Basic Graph",
     url: "./data/knowledge_graph_core_normalized.json"
   },
   school: {
-    name: "School MVP",
+    name: "Detailed Graph",
     url: "./data/knowledge_graph_school_mvp_normalized.json"
   }
 };
