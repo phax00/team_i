@@ -11,11 +11,11 @@ const DATASETS = {
 
 const LABEL_COLORS = {
   Person: "#7B3AED",
-  Role: "#4C1D95",
+  Role: "#0F766E",
   Skill: "#F59E0B",
   Topic: "#EC4899",
   System: "#10B981",
-  JobDescription: "#111111",
+  JobDescription: "#DDD6FE",
   Department: "#EF4444",
   Team: "#06B6D4",
   Site: "#84CC16",
