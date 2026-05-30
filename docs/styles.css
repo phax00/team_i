@@ -412,6 +412,26 @@ h1 {
   align-items: flex-start;
 }
 
+.graph-network-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.graph-header-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.graph-size-reset {
+  height: 38px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
 #graph-caption {
   margin: 4px 0 0;
 }
@@ -440,9 +460,9 @@ h1 {
 }
 
 #graph-network {
-  flex: 1;
-  min-height: 0;
   height: calc(100vh - 295px);
+  min-height: 290px;
+  max-height: 85vh;
   border-radius: 20px;
   overflow: hidden;
   background:
@@ -462,6 +482,36 @@ h1 {
   width: 100% !important;
   height: 100% !important;
   display: block;
+}
+
+.graph-resize-handle {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, transparent 0 44%, rgba(20, 95, 116, 0.28) 44% 52%, transparent 52% 100%),
+    linear-gradient(135deg, transparent 0 64%, rgba(20, 95, 116, 0.48) 64% 72%, transparent 72% 100%),
+    rgba(255, 250, 242, 0.92);
+  box-shadow: 0 4px 12px rgba(24, 50, 71, 0.16);
+  cursor: ns-resize;
+  z-index: 8;
+  touch-action: none;
+}
+
+.graph-resize-handle:hover {
+  background:
+    linear-gradient(135deg, transparent 0 44%, rgba(20, 95, 116, 0.38) 44% 52%, transparent 52% 100%),
+    linear-gradient(135deg, transparent 0 64%, rgba(20, 95, 116, 0.6) 64% 72%, transparent 72% 100%),
+    rgba(255, 250, 242, 0.98);
+}
+
+body.is-resizing-graph,
+body.is-resizing-graph * {
+  cursor: ns-resize !important;
+  user-select: none !important;
 }
 
 .empty-state {
@@ -662,6 +712,7 @@ h1 {
 
   #graph-network {
     height: 620px;
+    max-height: none;
   }
 }
 

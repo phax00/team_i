@@ -1,11 +1,11 @@
 const DATASETS = {
   core: {
     name: "Core Graph",
-    url: "./data/knowledge_graph_core.json"
+    url: "./data/knowledge_graph_core_normalized.json"
   },
   school: {
     name: "School MVP",
-    url: "./data/knowledge_graph_school_mvp.json"
+    url: "./data/knowledge_graph_school_mvp_normalized.json"
   }
 };
 
@@ -103,6 +103,10 @@ const state = {
   selectedNodeId: null,
   depth: 2,
   defaultFocusNodeId: null,
+  manualNetworkHeight: null,
+  appliedNetworkHeight: null,
+  programmaticHeightSync: false,
+  resizeObserver: null,
   network: null,
   networkFrameKey: null,
   visNodes: null,
@@ -133,6 +137,8 @@ function cacheElements() {
   el.graphCaption = document.getElementById("graph-caption");
   el.legend = document.getElementById("legend");
   el.network = document.getElementById("graph-network");
+  el.graphResizeHandle = document.getElementById("graph-resize-handle");
+  el.resetGraphSize = document.getElementById("reset-graph-size");
   el.statNodes = document.getElementById("stat-nodes");
   el.statRelationships = document.getElementById("stat-relationships");
   el.statRenderedNodes = document.getElementById("stat-rendered-nodes");
@@ -140,11 +146,13 @@ function cacheElements() {
   el.selectionEmpty = document.getElementById("selection-empty");
   el.selectionDetails = document.getElementById("selection-details");
   el.detailsBody = document.getElementById("details-body");
+  applyGraphResizeHandleStyles();
 }
 
 function bindUI() {
   window.addEventListener("resize", debounce(() => {
     if (state.raw) {
+      state.manualNetworkHeight = null;
       syncNetworkSize();
       render();
     }
@@ -174,6 +182,11 @@ function bindUI() {
 
   el.clearFilters.addEventListener("click", () => {
     applyPreset(state.activePreset);
+  });
+
+  el.resetGraphSize.addEventListener("click", () => {
+    state.manualNetworkHeight = null;
+    render();
   });
 
   el.datasetRow.addEventListener("click", async (event) => {
@@ -216,6 +229,9 @@ function bindUI() {
       render();
     }
   });
+
+  setupNetworkResizeObserver();
+  setupGraphResizeHandle();
 }
 
 function createNetwork() {
@@ -979,15 +995,109 @@ function renderEmptyDetails() {
 }
 
 function applyAdaptiveCanvasHeight(nodeCount) {
+  const nextHeight = state.manualNetworkHeight ?? getAutoNetworkHeight(nodeCount);
+  state.programmaticHeightSync = true;
+  state.appliedNetworkHeight = nextHeight;
+  el.network.style.height = `${nextHeight}px`;
+  requestAnimationFrame(() => {
+    state.programmaticHeightSync = false;
+  });
+}
+
+function getAutoNetworkHeight(nodeCount) {
   if (nodeCount <= 15) {
-    el.network.style.height = "290px";
-    return;
+    return 290;
   }
   if (nodeCount <= 35) {
-    el.network.style.height = "420px";
+    return 420;
+  }
+  return Math.max(430, window.innerHeight - 295);
+}
+
+function setupNetworkResizeObserver() {
+  if (!("ResizeObserver" in window) || !el.network) {
     return;
   }
-  el.network.style.height = "calc(100vh - 295px)";
+
+  const onResize = debounce((entries) => {
+    const entry = entries[0];
+    if (!entry) {
+      return;
+    }
+    const nextHeight = Math.round(entry.contentRect.height);
+    if (!state.programmaticHeightSync && Math.abs(nextHeight - (state.appliedNetworkHeight ?? nextHeight)) > 6) {
+      state.manualNetworkHeight = nextHeight;
+    }
+    syncNetworkSize();
+  }, 80);
+
+  state.resizeObserver?.disconnect?.();
+  state.resizeObserver = new ResizeObserver(onResize);
+  state.resizeObserver.observe(el.network);
+}
+
+function setupGraphResizeHandle() {
+  if (!el.graphResizeHandle || !el.network) {
+    return;
+  }
+
+  el.graphResizeHandle.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+
+    const startY = event.clientY;
+    const startHeight = el.network.getBoundingClientRect().height;
+    document.body.classList.add("is-resizing-graph");
+    el.graphResizeHandle.setPointerCapture?.(event.pointerId);
+
+    const onPointerMove = (moveEvent) => {
+      const delta = moveEvent.clientY - startY;
+      const nextHeight = clampGraphHeight(startHeight + delta);
+      state.manualNetworkHeight = nextHeight;
+      state.appliedNetworkHeight = nextHeight;
+      state.programmaticHeightSync = true;
+      el.network.style.height = `${nextHeight}px`;
+      syncNetworkSize();
+    };
+
+    const stopResize = () => {
+      document.body.classList.remove("is-resizing-graph");
+      state.programmaticHeightSync = false;
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", stopResize);
+      window.removeEventListener("pointercancel", stopResize);
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", stopResize);
+    window.addEventListener("pointercancel", stopResize);
+  });
+}
+
+function clampGraphHeight(height) {
+  const minHeight = 290;
+  const maxHeight = Math.max(minHeight, Math.round(window.innerHeight * 0.92));
+  return Math.min(maxHeight, Math.max(minHeight, Math.round(height)));
+}
+
+function applyGraphResizeHandleStyles() {
+  if (!el.graphResizeHandle) {
+    return;
+  }
+
+  Object.assign(el.graphResizeHandle.style, {
+    position: "absolute",
+    right: "10px",
+    bottom: "10px",
+    width: "24px",
+    height: "24px",
+    borderRadius: "8px",
+    background: "linear-gradient(135deg, transparent 0 44%, rgba(20, 95, 116, 0.28) 44% 52%, transparent 52% 100%), linear-gradient(135deg, transparent 0 64%, rgba(20, 95, 116, 0.48) 64% 72%, transparent 72% 100%), rgba(255, 250, 242, 0.92)",
+    boxShadow: "0 4px 12px rgba(24, 50, 71, 0.16)",
+    cursor: "ns-resize",
+    zIndex: "8",
+    touchAction: "none",
+    display: "block"
+  });
 }
 
 function syncNetworkSize() {

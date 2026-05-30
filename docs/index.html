@@ -98,9 +98,15 @@
             <h2>Graph Canvas</h2>
             <p id="graph-caption" class="panel-subtitle">Rendering current subset...</p>
           </div>
-          <div class="legend" id="legend"></div>
+          <div class="graph-header-actions">
+            <button class="ghost-button graph-size-reset" id="reset-graph-size" type="button">Auto Size</button>
+            <div class="legend" id="legend"></div>
+          </div>
         </div>
-        <div id="graph-network"></div>
+        <div class="graph-network-wrap">
+          <div id="graph-network"></div>
+          <div id="graph-resize-handle" class="graph-resize-handle" role="separator" aria-label="Resize graph panel" title="Drag to resize graph"></div>
+        </div>
       </section>
 
       <aside class="panel details-panel">
