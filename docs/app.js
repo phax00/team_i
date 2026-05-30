@@ -10,21 +10,21 @@ const DATASETS = {
 };
 
 const LABEL_COLORS = {
-  Person: "#0f7b8a",
-  Role: "#145f74",
-  Skill: "#c48a3a",
-  Topic: "#b36442",
-  System: "#5b8f61",
-  JobDescription: "#5f5aa2",
-  Department: "#78624a",
-  Team: "#8e5675",
-  Site: "#6a7f9d",
-  Country: "#447d8f",
-  Repository: "#3d7ea6",
-  Commit: "#5a6f87",
-  PullRequest: "#2f8f6b",
-  JiraIssue: "#b45f43",
-  Project: "#8d6e4f"
+  Person: "#7B3AED",
+  Role: "#4C1D95",
+  Skill: "#F59E0B",
+  Topic: "#EC4899",
+  System: "#10B981",
+  JobDescription: "#111111",
+  Department: "#EF4444",
+  Team: "#06B6D4",
+  Site: "#84CC16",
+  Country: "#F97316",
+  Repository: "#2563EB",
+  Commit: "#64748B",
+  PullRequest: "#14B8A6",
+  JiraIssue: "#DC2626",
+  Project: "#8B5CF6"
 };
 
 const LABEL_PRIORITY = {
@@ -87,6 +87,7 @@ const PRESETS = {
 };
 
 const SEARCHABLE_LABELS = new Set(["Person", "Role", "Repository", "JiraIssue", "Project", "Skill"]);
+const BROWSE_LABEL_ORDER = ["Person", "Role", "Skill", "Topic", "System", "Department", "Team", "Country", "Site", "JobDescription", "Repository", "JiraIssue", "Project"];
 
 const state = {
   datasetKey: "core",
@@ -101,6 +102,7 @@ const state = {
   relationshipFilter: new Set(),
   searchTerm: "",
   selectedNodeId: null,
+  browseLabel: "Person",
   depth: 2,
   defaultFocusNodeId: null,
   manualNetworkHeight: null,
@@ -133,9 +135,12 @@ function cacheElements() {
   el.presetRow = document.getElementById("preset-row");
   el.labelFilters = document.getElementById("label-filters");
   el.relationshipFilters = document.getElementById("relationship-filters");
+  el.browseLabel = document.getElementById("browse-label");
+  el.browseNode = document.getElementById("browse-node");
   el.quickPicks = document.getElementById("quick-picks");
   el.graphCaption = document.getElementById("graph-caption");
   el.legend = document.getElementById("legend");
+  el.networkWrap = document.getElementById("graph-network-wrap");
   el.network = document.getElementById("graph-network");
   el.graphResizeHandle = document.getElementById("graph-resize-handle");
   el.resetGraphSize = document.getElementById("reset-graph-size");
@@ -162,6 +167,11 @@ function bindUI() {
     state.searchTerm = el.searchInput.value.trim().toLowerCase();
     if (!state.searchTerm) {
       state.selectedNodeId = state.defaultFocusNodeId;
+    } else {
+      const bestMatch = findBestSearchMatch(state.searchTerm);
+      if (bestMatch) {
+        state.selectedNodeId = bestMatch.id;
+      }
     }
     render();
   });
@@ -186,6 +196,22 @@ function bindUI() {
 
   el.resetGraphSize.addEventListener("click", () => {
     state.manualNetworkHeight = null;
+    render();
+  });
+
+  el.browseLabel.addEventListener("change", () => {
+    state.browseLabel = el.browseLabel.value;
+    buildBrowseControls();
+  });
+
+  el.browseNode.addEventListener("change", () => {
+    const nextId = el.browseNode.value;
+    if (!nextId) {
+      return;
+    }
+    state.selectedNodeId = nextId;
+    state.searchTerm = "";
+    el.searchInput.value = "";
     render();
   });
 
@@ -406,6 +432,7 @@ function applyPreset(presetKey) {
   }
 
   buildFilterControls();
+  buildBrowseControls();
   buildLegend();
   buildQuickPicks();
   updatePresetButtons();
@@ -432,6 +459,36 @@ function buildFilterControls() {
       })
     );
   }
+}
+
+function buildBrowseControls() {
+  const availableLabels = BROWSE_LABEL_ORDER.filter((label) => state.labelCounts.has(label));
+  if (!availableLabels.length) {
+    el.browseLabel.innerHTML = "";
+    el.browseNode.innerHTML = "";
+    return;
+  }
+
+  if (!availableLabels.includes(state.browseLabel)) {
+    state.browseLabel = availableLabels[0];
+  }
+
+  el.browseLabel.innerHTML = availableLabels
+    .map((label) => `<option value="${escapeHtml(label)}"${label === state.browseLabel ? " selected" : ""}>${escapeHtml(label)}</option>`)
+    .join("");
+
+  const valueNodes = state.raw.nodes
+    .filter((node) => node.label === state.browseLabel)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const selectedNode = state.nodeMap.get(state.selectedNodeId);
+  const shouldSelectCurrent = selectedNode?.label === state.browseLabel;
+  const currentValue = shouldSelectCurrent ? selectedNode.id : "";
+
+  el.browseNode.innerHTML = [
+    `<option value="">Select ${escapeHtml(state.browseLabel)}</option>`,
+    ...valueNodes.map((node) => `<option value="${escapeHtml(node.id)}"${node.id === currentValue ? " selected" : ""}>${escapeHtml(node.name)}</option>`)
+  ].join("");
 }
 
 function buildToggleCard(name, count, checked, onChange) {
@@ -547,6 +604,7 @@ function render() {
   el.statRenderedRelationships.textContent = filtered.edges.length;
   el.graphCaption.textContent = `${PRESETS[state.activePreset].name} - ${filtered.nodes.length} nodes - ${filtered.edges.length} relationships`;
 
+  buildBrowseControls();
   buildQuickPicks();
 
   if (state.selectedNodeId && state.nodeMap.has(state.selectedNodeId)) {
@@ -554,6 +612,39 @@ function render() {
   } else {
     renderEmptyDetails();
   }
+}
+
+function findBestSearchMatch(term) {
+  if (!term) {
+    return null;
+  }
+
+  let bestNode = null;
+  let bestScore = -1;
+
+  for (const node of state.raw.nodes) {
+    const haystack = JSON.stringify(node).toLowerCase();
+    const name = node.name.toLowerCase();
+    const labelBonus = SEARCHABLE_LABELS.has(node.label) ? 20 : 0;
+    let score = -1;
+
+    if (name === term) {
+      score = 500 + labelBonus;
+    } else if (name.startsWith(term)) {
+      score = 400 + labelBonus;
+    } else if (name.includes(term)) {
+      score = 300 + labelBonus;
+    } else if (haystack.includes(term)) {
+      score = 160 + labelBonus;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestNode = node;
+    }
+  }
+
+  return bestNode;
 }
 
 function buildVisibleSubgraph() {
@@ -649,7 +740,7 @@ function decorateNode(node) {
     font: {
       face: "Space Grotesk",
       size: isSelected ? 16 : 13,
-      color: shouldUseLightText(node.label) ? "#fff" : "#183247"
+      color: "#141414"
     },
     physics: true
   };
@@ -995,27 +1086,31 @@ function renderEmptyDetails() {
 }
 
 function applyAdaptiveCanvasHeight(nodeCount) {
-  const nextHeight = state.manualNetworkHeight ?? getAutoNetworkHeight(nodeCount);
   state.programmaticHeightSync = true;
-  state.appliedNetworkHeight = nextHeight;
-  el.network.style.height = `${nextHeight}px`;
+
+  if (state.manualNetworkHeight) {
+    const nextHeight = clampGraphHeight(state.manualNetworkHeight);
+    state.appliedNetworkHeight = nextHeight;
+    if (el.networkWrap) {
+      el.networkWrap.style.flex = "0 0 auto";
+      el.networkWrap.style.height = `${nextHeight}px`;
+    }
+    el.network.style.height = `${nextHeight}px`;
+  } else {
+    state.appliedNetworkHeight = null;
+    if (el.networkWrap) {
+      el.networkWrap.style.flex = "";
+      el.networkWrap.style.height = "";
+    }
+    el.network.style.height = "";
+  }
   requestAnimationFrame(() => {
     state.programmaticHeightSync = false;
   });
 }
 
-function getAutoNetworkHeight(nodeCount) {
-  if (nodeCount <= 15) {
-    return 290;
-  }
-  if (nodeCount <= 35) {
-    return 420;
-  }
-  return Math.max(430, window.innerHeight - 295);
-}
-
 function setupNetworkResizeObserver() {
-  if (!("ResizeObserver" in window) || !el.network) {
+  if (!("ResizeObserver" in window) || !el.networkWrap) {
     return;
   }
 
@@ -1033,7 +1128,7 @@ function setupNetworkResizeObserver() {
 
   state.resizeObserver?.disconnect?.();
   state.resizeObserver = new ResizeObserver(onResize);
-  state.resizeObserver.observe(el.network);
+  state.resizeObserver.observe(el.networkWrap);
 }
 
 function setupGraphResizeHandle() {
@@ -1055,6 +1150,10 @@ function setupGraphResizeHandle() {
       state.manualNetworkHeight = nextHeight;
       state.appliedNetworkHeight = nextHeight;
       state.programmaticHeightSync = true;
+      if (el.networkWrap) {
+        el.networkWrap.style.flex = "0 0 auto";
+        el.networkWrap.style.height = `${nextHeight}px`;
+      }
       el.network.style.height = `${nextHeight}px`;
       syncNetworkSize();
     };
@@ -1218,10 +1317,6 @@ function getNodeSize(label) {
     default:
       return 15;
   }
-}
-
-function shouldUseLightText(label) {
-  return ["Role", "JobDescription", "Repository", "PullRequest", "JiraIssue"].includes(label);
 }
 
 function toggleSetValue(set, value, shouldInclude) {

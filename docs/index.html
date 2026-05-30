@@ -39,7 +39,7 @@
     <section class="toolbar">
       <label class="search">
         <span>Search</span>
-        <input id="search-input" type="search" placeholder="Try Erik Sykora, IFS, Supply Chain, Airflow...">
+        <input id="search-input" type="search" placeholder="Search people, roles, skills, systems, or topics">
       </label>
 
       <div class="toolbar-group">
@@ -87,6 +87,18 @@
         </section>
 
         <section class="filter-section">
+          <h3>Browse Values</h3>
+          <label class="stacked-field">
+            <span>Category</span>
+            <select id="browse-label"></select>
+          </label>
+          <label class="stacked-field">
+            <span>Value</span>
+            <select id="browse-node"></select>
+          </label>
+        </section>
+
+        <section class="filter-section">
           <h3>Relationship Types</h3>
           <div id="relationship-filters" class="toggle-grid compact-grid"></div>
         </section>
@@ -103,7 +115,7 @@
             <div class="legend" id="legend"></div>
           </div>
         </div>
-        <div class="graph-network-wrap">
+        <div id="graph-network-wrap" class="graph-network-wrap">
           <div id="graph-network"></div>
           <div id="graph-resize-handle" class="graph-resize-handle" role="separator" aria-label="Resize graph panel" title="Drag to resize graph"></div>
         </div>

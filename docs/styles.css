@@ -308,6 +308,31 @@ h1 {
   font-size: 0.98rem;
 }
 
+.stacked-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stacked-field + .stacked-field {
+  margin-top: 10px;
+}
+
+.stacked-field span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.stacked-field select {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+}
+
 .toggle-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -404,7 +429,7 @@ h1 {
 .graph-stage {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 235px);
+  min-height: 0;
   overflow: hidden;
 }
 
