@@ -9,7 +9,7 @@
       "GitHub public activity",
       "Synthetic Jira"
     ],
-    "graph_scope": "School MVP knowledge graph with HR baseline plus GitHub and Jira activity",
+    "graph_scope": "Expanded enterprise knowledge graph with organizational context, job descriptions, skills, topics, systems, engineering activity, and project work evidence",
     "node_count": 674,
     "relationship_count": 1108,
     "normalization_rules": "normalization_rules.json",

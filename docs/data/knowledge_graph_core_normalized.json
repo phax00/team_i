@@ -5,7 +5,7 @@
       "Person_Profiles_Linked.verbose_backup.json"
     ],
     "activity_sources_included": [],
-    "graph_scope": "Core enterprise knowledge graph without GitHub or Jira activity",
+    "graph_scope": "Enterprise knowledge graph for organizational structure, job descriptions, skills, topics, systems, and reporting relationships",
     "node_count": 564,
     "relationship_count": 751,
     "normalization_rules": "normalization_rules.json",
