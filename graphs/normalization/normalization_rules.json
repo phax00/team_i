@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "purpose": "Canonical naming rules for graph taxonomy normalization across core and school MVP datasets.",
+    "scope": [
+      "Department",
+      "Skill",
+      "Topic",
+      "System"
+    ],
+    "strategy": "Conservative normalization: only safe aliases and formatting cleanup are merged."
+  },
+  "rules": {
+    "Department": {
+      "aliases": {
+        "HR": "Human Resources"
+      }
+    },
+    "Skill": {
+      "aliases": {
+        "Analytics": "Analytics engineering",
+        "Governance": "Data Governance"
+      }
+    },
+    "Topic": {
+      "aliases": {
+        "HR onboarding": "Employee onboarding",
+        "account-plan": "Account plan",
+        "czech-market": "Czech market",
+        "data-quality": "Data quality",
+        "engineering-change": "Engineering change",
+        "ifs": "IFS",
+        "item-master": "Item master"
+      }
+    },
+    "System": {
+      "aliases": {}
+    }
+  }
+}

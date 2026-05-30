@@ -1,0 +1,27 @@
+[
+  {
+    "Name": "Petra",
+    "Job Title": "HR Director",
+    "Skills": "Strategic Human Resources Leadership, Organizational Design, Global Talent Acquisition, Succession Planning, Compensation Strategies, EEO Compliance, HR Policy Formulation, Positive Employee Relations, Workforce Planning, Change Management, Employee Engagement, Performance Management, HR Analytics, Diversity, Equality, and Inclusion (DEI), Leadership Development, Talent Management, HR Project Management, Human Capital Management, International Mobility, HRIS"
+  },
+  {
+    "Name": "Filip",
+    "Job Title": "IT Director",
+    "Skills": "IT Strategy, IT Governance, Data Governance, ERP Implementations, Change Management, Project Management, Budget Management, Vendor Management, Systems Integration, Business Process Efficiency, Information Security Management, Cloud Computing, Change Management Communications, Service Desk Management, Master Data Management, Audit Management, Supply Chain Software, Training Program Design, Business Intelligence (BI), Contract Management, Process Automation, IT Asset Management, IT Infrastructure Management, Maturity Assessments, Digital Transformation, Metrics Reporting, Meeting Facilitation, Incident Management, License Management, IT Strategic Planning, Cross-functional Team Leadership, Transition Planning, Process Mapping, Demand Planning, Design Workshops, Integration Development, Compliance Reporting, Risk Management, IT Documentation, Report Building"
+  },
+  {
+    "Name": "Marek",
+    "Job Title": "Finance Director",
+    "Skills": "Financial strategy, financial planning & analysis (FP&A), budgeting, forecasting, performance management, controlling, P&L management, balance sheet management, cash flow optimization, treasury management, working capital optimization, consolidation & reporting, tax compliance, audit management, cost optimization, margin improvement, process automation, digital finance tools (ERP, BI), investment analysis, M&A evaluation, risk management, internal controls, stakeholder communication, financial modeling, decision support, financial governance, cross‑functional collaboration, leadership, problem‑solving, strategic thinking."
+  },
+  {
+    "Name": "Tomáš",
+    "Job Title": "Procurement Director",
+    "Skills": "Strategic sourcing, category management, supplier relationship management, contract negotiation, cost optimization, value engineering, risk management, compliance governance, supply market analysis, sustainability in sourcing, procurement policy development, ERP & e‑procurement tools, data‑driven decision‑making, procurement analytics, cross‑functional collaboration, stakeholder management, M&A due diligence, integration planning, digital procurement transformation, process design, financial acumen, communication, global sourcing strategy, project management, innovation management, strategic thinking, adaptability, supplier performance management"
+  },
+  {
+    "Name": "Manuela",
+    "Job Title": "HR Lead",
+    "Skills": "Talent acquisition, workforce planning, employee relations, conflict resolution, employee engagement, HR process development, HR policy implementation, labor law compliance, performance management, coaching managers, change management, cultural integration, HRIS systems, data accuracy, stakeholder communication, negotiation, risk management, problem‑solving, adaptability, resilience, collaboration, people management, organizational development, onboarding, training coordination, health & safety awareness, local labor regulation understanding, decision‑making, process standardization"
+  }
+]

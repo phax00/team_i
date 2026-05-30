@@ -1,0 +1,721 @@
+{
+  "meta": {
+    "generated_at": "2026-05-30T20:08:29Z",
+    "source": "synthetic_jira",
+    "project_keys": [
+      "APP",
+      "DATA",
+      "ENG",
+      "ERP",
+      "MDM",
+      "MKT",
+      "RND",
+      "SALES",
+      "SCM"
+    ],
+    "linked_to_person_profiles": "people/data/Person_Profiles_Lean.json",
+    "note": "Synthetic Jira data for school MVP only. Designed to align with JD-backed employees and topics."
+  },
+  "issues": [
+    {
+      "project_key": "ERP",
+      "issue_key": "ERP-101",
+      "issue_type": "Story",
+      "summary": "Improve IFS purchase order approval flow",
+      "description": "Redesign the approval routing for high-value purchase orders, reduce manual rework, and improve approval visibility for Procurement and Finance users.",
+      "status": "Done",
+      "priority": "High",
+      "assignee_name": "Erik Sykora",
+      "reporter_name": "Tomas Benes",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-07T12:00:00Z",
+      "labels": [
+        "ifs",
+        "procurement",
+        "workflow"
+      ],
+      "components": [
+        "ERP",
+        "Procurement"
+      ],
+      "project_name": "ERP Process Modernization",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "IFS ERP"
+      ],
+      "acceptance_criteria": [
+        "Approval routing follows threshold rules",
+        "Workflow states are visible to requestors",
+        "Exception handling is logged"
+      ],
+      "comments": [
+        {
+          "author_name": "Nina Havel",
+          "created_at": "2026-04-02T10:00:00Z",
+          "body": "Please keep the approval states aligned with the current ERP release constraints."
+        },
+        {
+          "author_name": "Marek Sramek",
+          "created_at": "2026-04-04T09:00:00Z",
+          "body": "Finance needs clear reporting on pending approvals above threshold."
+        }
+      ]
+    },
+    {
+      "project_key": "ERP",
+      "issue_key": "ERP-102",
+      "issue_type": "Task",
+      "summary": "Stabilize ERP user issue triage for receiving and inventory teams",
+      "description": "Create a lightweight triage process for recurring ERP issues from warehouse and inventory users, including categorization, ownership, and escalation logic.",
+      "status": "In Progress",
+      "priority": "Medium",
+      "assignee_name": "Erik Sykora",
+      "reporter_name": "Nina Havel",
+      "created_at": "2026-04-03T08:00:00Z",
+      "updated_at": "2026-04-10T11:00:00Z",
+      "labels": [
+        "ifs",
+        "support",
+        "inventory"
+      ],
+      "components": [
+        "ERP",
+        "Support"
+      ],
+      "project_name": "ERP Process Modernization",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "IFS ERP"
+      ],
+      "acceptance_criteria": [
+        "Issue categories are defined",
+        "Escalation path is documented",
+        "Top recurring issues have clear owners"
+      ],
+      "comments": [
+        {
+          "author_name": "Roman Kolar",
+          "created_at": "2026-04-05T13:00:00Z",
+          "body": "Please capture whether master data quality is part of the issue root cause."
+        }
+      ]
+    },
+    {
+      "project_key": "APP",
+      "issue_key": "APP-201",
+      "issue_type": "Epic",
+      "summary": "Prepare smart factory application rollout for packaging area",
+      "description": "Coordinate the rollout of smart factory applications for packaging performance visibility, operator workflow support, and line-level event capture.",
+      "status": "In Progress",
+      "priority": "High",
+      "assignee_name": "Nina Havel",
+      "reporter_name": "Filip Hruby",
+      "created_at": "2026-04-06T08:00:00Z",
+      "updated_at": "2026-04-21T14:00:00Z",
+      "labels": [
+        "smart-factory",
+        "packaging",
+        "rollout"
+      ],
+      "components": [
+        "Industrial IT",
+        "Packaging"
+      ],
+      "project_name": "Smart Factory Enablement",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "MES",
+        "SCADA",
+        "ERP"
+      ],
+      "acceptance_criteria": [
+        "Packaging pilot scope is agreed",
+        "Key user training plan is ready",
+        "Data flow to reporting is validated"
+      ],
+      "comments": [
+        {
+          "author_name": "Jozef Polak",
+          "created_at": "2026-04-08T10:00:00Z",
+          "body": "The packaging area must stay stable during the rollout window."
+        },
+        {
+          "author_name": "Lucia Benesova",
+          "created_at": "2026-04-09T09:00:00Z",
+          "body": "Please include operator usability feedback before go-live."
+        }
+      ]
+    },
+    {
+      "project_key": "APP",
+      "issue_key": "APP-202",
+      "issue_type": "Story",
+      "summary": "Define application ownership matrix for plant-facing systems",
+      "description": "Clarify ownership for plant-facing applications, including support responsibility, enhancement intake, and release communication across IT and operations.",
+      "status": "Done",
+      "priority": "Medium",
+      "assignee_name": "Nina Havel",
+      "reporter_name": "Filip Hruby",
+      "created_at": "2026-04-11T08:00:00Z",
+      "updated_at": "2026-04-17T10:00:00Z",
+      "labels": [
+        "governance",
+        "applications",
+        "ownership"
+      ],
+      "components": [
+        "Industrial IT",
+        "Governance"
+      ],
+      "project_name": "Smart Factory Enablement",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "MES",
+        "ERP",
+        "shopfloor apps"
+      ],
+      "acceptance_criteria": [
+        "Each application has a named owner",
+        "Support routing is documented",
+        "Enhancement requests follow one intake path"
+      ],
+      "comments": [
+        {
+          "author_name": "Eva Kralikova",
+          "created_at": "2026-04-12T12:00:00Z",
+          "body": "Please make sure plant leadership knows where escalations belong."
+        }
+      ]
+    },
+    {
+      "project_key": "DATA",
+      "issue_key": "DATA-301",
+      "issue_type": "Task",
+      "summary": "Build executive sales dashboard for weekly reviews",
+      "description": "Create a dashboard for weekly sales, margin, and promotion performance reviews across Czech Republic, Slovakia, and Poland.",
+      "status": "In Progress",
+      "priority": "High",
+      "assignee_name": "Barbora Klinec",
+      "reporter_name": "Marek Sramek",
+      "created_at": "2026-04-04T08:00:00Z",
+      "updated_at": "2026-04-19T09:00:00Z",
+      "labels": [
+        "powerbi",
+        "sales",
+        "dashboard"
+      ],
+      "components": [
+        "Analytics",
+        "Finance"
+      ],
+      "project_name": "Commercial Reporting Enablement",
+      "site": "Bratislava",
+      "country": "Slovakia",
+      "linked_systems": [
+        "Power BI",
+        "ERP"
+      ],
+      "acceptance_criteria": [
+        "Market drilldown is included",
+        "Margin logic is aligned with Finance",
+        "Dashboard refresh is automated"
+      ],
+      "comments": [
+        {
+          "author_name": "David Mraz",
+          "created_at": "2026-04-07T10:00:00Z",
+          "body": "We should reuse the existing sales fact table instead of duplicating KPI logic."
+        },
+        {
+          "author_name": "Klara Novak",
+          "created_at": "2026-04-13T11:00:00Z",
+          "body": "Please add promotion performance by key customer group."
+        }
+      ]
+    },
+    {
+      "project_key": "DATA",
+      "issue_key": "DATA-302",
+      "issue_type": "Story",
+      "summary": "Automate finance reporting data quality checks",
+      "description": "Add automated validation checks for finance reporting tables to reduce reconciliation effort and catch schema issues earlier in the pipeline.",
+      "status": "To Do",
+      "priority": "High",
+      "assignee_name": "David Mraz",
+      "reporter_name": "Marek Sramek",
+      "created_at": "2026-04-13T08:00:00Z",
+      "updated_at": "2026-04-13T08:00:00Z",
+      "labels": [
+        "etl",
+        "finance",
+        "data-quality"
+      ],
+      "components": [
+        "Analytics",
+        "Finance"
+      ],
+      "project_name": "Commercial Reporting Enablement",
+      "site": "Bratislava",
+      "country": "Slovakia",
+      "linked_systems": [
+        "SQL Server",
+        "BI data pipelines"
+      ],
+      "acceptance_criteria": [
+        "Validation checks cover key finance tables",
+        "Failures are visible to the BI team",
+        "Finance can review validation outcomes"
+      ],
+      "comments": [
+        {
+          "author_name": "Barbora Klinec",
+          "created_at": "2026-04-14T09:00:00Z",
+          "body": "Let's align the validation rules with the KPI layer, not only the raw tables."
+        }
+      ]
+    },
+    {
+      "project_key": "MDM",
+      "issue_key": "MDM-401",
+      "issue_type": "Story",
+      "summary": "Clean up supplier master ownership and approval flow",
+      "description": "Redesign supplier master data ownership and approval checkpoints so Procurement and Finance can resolve onboarding and change requests faster.",
+      "status": "In Progress",
+      "priority": "High",
+      "assignee_name": "Roman Kolar",
+      "reporter_name": "Tomas Benes",
+      "created_at": "2026-04-05T08:00:00Z",
+      "updated_at": "2026-04-18T13:00:00Z",
+      "labels": [
+        "master-data",
+        "supplier",
+        "governance"
+      ],
+      "components": [
+        "Data Governance",
+        "Procurement"
+      ],
+      "project_name": "Master Data Reliability",
+      "site": "Bratislava",
+      "country": "Slovakia",
+      "linked_systems": [
+        "ERP",
+        "MDM workflows"
+      ],
+      "acceptance_criteria": [
+        "Supplier ownership model is agreed",
+        "Approval checkpoints are documented",
+        "Priority change requests can be tracked"
+      ],
+      "comments": [
+        {
+          "author_name": "Erik Sykora",
+          "created_at": "2026-04-08T12:00:00Z",
+          "body": "Please note which issues are ERP configuration versus pure ownership ambiguity."
+        },
+        {
+          "author_name": "Marek Sramek",
+          "created_at": "2026-04-10T10:00:00Z",
+          "body": "Finance needs clarity on payment-critical supplier attributes."
+        }
+      ]
+    },
+    {
+      "project_key": "MDM",
+      "issue_key": "MDM-402",
+      "issue_type": "Task",
+      "summary": "Review item master quality for planning-critical SKUs",
+      "description": "Analyze recurring planning disruptions caused by incomplete or inconsistent item master data and define the first remediation wave.",
+      "status": "Done",
+      "priority": "Medium",
+      "assignee_name": "Roman Kolar",
+      "reporter_name": "Veronika Duda",
+      "created_at": "2026-04-08T08:00:00Z",
+      "updated_at": "2026-04-14T14:00:00Z",
+      "labels": [
+        "master-data",
+        "planning",
+        "item-master"
+      ],
+      "components": [
+        "Data Governance",
+        "Supply Chain"
+      ],
+      "project_name": "Master Data Reliability",
+      "site": "Bratislava",
+      "country": "Slovakia",
+      "linked_systems": [
+        "ERP",
+        "planning tools"
+      ],
+      "acceptance_criteria": [
+        "Priority SKU list is reviewed",
+        "Critical gaps are categorized",
+        "Remediation ownership is assigned"
+      ],
+      "comments": [
+        {
+          "author_name": "Martin Pospisil",
+          "created_at": "2026-04-11T11:00:00Z",
+          "body": "Please prioritize items that drive the largest schedule instability."
+        }
+      ]
+    },
+    {
+      "project_key": "ENG",
+      "issue_key": "ENG-501",
+      "issue_type": "Bug",
+      "summary": "Reduce recurring line stoppages on tofu packaging line",
+      "description": "Investigate repeated stoppages on the packaging line, identify the root cause, and implement technical changes to improve uptime.",
+      "status": "To Do",
+      "priority": "Highest",
+      "assignee_name": "Lucia Benesova",
+      "reporter_name": "Michal Hronec",
+      "created_at": "2026-04-02T08:00:00Z",
+      "updated_at": "2026-04-02T08:00:00Z",
+      "labels": [
+        "packaging",
+        "uptime",
+        "root-cause"
+      ],
+      "components": [
+        "Engineering",
+        "Production"
+      ],
+      "project_name": "Packaging Stability Improvement",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "maintenance planning",
+        "engineering documentation"
+      ],
+      "acceptance_criteria": [
+        "Root cause is documented",
+        "Countermeasure is implemented",
+        "Downtime recurrence decreases over the next two weeks"
+      ],
+      "comments": [
+        {
+          "author_name": "Andrej Varga",
+          "created_at": "2026-04-03T09:00:00Z",
+          "body": "We should compare events before and after the last changeover adjustment."
+        }
+      ]
+    },
+    {
+      "project_key": "ENG",
+      "issue_key": "ENG-502",
+      "issue_type": "Story",
+      "summary": "Standardize engineering change handover after line modifications",
+      "description": "Create a cleaner handover process after engineering changes so Production, Quality, and Maintenance have the right documentation and follow-up actions.",
+      "status": "In Progress",
+      "priority": "Medium",
+      "assignee_name": "Lucia Benesova",
+      "reporter_name": "Michal Hronec",
+      "created_at": "2026-04-10T08:00:00Z",
+      "updated_at": "2026-04-22T10:00:00Z",
+      "labels": [
+        "engineering-change",
+        "handover",
+        "documentation"
+      ],
+      "components": [
+        "Engineering",
+        "Governance"
+      ],
+      "project_name": "Packaging Stability Improvement",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "engineering documentation"
+      ],
+      "acceptance_criteria": [
+        "Handover checklist is defined",
+        "Required documentation is standardized",
+        "Quality and Production sign-off is included"
+      ],
+      "comments": [
+        {
+          "author_name": "Katarina Urban",
+          "created_at": "2026-04-13T10:00:00Z",
+          "body": "Please include a quality verification step for process-affecting changes."
+        },
+        {
+          "author_name": "Jozef Polak",
+          "created_at": "2026-04-15T12:00:00Z",
+          "body": "The handover cannot slow down urgent plant modifications too much."
+        }
+      ]
+    },
+    {
+      "project_key": "ENG",
+      "issue_key": "ENG-503",
+      "issue_type": "Task",
+      "summary": "Validate process settings for new packaging material trial",
+      "description": "Support the packaging trial by validating line settings, documenting observed issues, and recommending adjustments before the next run.",
+      "status": "Done",
+      "priority": "Medium",
+      "assignee_name": "Andrej Varga",
+      "reporter_name": "Lucia Benesova",
+      "created_at": "2026-04-16T08:00:00Z",
+      "updated_at": "2026-04-20T13:00:00Z",
+      "labels": [
+        "trial",
+        "validation",
+        "packaging"
+      ],
+      "components": [
+        "Engineering",
+        "Production"
+      ],
+      "project_name": "Packaging Stability Improvement",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "process tracking",
+        "automation interfaces"
+      ],
+      "acceptance_criteria": [
+        "Trial settings are documented",
+        "Observed issues are categorized",
+        "Recommended next-step adjustments are defined"
+      ],
+      "comments": [
+        {
+          "author_name": "Michal Hronec",
+          "created_at": "2026-04-17T11:00:00Z",
+          "body": "Please compare the trial output to baseline stability, not only output speed."
+        }
+      ]
+    },
+    {
+      "project_key": "SCM",
+      "issue_key": "SCM-601",
+      "issue_type": "Story",
+      "summary": "Stabilize weekly production planning freeze window",
+      "description": "Introduce a more disciplined weekly planning freeze window to reduce late production changes and improve execution stability across planning and plant teams.",
+      "status": "In Progress",
+      "priority": "High",
+      "assignee_name": "Veronika Duda",
+      "reporter_name": "Martin Pospisil",
+      "created_at": "2026-04-07T08:00:00Z",
+      "updated_at": "2026-04-19T14:00:00Z",
+      "labels": [
+        "planning",
+        "freeze-window",
+        "schedule"
+      ],
+      "components": [
+        "Supply Chain",
+        "Production Planning"
+      ],
+      "project_name": "Planning Maturity Improvement",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "planning tools",
+        "ERP"
+      ],
+      "acceptance_criteria": [
+        "Freeze window policy is defined",
+        "Escalation path for urgent changes is documented",
+        "Schedule adherence impact can be tracked"
+      ],
+      "comments": [
+        {
+          "author_name": "Jozef Polak",
+          "created_at": "2026-04-09T11:00:00Z",
+          "body": "We need a practical exception path for true production emergencies."
+        },
+        {
+          "author_name": "Klara Novak",
+          "created_at": "2026-04-11T09:00:00Z",
+          "body": "Commercial needs clarity on which late requests can still be accepted."
+        }
+      ]
+    },
+    {
+      "project_key": "SCM",
+      "issue_key": "SCM-602",
+      "issue_type": "Task",
+      "summary": "Review service-risk items before Poland promotion wave",
+      "description": "Coordinate a pre-promotion planning review for items with elevated supply risk ahead of the Poland modern trade promotional period.",
+      "status": "To Do",
+      "priority": "High",
+      "assignee_name": "Veronika Duda",
+      "reporter_name": "Marta Zielinska",
+      "created_at": "2026-04-19T08:00:00Z",
+      "updated_at": "2026-04-19T08:00:00Z",
+      "labels": [
+        "promotion",
+        "planning",
+        "service-risk"
+      ],
+      "components": [
+        "Supply Chain",
+        "Commercial"
+      ],
+      "project_name": "Planning Maturity Improvement",
+      "site": "Banska Bystrica",
+      "country": "Slovakia",
+      "linked_systems": [
+        "planning tools",
+        "ERP"
+      ],
+      "acceptance_criteria": [
+        "Risk item list is agreed",
+        "Escalation owners are defined",
+        "Commercial receives a clear risk summary"
+      ],
+      "comments": [
+        {
+          "author_name": "Martin Pospisil",
+          "created_at": "2026-04-20T10:00:00Z",
+          "body": "Please focus on items with both constrained capacity and high promotional sensitivity."
+        }
+      ]
+    },
+    {
+      "project_key": "RND",
+      "issue_key": "RND-701",
+      "issue_type": "Story",
+      "summary": "Improve launch readiness review for new product introduction",
+      "description": "Strengthen the launch readiness review process so R&D, Quality, Operations, and Marketing align earlier on technical, packaging, and execution constraints.",
+      "status": "In Progress",
+      "priority": "Medium",
+      "assignee_name": "Saskia de Vries",
+      "reporter_name": "Julia Hartmann",
+      "created_at": "2026-04-12T08:00:00Z",
+      "updated_at": "2026-04-25T12:00:00Z",
+      "labels": [
+        "launch",
+        "innovation",
+        "readiness"
+      ],
+      "components": [
+        "R&D",
+        "Marketing"
+      ],
+      "project_name": "Innovation Delivery Discipline",
+      "site": "Landgraaf",
+      "country": "Netherlands",
+      "linked_systems": [
+        "innovation portfolio tracking",
+        "product lifecycle files"
+      ],
+      "acceptance_criteria": [
+        "Review inputs are standardized",
+        "Cross-functional sign-off criteria are documented",
+        "Launch blockers are escalated earlier"
+      ],
+      "comments": [
+        {
+          "author_name": "Katarina Urban",
+          "created_at": "2026-04-14T13:00:00Z",
+          "body": "Quality needs visibility before final launch packaging decisions are locked."
+        },
+        {
+          "author_name": "Eva Kralikova",
+          "created_at": "2026-04-16T10:00:00Z",
+          "body": "Operations should only join the review when actionable decisions are needed."
+        }
+      ]
+    },
+    {
+      "project_key": "MKT",
+      "issue_key": "MKT-801",
+      "issue_type": "Task",
+      "summary": "Localize central campaign assets for Romania summer activation",
+      "description": "Adapt central brand assets and campaign messaging for the Romania summer retail activation and align execution timing with local commercial needs.",
+      "status": "Done",
+      "priority": "Medium",
+      "assignee_name": "Andreea Popescu",
+      "reporter_name": "Julia Hartmann",
+      "created_at": "2026-04-15T08:00:00Z",
+      "updated_at": "2026-04-21T11:00:00Z",
+      "labels": [
+        "campaign",
+        "localization",
+        "romania"
+      ],
+      "components": [
+        "Marketing",
+        "Commercial"
+      ],
+      "project_name": "Local Market Activation",
+      "site": "Bucharest",
+      "country": "Romania",
+      "linked_systems": [
+        "campaign calendars",
+        "asset libraries"
+      ],
+      "acceptance_criteria": [
+        "Core assets are localized",
+        "Retail timing is aligned with local teams",
+        "Market-specific messaging is approved"
+      ],
+      "comments": [
+        {
+          "author_name": "Radu Ionescu",
+          "created_at": "2026-04-17T09:00:00Z",
+          "body": "Please keep the messaging useful for retail activation, not just brand consistency."
+        },
+        {
+          "author_name": "Klara Novak",
+          "created_at": "2026-04-18T10:00:00Z",
+          "body": "A short summary of retail-facing differences would help other markets too."
+        }
+      ]
+    },
+    {
+      "project_key": "SALES",
+      "issue_key": "SALES-901",
+      "issue_type": "Story",
+      "summary": "Prepare account growth plan for Czech key retail customer",
+      "description": "Build a customer growth plan combining pricing, assortment, promotion timing, and service risk assumptions for a major Czech retail account.",
+      "status": "In Progress",
+      "priority": "Medium",
+      "assignee_name": "Klara Novak",
+      "reporter_name": "Daniel Richter",
+      "created_at": "2026-04-18T08:00:00Z",
+      "updated_at": "2026-04-26T13:00:00Z",
+      "labels": [
+        "account-plan",
+        "czech-market",
+        "retail"
+      ],
+      "components": [
+        "Commercial",
+        "Sales"
+      ],
+      "project_name": "Account Planning Excellence",
+      "site": "Brno",
+      "country": "Czech Republic",
+      "linked_systems": [
+        "CRM",
+        "sales dashboards"
+      ],
+      "acceptance_criteria": [
+        "Growth assumptions are documented",
+        "Promotion timing is aligned",
+        "Service risks are visible to the customer team"
+      ],
+      "comments": [
+        {
+          "author_name": "Veronika Duda",
+          "created_at": "2026-04-20T09:00:00Z",
+          "body": "We need better visibility on customer requests that break the planning freeze window."
+        },
+        {
+          "author_name": "Julia Hartmann",
+          "created_at": "2026-04-22T12:00:00Z",
+          "body": "Please connect this with the next central campaign timing."
+        }
+      ]
+    }
+  ]
+}

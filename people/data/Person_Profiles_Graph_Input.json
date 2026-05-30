@@ -1,0 +1,2160 @@
+{
+  "meta": {
+    "purpose": "Graph input person profiles where JD-backed fields are materialized from JD_Catalog.json.",
+    "resolution_rule": "Role, location, reporting baseline, and technical baseline are copied from the linked JD document.",
+    "source_files": {
+      "lean_profiles": "people/data/Person_Profiles_Lean.json",
+      "jd_catalog": "job_descriptions/catalog/JD_Catalog.json"
+    },
+    "dataset_summary": {
+      "total_people": 32,
+      "resolved_from_jd": 24,
+      "org_support_people": 8
+    }
+  },
+  "people": [
+    {
+      "name": "Anna Weber",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": null,
+      "team": "Executive Leadership",
+      "primary_topics": [
+        "company strategy",
+        "portfolio priorities",
+        "executive decision making"
+      ],
+      "skills_person_specific": [
+        "enterprise strategy",
+        "growth leadership",
+        "stakeholder management"
+      ],
+      "systems_known": [
+        "executive reporting"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Chief Executive Officer",
+      "site": "Wien HQ",
+      "country": "Austria"
+    },
+    {
+      "name": "Lukas Steiner",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Executive Leadership",
+      "primary_topics": [
+        "group budgeting",
+        "financial governance",
+        "investment approvals"
+      ],
+      "skills_person_specific": [
+        "financial governance",
+        "budget steering",
+        "risk management"
+      ],
+      "systems_known": [
+        "ERP",
+        "BI"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Chief Financial Officer",
+      "site": "Wien HQ",
+      "country": "Austria"
+    },
+    {
+      "name": "Petra Novakova",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/source_docs/Job Descriptions/HR Director.docx",
+      "manager_name": "Lukas Steiner",
+      "team": "Group HR",
+      "primary_topics": [
+        "group HR policy",
+        "talent strategy",
+        "people governance"
+      ],
+      "skills_person_specific": [
+        "organizational design",
+        "talent acquisition",
+        "succession planning",
+        "HR analytics",
+        "change management",
+        "performance management"
+      ],
+      "systems_known": [
+        "HRIS",
+        "ATS",
+        "SharePoint"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "HR Director/ Head of HR",
+      "department_from_jd": "HR",
+      "location_from_jd": "Group / Multi-site (Europe HQ with frequent travel to production sites and sales subsidiaries)",
+      "reports_to_from_jd": "Chief Financial Officer",
+      "direct_reports_from_jd": "3-5 Country HR Leads and HR Experts; total org span 11–50 FTE across countries/sites",
+      "role_level_from_jd": "Enterprise/Group (Top Leadership Level – Director)",
+      "technical_skills_baseline_from_jd": [
+        "HR Strategy & Org Design — Expert",
+        "Talent Acquisition & Workforce Planning — Expert",
+        "Compensation & Benefits Design — Advanced",
+        "Employee/Labor Relations (EU) — Advanced",
+        "HRIS/People Analytics — Advanced",
+        "Learning & Leadership Development — Advanced",
+        "Change Management & Communications — Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "End-to-end understanding of plant and commercial operations in FMCG/food production; familiarity with BRC/IFS-driven environments and their HR implications; strong financial acumen (workforce cost modeling, productivity, ROI on People initiatives); experience navigating multi-entity, acquisition-driven environments.",
+      "jd_role_summary": "Leads the Group HR function with enterprise-wide impact on policies, standards, and people outcomes across all production sites and offices. Sets the People strategy to enable high growth, M&A integration, and culture harmonization in a dynamic, fast-paced environment—building scalable processes from the ground up while safeguarding compliance and workforce engagement.",
+      "jd_key_responsibilities": [
+        {
+          "title": "People Strategy & Governance",
+          "description": "Define and execute the Group People strategy (workforce planning, org design, culture, DEI) aligned to company growth and M&A roadmap to drive capability, engagement, and productivity."
+        },
+        {
+          "title": "Talent Acquisition & Employer Brand",
+          "description": "Lead TA across countries to meet ramp-up needs; reduce time-to-fill and improve quality-of-hire; steward Group employer brand and partnerships."
+        },
+        {
+          "title": "Total Rewards & Performance",
+          "description": "Own Group C&B frameworks (base pay, incentives, benefits) and performance management; ensure external competitiveness, internal equity, and pay-for-performance discipline."
+        },
+        {
+          "title": "HR Operations & Systems",
+          "description": "Standardize HR policies, employee lifecycle processes, and HRIS/data across sites; deliver reliable payroll interfaces and self-service; drive data integrity and People analytics."
+        },
+        {
+          "title": "Learning, Leadership & Culture",
+          "description": "Build L&D architecture (onboarding, technical/plant training, leadership academies) to support safety, quality, and continuous improvement; accelerate manager capability."
+        },
+        {
+          "title": "M&A and Integration",
+          "description": "Lead HR due diligence, integration planning, and post-close harmonization (policies, grades, benefits, culture) to protect continuity and realize synergies."
+        },
+        {
+          "title": "Employee Relations & Compliance",
+          "description": "Ensure compliant ER practices across jurisdictions (works councils/unions where present), health & safety collaboration, and audit readiness; mitigate labor risk."
+        },
+        {
+          "title": "Stakeholder Leadership & Change",
+          "description": "Advise Executives and Senior Leaders; lead change communications and organization-wide initiatives (e.g., org redesign, restructures, new site start-ups)."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/source_docs/Job Descriptions/HR Director.docx"
+    },
+    {
+      "name": "Filip Hruby",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/source_docs/Job Descriptions/IT Director.docx",
+      "manager_name": "Lukas Steiner",
+      "team": "Group IT",
+      "primary_topics": [
+        "group IT strategy",
+        "application portfolio",
+        "data governance"
+      ],
+      "skills_person_specific": [
+        "IT strategy",
+        "enterprise architecture",
+        "systems integration",
+        "cloud computing",
+        "information security"
+      ],
+      "systems_known": [
+        "ERP",
+        "Azure",
+        "BI platform",
+        "identity management"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "IT Director / Head of IT",
+      "department_from_jd": "Information Technology (Digital & Systems)",
+      "location_from_jd": "Multi-site (Europe HQ with frequent travel to production sites and sales subsidiaries)",
+      "reports_to_from_jd": "Chief Financial Officer",
+      "direct_reports_from_jd": "5–8 Country IT Leads and IT Experts; total org span 11–50 FTE across countries/sites",
+      "role_level_from_jd": "Enterprise (Senior Leadership Level)",
+      "technical_skills_baseline_from_jd": [
+        "IT Strategy & Enterprise Architecture — Expert",
+        "Cybersecurity & Risk Management — Advanced",
+        "ERP/MES/WMS Platforms (e.g., SAP, Microsoft Dynamics, Infor; MES/SCADA) — Advanced",
+        "Cloud & Infrastructure (Azure/AWS, identity, networking) — Advanced",
+        "Data Platform & Integration (ETL/iPaaS, APIs, MDM) — Advanced",
+        "Portfolio/Program Management — Advanced",
+        "ITIL Service Management — Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "End-to-end understanding of manufacturing and supply chain processes (plan/make/move/sell), commercial applications, and compliance contexts; financial acumen for business cases and TCO; experience in multi-entity, acquisition-driven environments.",
+      "jd_role_summary": "Leads the IT function with enterprise-wide impact on technology strategy, policies, and platforms across all production sites and offices. Builds a scalable, secure, and data-enabled technology foundation to support high growth, M&A integration, and continuous improvement—standardizing the core stack while enabling local agility.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Technology Strategy & Governance",
+          "description": "Define the IT strategy and operating model (architecture principles, standards, service catalog, SLAs, RACI) aligned with business growth and M&A roadmap."
+        },
+        {
+          "title": "Enterprise Architecture & Roadmaps",
+          "description": "Set target architecture for core platforms (ERP, MES/SCADA, WMS/TMS, CRM, HRIS, Data/ Analytics) and lead multi-year modernization and consolidation roadmaps."
+        },
+        {
+          "title": "Cybersecurity & Risk",
+          "description": "Establish enterprise security policies and controls (e.g., ISO 27001/NIST-aligned), manage risk assessments, incident response, and audit readiness across IT/OT environments."
+        },
+        {
+          "title": "Applications & Data Enablement",
+          "description": "Govern application portfolio, master data, and integration patterns; enable analytics, automation, and AI/ML through a governed data platform and KPI suite."
+        },
+        {
+          "title": "Infrastructure & Connectivity",
+          "description": "Standardize networks, identity & access, end-user services, and cloud/on‑prem hybrid infrastructure; ensure resilience, performance, disaster recovery (DR) and business continuity (BCP), and cost efficiency."
+        },
+        {
+          "title": "M&A and Integration",
+          "description": "Lead IT due diligence, Day‑1 readiness, and post-close integration (systems, data, cyber, infrastructure) to minimize business disruption and realize synergies."
+        },
+        {
+          "title": "Vendor & Portfolio Management",
+          "description": "Own strategic vendor selection, contracts, and performance; prioritize and steer the IT project/program portfolio to deliver value on time and budget."
+        },
+        {
+          "title": "Change Leadership & Stakeholder Management",
+          "description": "Advise executives and site leaders; drive change communications, adoption, and training for technology-enabled transformations."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "platform uptime & incident MTTR, cyber posture/controls coverage, on-time/on-budget delivery, ERP/MES rollout milestones, integration cycle time, cost-to-serve per user/site, audit findings, data quality SLAs."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/source_docs/Job Descriptions/IT Director.docx"
+    },
+    {
+      "name": "Marek Sramek",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/source_docs/Job Descriptions/Finance Director.docx",
+      "manager_name": "Lukas Steiner",
+      "team": "Group Finance",
+      "primary_topics": [
+        "group financial planning",
+        "budget governance",
+        "performance reviews"
+      ],
+      "skills_person_specific": [
+        "FP&A",
+        "budgeting",
+        "forecasting",
+        "controlling",
+        "cash flow management",
+        "financial governance"
+      ],
+      "systems_known": [
+        "ERP",
+        "BI",
+        "consolidation tools"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Finance Director / Head of Finance",
+      "department_from_jd": "Finance",
+      "location_from_jd": "Enterprise / Multi-site (Europe HQ with regular travel to production sites and sales subsidiaries)",
+      "reports_to_from_jd": "Chief Financial Officer",
+      "direct_reports_from_jd": "3–6 Finance Leads (e.g., Country Finance Leads, Group Accounting Lead, FP&A Lead, Tax & Treasury Lead); total org span 11–50 FTE across countries/sites",
+      "role_level_from_jd": "Enterprise (Senior Leadership Level – Director)",
+      "technical_skills_baseline_from_jd": [
+        "Financial Planning & Analysis (FP&A) — Expert",
+        "Group Accounting & Consolidation — Expert",
+        "Controlling & Performance Management — Advanced",
+        "Tax & Treasury — Advanced",
+        "Financial Risk Management & Internal Controls — Advanced",
+        "Finance Systems & Digitalization (ERP, consolidation tools, BI) — Advanced",
+        "M&A and Investment Analysis — Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of manufacturing and supply chain economics (plants, inventory, logistics), commercial models (pricing, trade terms, channel margins), and industry dynamics in FMCG/food; solid knowledge of multi‑entity and multi‑country structures, including implications for tax, transfer pricing, and reporting.",
+      "jd_role_summary": "Leads the Finance function with enterprise-wide responsibility for financial strategy, performance management, and control across all entities. Designs and builds scalable finance capabilities (processes, systems, governance) to support high growth, M&A integration, and continuous improvement, while safeguarding liquidity, compliance, and value creation.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Financial Strategy & Planning",
+          "description": "Lead the development of financial strategies, long‑term plans, budgets, and forecasts to support business objectives and growth ambitions across the group."
+        },
+        {
+          "title": "Performance Management & Controlling",
+          "description": "Lead financial performance management (P&L, balance sheet, cash, capex) across plants and commercial entities; analyze variances versus budget/forecast and drive corrective actions with business leaders."
+        },
+        {
+          "title": "Cash Flow, Funding & Treasury",
+          "description": "Lead cash flow planning, working capital optimization, and treasury activities; ensure adequate liquidity, efficient use of capital, and compliance with financing covenants."
+        },
+        {
+          "title": "Financial Reporting & Consolidation",
+          "description": "Lead timely and accurate monthly, quarterly, and annual reporting; oversee consolidation of financial statements for all legal entities in line with applicable accounting standards."
+        },
+        {
+          "title": "Compliance, Tax & Audit",
+          "description": "Ensure compliance with legal, tax, and regulatory requirements as well as applicable accounting frameworks; lead interactions with external auditors, tax advisors, regulatory authorities, and financial institutions."
+        },
+        {
+          "title": "Cost & Process Optimization",
+          "description": "Identify and lead cost optimization, margin improvement, and efficiency initiatives; drive automation and digitalization of end‑to‑end finance processes (P2P, O2C, R2R)."
+        },
+        {
+          "title": "Decision Support & Investment Analysis",
+          "description": "Provide financial analysis and recommendations to the Executive Team and senior leaders; evaluate investment opportunities, business cases, and M&A transactions, including ROI and risk/return trade‑offs."
+        },
+        {
+          "title": "Risk Management & Internal Controls",
+          "description": "Lead identification, assessment, and management of financial risks; design and maintain internal control frameworks and contingency plans to protect company assets and ensure stability."
+        },
+        {
+          "title": "Team Leadership & Cross-functional Collaboration",
+          "description": "Lead, develop, and coach Finance Leads and teams across countries; ensure effective collaboration between finance and other functions (Operations, Supply Chain, Sales, HR, IT) to enable informed decision‑making."
+        },
+        {
+          "title": "Investor & Stakeholder Communication (if applicable)",
+          "description": "Lead preparation of financial materials for presentations to investors, shareholders, banks, and other external stakeholders, ensuring transparency and consistency of financial information."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "revenue and margin performance vs. plan, working capital and cash conversion, forecast accuracy, cost savings and productivity gains, audit findings, on‑time closing, automation/digitalization milestones, return on investments."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/source_docs/Job Descriptions/Finance Director.docx"
+    },
+    {
+      "name": "Tomas Benes",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/source_docs/Job Descriptions/Procurement Director.docx",
+      "manager_name": "Anna Weber",
+      "team": "Group Procurement",
+      "primary_topics": [
+        "group sourcing strategy",
+        "supplier governance",
+        "procurement policy"
+      ],
+      "skills_person_specific": [
+        "strategic sourcing",
+        "category management",
+        "supplier negotiations",
+        "cost optimization",
+        "risk management",
+        "procurement analytics"
+      ],
+      "systems_known": [
+        "ERP",
+        "e-procurement tools"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Head of Procurement / Procurement Director",
+      "department_from_jd": "Procurement & Supply Chain",
+      "location_from_jd": "Group (covering all production sites and sales subsidiaries)",
+      "reports_to_from_jd": "CEO",
+      "direct_reports_from_jd": "Strategic Buyers",
+      "role_level_from_jd": "Group",
+      "technical_skills_baseline_from_jd": [],
+      "business_knowledge_baseline_from_jd": "",
+      "jd_role_summary": "Leads the Group’s strategic procurement function, defining sourcing strategies, supplier partnerships, and risk management frameworks to ensure long-term competitiveness and sustainability. This role focuses on building procurement capabilities, driving cost optimization, and supporting growth initiatives such as M&A and new product development, rather than day-to-day operational purchasing.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Develop Group Procurement Strategy",
+          "description": "Design and implement long-term sourcing strategies aligned with business growth, sustainability, and cost-efficiency objectives."
+        },
+        {
+          "title": "Supplier Portfolio Management",
+          "description": "Establish and maintain strategic partnerships with global and regional suppliers to secure innovation, quality, and supply continuity."
+        },
+        {
+          "title": "Risk & Compliance Governance",
+          "description": "Define procurement policies and risk management frameworks to ensure compliance with regulatory and certification standards (e.g., BRC, IFS)."
+        },
+        {
+          "title": "Cost Optimization & Value Creation",
+          "description": "Drive initiatives for cost reduction, process efficiency, and value-added supplier collaboration across all categories."
+        },
+        {
+          "title": "Support Growth & M&A Integration",
+          "description": "Lead procurement due diligence and integration planning for acquisitions and new business units."
+        },
+        {
+          "title": "Digital Transformation",
+          "description": "Implement advanced procurement tools (ERP, e-sourcing platforms) to enhance transparency, analytics, and decision-making."
+        },
+        {
+          "title": "Cross-functional Leadership",
+          "description": "Collaborate with Operations, Finance, Quality, and R&D to align procurement strategies with production excellence and innovation goals."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/source_docs/Job Descriptions/Procurement Director.docx"
+    },
+    {
+      "name": "Eva Kralikova",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Chief Operating Officer.docx",
+      "manager_name": "Anna Weber",
+      "team": "Operations Leadership",
+      "primary_topics": [
+        "group operations",
+        "plant performance",
+        "operating model"
+      ],
+      "skills_person_specific": [
+        "operations leadership",
+        "manufacturing governance",
+        "supply chain coordination",
+        "cross-site alignment"
+      ],
+      "systems_known": [
+        "executive reporting",
+        "operations dashboards"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Chief Operating Officer",
+      "department_from_jd": "Operations / Manufacturing Leadership",
+      "location_from_jd": "Group / Multi-site (Europe HQ with frequent travel to production sites and sales subsidiaries)",
+      "reports_to_from_jd": "Chief Executive Officer",
+      "direct_reports_from_jd": "Plant Director, Group Supply Chain Director, Head of Group Quality, senior operations leaders across sites",
+      "role_level_from_jd": "Enterprise/Group (Executive Leadership Level)",
+      "technical_skills_baseline_from_jd": [
+        "Operations Strategy & Governance - Expert",
+        "Multi-site Manufacturing Leadership - Expert",
+        "Performance Management & KPI Steering - Advanced",
+        "Continuous Improvement & Operational Excellence - Advanced",
+        "Capacity, Cost, and Service Trade-off Management - Advanced",
+        "Capex Prioritization & Transformation Delivery - Advanced",
+        "M&A Integration in Operations - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of plant operations, network planning, service models, procurement dependencies, and the cost/service implications of operational choices in a multi-entity environment.",
+      "jd_role_summary": "Leads the Group Operations agenda across manufacturing, supply chain execution, quality coordination, and operational transformation. Shapes the operating model needed for scale, resilience, and continuous improvement while aligning plant performance, service levels, and investment priorities with the company's growth ambitions.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Operations Strategy & Performance",
+          "description": "Define and execute the Group operations strategy across plants and fulfillment activities; set the performance cadence, target metrics, and management routines that align local execution with enterprise goals."
+        },
+        {
+          "title": "Plant Governance",
+          "description": "Oversee plant leadership across sites; ensure safe, stable, and efficient manufacturing operations, clear accountability, and disciplined escalation of production, labor, quality, and continuity issues."
+        },
+        {
+          "title": "Supply and Service Alignment",
+          "description": "Coordinate with Supply Chain, Procurement, Commercial, and Finance to balance service, cost, inventory, and capacity trade-offs in support of business priorities."
+        },
+        {
+          "title": "Operational Excellence",
+          "description": "Lead continuous improvement programs focused on throughput, waste reduction, labor productivity, planning discipline, and process standardization across the network."
+        },
+        {
+          "title": "Quality & Compliance Coordination",
+          "description": "Ensure that quality, food safety, and operational compliance expectations are embedded into the operating model and consistently executed across sites."
+        },
+        {
+          "title": "Capex & Transformation Prioritization",
+          "description": "Steer plant and operations investment priorities, including automation, expansion, asset replacement, and site improvement programs, to maximize business value and resilience."
+        },
+        {
+          "title": "M&A and Integration",
+          "description": "Lead the operations workstream for acquisitions and integrations, including Day-1 readiness, manufacturing continuity, footprint alignment, and synergy execution."
+        },
+        {
+          "title": "Leadership & Change",
+          "description": "Coach senior operations leaders, drive cross-site collaboration, and reinforce a culture of ownership, pace, and fact-based decision-making."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "OTIF/service level, plant OEE, yield and waste, labor productivity, inventory health, quality incidents, safety metrics, capex delivery, and cost-to-serve."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Chief Operating Officer.docx"
+    },
+    {
+      "name": "Jozef Polak",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Plant Director.docx",
+      "manager_name": "Eva Kralikova",
+      "team": "Plant Leadership",
+      "primary_topics": [
+        "site operations",
+        "plant escalation",
+        "production performance"
+      ],
+      "skills_person_specific": [
+        "plant leadership",
+        "production governance",
+        "quality escalation",
+        "operations planning"
+      ],
+      "systems_known": [
+        "plant KPIs",
+        "operations reports"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Plant Director",
+      "department_from_jd": "Operations / Manufacturing",
+      "location_from_jd": "Banska Bystrica, Slovakia",
+      "reports_to_from_jd": "Chief Operating Officer",
+      "direct_reports_from_jd": "Production Manager, Head of Engineering and Reliability, local Quality and Logistics leadership, selected support managers",
+      "role_level_from_jd": "Site Leadership Level - Director",
+      "technical_skills_baseline_from_jd": [
+        "Plant Operations Leadership - Expert",
+        "Production Performance Management - Advanced",
+        "Quality, Food Safety, and Compliance Coordination - Advanced",
+        "Labor & Resource Planning - Advanced",
+        "Operational Escalation & Continuity Management - Advanced",
+        "Continuous Improvement - Advanced",
+        "Budget & Cost Awareness - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of plant economics, labor constraints, production scheduling, quality impact, and operational trade-offs within a larger multi-site organization.",
+      "jd_role_summary": "Leads the end-to-end performance of the plant, ensuring safe, efficient, and compliant production while coordinating people, assets, planning, quality, and support functions. Owns the local operating rhythm and translates Group priorities into disciplined plant execution.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Plant Performance Leadership",
+          "description": "Lead day-to-day and medium-term plant performance across production, quality, engineering, logistics, and people coordination; ensure stable execution against output, service, and cost targets."
+        },
+        {
+          "title": "Production & Resource Coordination",
+          "description": "Coordinate production plans, labor deployment, asset availability, and operational priorities to deliver a reliable manufacturing schedule."
+        },
+        {
+          "title": "Safety, Quality & Compliance",
+          "description": "Ensure that food safety, quality, and operational compliance requirements are embedded into daily routines and escalated quickly when risk emerges."
+        },
+        {
+          "title": "Operational Escalation Management",
+          "description": "Own the plant response to major disruptions, including equipment downtime, staffing constraints, quality incidents, and supply interruptions."
+        },
+        {
+          "title": "Continuous Improvement",
+          "description": "Drive site-level improvement initiatives in yield, throughput, waste, labor productivity, planning discipline, and standard work."
+        },
+        {
+          "title": "Cross-functional Execution",
+          "description": "Work closely with Supply Chain, Engineering, Quality, HR, Finance, and IT to ensure that plant needs are visible and translated into practical action."
+        },
+        {
+          "title": "Budget & Asset Stewardship",
+          "description": "Manage local budget areas, operating expenses, and plant asset priorities in line with approved plans and performance expectations."
+        },
+        {
+          "title": "People Leadership",
+          "description": "Lead and develop the site leadership team; establish clarity, accountability, and a strong execution culture across the plant."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "OEE, schedule attainment, yield, waste, labor productivity, safety metrics, quality deviations, service performance, and local cost performance."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Plant Director.docx"
+    },
+    {
+      "name": "Michal Hronec",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Engineering and Reliability.docx",
+      "manager_name": "Jozef Polak",
+      "team": "Engineering and Reliability",
+      "primary_topics": [
+        "line reliability",
+        "maintenance governance",
+        "engineering roadmap"
+      ],
+      "skills_person_specific": [
+        "reliability engineering",
+        "maintenance strategy",
+        "capex planning",
+        "process improvement",
+        "root cause analysis"
+      ],
+      "systems_known": [
+        "maintenance planning",
+        "asset registers",
+        "engineering documentation"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Head of Engineering and Reliability",
+      "department_from_jd": "Engineering / Reliability / Technical Operations",
+      "location_from_jd": "Banska Bystrica, Slovakia",
+      "reports_to_from_jd": "Plant Director",
+      "direct_reports_from_jd": "Project and Process Engineers, maintenance planning specialists, selected technical experts",
+      "role_level_from_jd": "Site Leadership Level - Head",
+      "technical_skills_baseline_from_jd": [
+        "Reliability Engineering - Expert",
+        "Maintenance Strategy & Asset Health - Advanced",
+        "Process Improvement & Technical Problem Solving - Advanced",
+        "Engineering Change Control - Advanced",
+        "Capex Planning & Project Delivery - Advanced",
+        "Root Cause Analysis - Advanced",
+        "Cross-functional Plant Support - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of how equipment stability, engineering standards, production planning, and quality expectations interact in a high-throughput manufacturing environment.",
+      "jd_role_summary": "Leads technical reliability, engineering governance, and operational asset improvement for the plant. Builds the maintenance and engineering roadmap needed to improve uptime, technical stability, and delivery of process change while balancing capex, operational risk, and production realities.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Reliability Strategy",
+          "description": "Define and execute the plant reliability strategy for critical assets, maintenance planning, preventive routines, and technical risk reduction."
+        },
+        {
+          "title": "Engineering Governance",
+          "description": "Own engineering standards, technical documentation expectations, change control practices, and practical decision frameworks for modifications and upgrades."
+        },
+        {
+          "title": "Maintenance & Asset Health",
+          "description": "Partner with maintenance and operations teams to improve asset care, failure analysis, spare planning, and uptime performance."
+        },
+        {
+          "title": "Process Improvement Delivery",
+          "description": "Lead or sponsor engineering projects that improve throughput, reduce downtime, stabilize quality, or eliminate recurring technical losses."
+        },
+        {
+          "title": "Capex Planning & Execution",
+          "description": "Shape the site engineering roadmap and support business cases for capex, automation, asset replacement, and process redesign."
+        },
+        {
+          "title": "Root Cause Analysis",
+          "description": "Ensure that major breakdowns, recurring technical issues, and chronic line losses are investigated rigorously and translated into sustainable action."
+        },
+        {
+          "title": "Cross-functional Support",
+          "description": "Work closely with Production, Quality, Supply Chain, IT, and Procurement on technical priorities that affect plant performance and change delivery."
+        },
+        {
+          "title": "Team Leadership",
+          "description": "Lead and coach engineers and technical specialists; reinforce practical standards for ownership, documentation, and execution quality."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "planned vs. unplanned downtime, MTBF/MTTR, engineering project delivery, line reliability, maintenance compliance, and technical loss reduction."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Engineering and Reliability.docx"
+    },
+    {
+      "name": "Lucia Benesova",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Project and Process Engineer.docx",
+      "manager_name": "Michal Hronec",
+      "team": "Engineering and Reliability",
+      "primary_topics": [
+        "process improvement",
+        "line optimization",
+        "technical change requests"
+      ],
+      "skills_person_specific": [
+        "process optimization",
+        "industrialization",
+        "line balancing",
+        "technical documentation",
+        "project delivery"
+      ],
+      "systems_known": [
+        "engineering documentation",
+        "process tracking",
+        "project plans"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Project and Process Engineer",
+      "department_from_jd": "Engineering / Process Improvement",
+      "location_from_jd": "Banska Bystrica, Slovakia",
+      "reports_to_from_jd": "Head of Engineering and Reliability",
+      "direct_reports_from_jd": "No direct reports; may coordinate technicians, operators, and external vendors within projects",
+      "role_level_from_jd": "Professional / Specialist",
+      "technical_skills_baseline_from_jd": [
+        "Process Optimization - Advanced",
+        "Technical Project Delivery - Advanced",
+        "Root Cause Analysis - Advanced",
+        "Change Documentation & Validation - Advanced",
+        "Manufacturing Data Interpretation - Advanced",
+        "Cross-functional Problem Solving - Advanced",
+        "Continuous Improvement Methods - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Good understanding of production flow, operator constraints, equipment dependencies, and the practical realities of implementing change in a live plant environment.",
+      "jd_role_summary": "Supports plant performance through structured process improvement, technical project delivery, and practical problem-solving on production systems. Combines engineering analysis with hands-on implementation to improve line stability, throughput, and execution quality.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Process Analysis",
+          "description": "Analyze production processes, technical losses, bottlenecks, and workflow constraints to identify practical improvement opportunities."
+        },
+        {
+          "title": "Project Delivery",
+          "description": "Lead or support engineering projects, modifications, and technical workstreams from scoping and documentation through implementation and handover."
+        },
+        {
+          "title": "Operational Troubleshooting",
+          "description": "Partner with operations and maintenance teams on recurring technical issues, process instability, and line performance gaps."
+        },
+        {
+          "title": "Change Implementation",
+          "description": "Prepare technical change documentation, coordinate relevant stakeholders, and ensure implementation is controlled, traceable, and practical for plant use."
+        },
+        {
+          "title": "Performance Improvement",
+          "description": "Support initiatives to improve yield, changeover performance, throughput, process reliability, and operator usability."
+        },
+        {
+          "title": "Validation & Handover",
+          "description": "Verify that process changes and technical interventions achieve intended results and are embedded into standards and documentation."
+        },
+        {
+          "title": "Cross-functional Coordination",
+          "description": "Work with Quality, Production, Engineering, IT, and external vendors where process changes affect multiple workflows."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "project milestones, process improvement impact, reduction in recurring losses, technical change cycle time, and implementation quality."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Project and Process Engineer.docx"
+    },
+    {
+      "name": "Andrej Varga",
+      "profile_type": "jd_backed_additional",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Project and Process Engineer.docx",
+      "manager_name": "Michal Hronec",
+      "team": "Engineering and Reliability",
+      "primary_topics": [
+        "automation projects",
+        "process validation",
+        "factory rollouts"
+      ],
+      "skills_person_specific": [
+        "industrial equipment",
+        "automation support",
+        "process validation",
+        "continuous improvement"
+      ],
+      "systems_known": [
+        "process tracking",
+        "automation interfaces"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Project and Process Engineer",
+      "department_from_jd": "Engineering / Process Improvement",
+      "location_from_jd": "Banska Bystrica, Slovakia",
+      "reports_to_from_jd": "Head of Engineering and Reliability",
+      "direct_reports_from_jd": "No direct reports; may coordinate technicians, operators, and external vendors within projects",
+      "role_level_from_jd": "Professional / Specialist",
+      "technical_skills_baseline_from_jd": [
+        "Process Optimization - Advanced",
+        "Technical Project Delivery - Advanced",
+        "Root Cause Analysis - Advanced",
+        "Change Documentation & Validation - Advanced",
+        "Manufacturing Data Interpretation - Advanced",
+        "Cross-functional Problem Solving - Advanced",
+        "Continuous Improvement Methods - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Good understanding of production flow, operator constraints, equipment dependencies, and the practical realities of implementing change in a live plant environment.",
+      "jd_role_summary": "Supports plant performance through structured process improvement, technical project delivery, and practical problem-solving on production systems. Combines engineering analysis with hands-on implementation to improve line stability, throughput, and execution quality.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Process Analysis",
+          "description": "Analyze production processes, technical losses, bottlenecks, and workflow constraints to identify practical improvement opportunities."
+        },
+        {
+          "title": "Project Delivery",
+          "description": "Lead or support engineering projects, modifications, and technical workstreams from scoping and documentation through implementation and handover."
+        },
+        {
+          "title": "Operational Troubleshooting",
+          "description": "Partner with operations and maintenance teams on recurring technical issues, process instability, and line performance gaps."
+        },
+        {
+          "title": "Change Implementation",
+          "description": "Prepare technical change documentation, coordinate relevant stakeholders, and ensure implementation is controlled, traceable, and practical for plant use."
+        },
+        {
+          "title": "Performance Improvement",
+          "description": "Support initiatives to improve yield, changeover performance, throughput, process reliability, and operator usability."
+        },
+        {
+          "title": "Validation & Handover",
+          "description": "Verify that process changes and technical interventions achieve intended results and are embedded into standards and documentation."
+        },
+        {
+          "title": "Cross-functional Coordination",
+          "description": "Work with Quality, Production, Engineering, IT, and external vendors where process changes affect multiple workflows."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "project milestones, process improvement impact, reduction in recurring losses, technical change cycle time, and implementation quality."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Project and Process Engineer.docx"
+    },
+    {
+      "name": "Nina Havel",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Application Manager and Smart Factory.docx",
+      "manager_name": "Filip Hruby",
+      "team": "Industrial IT",
+      "primary_topics": [
+        "smart factory roadmap",
+        "MES and shopfloor applications",
+        "application rollout"
+      ],
+      "skills_person_specific": [
+        "MES integration",
+        "smart factory systems",
+        "application ownership",
+        "process automation"
+      ],
+      "systems_known": [
+        "ERP",
+        "MES",
+        "SCADA"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Application Manager and Smart Factory",
+      "department_from_jd": "Information Technology / Industrial Applications",
+      "location_from_jd": "Banska Bystrica, Slovakia",
+      "reports_to_from_jd": "IT Director",
+      "direct_reports_from_jd": "IFS Application Specialist and selected application or support resources as assigned",
+      "role_level_from_jd": "Manager / Domain Lead",
+      "technical_skills_baseline_from_jd": [
+        "Industrial Application Ownership - Expert",
+        "ERP/MES/Shopfloor Integration - Advanced",
+        "Smart Factory Use Case Design - Advanced",
+        "Release & Change Coordination - Advanced",
+        "Vendor & Stakeholder Management - Advanced",
+        "Issue Prioritization & Escalation - Advanced",
+        "Business Process Translation into Digital Solutions - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of how plant execution, planning, and business process workflows depend on applications, data quality, and practical user adoption.",
+      "jd_role_summary": "Leads the application landscape that connects plant operations, core business processes, and smart factory initiatives. Owns the roadmap for manufacturing-related applications, coordinates cross-functional adoption, and ensures that industrial digitalization is practical, governed, and tied to business value.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Application Ownership",
+          "description": "Own the lifecycle, roadmap, and support model for selected industrial and operational applications, including interfaces to ERP and plant systems."
+        },
+        {
+          "title": "Smart Factory Roadmap",
+          "description": "Define and prioritize smart factory use cases that improve visibility, data capture, workflow reliability, and operational decision-making."
+        },
+        {
+          "title": "Integration Coordination",
+          "description": "Coordinate application and data flows across ERP, MES, shopfloor tools, reporting layers, and plant processes in partnership with IT and operations stakeholders."
+        },
+        {
+          "title": "Business Partnering",
+          "description": "Act as the main point of contact for plant and operations teams on application needs, enhancements, adoption issues, and digitalization opportunities."
+        },
+        {
+          "title": "Governance & Change Management",
+          "description": "Ensure that new applications, enhancements, and automations follow clear ownership, documentation, training, and release practices."
+        },
+        {
+          "title": "Vendor & Delivery Coordination",
+          "description": "Coordinate external implementation partners, vendors, and internal IT resources to deliver sustainable changes on time and with acceptable supportability."
+        },
+        {
+          "title": "Operational Support Oversight",
+          "description": "Oversee issue triage, prioritization, and escalation for critical industrial application issues that affect production or planning continuity."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "application availability, issue resolution responsiveness, enhancement throughput, user adoption, and business impact of smart factory initiatives."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Application Manager and Smart Factory.docx"
+    },
+    {
+      "name": "Erik Sykora",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/IFS Application Specialist.docx",
+      "manager_name": "Nina Havel",
+      "team": "Industrial IT",
+      "primary_topics": [
+        "ERP support",
+        "IFS process changes",
+        "user issue triage"
+      ],
+      "skills_person_specific": [
+        "IFS ERP",
+        "incident resolution",
+        "business process mapping",
+        "user support",
+        "release testing"
+      ],
+      "systems_known": [
+        "IFS ERP",
+        "workflow approvals",
+        "reporting extracts"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "IFS Application Specialist",
+      "department_from_jd": "Information Technology / ERP Applications",
+      "location_from_jd": "Banska Bystrica, Slovakia",
+      "reports_to_from_jd": "Application Manager and Smart Factory",
+      "direct_reports_from_jd": "No direct reports",
+      "role_level_from_jd": "Professional / Specialist",
+      "technical_skills_baseline_from_jd": [
+        "ERP Functional Support - Advanced",
+        "Issue Triage & Resolution - Advanced",
+        "Testing & Release Validation - Advanced",
+        "Process Documentation - Advanced",
+        "Master Data Troubleshooting - Advanced",
+        "Business User Support - Advanced",
+        "Functional Change Coordination - Intermediate to Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Working understanding of ERP-supported processes in planning, procurement, finance, inventory, and operational support, including how system and process issues interact.",
+      "jd_role_summary": "Supports the reliability, usability, and continuous improvement of the IFS ERP landscape. Acts as a hands-on specialist for issue resolution, process understanding, testing, and user support across ERP workflows that affect plant, planning, finance, procurement, and operational execution.",
+      "jd_key_responsibilities": [
+        {
+          "title": "ERP Support & Triage",
+          "description": "Investigate, prioritize, and resolve ERP-related issues or route them effectively to the right internal or external owners."
+        },
+        {
+          "title": "Process Understanding",
+          "description": "Understand the business workflows behind ERP incidents and enhancements, especially where operational, planning, procurement, or data dependencies are involved."
+        },
+        {
+          "title": "Testing & Release Support",
+          "description": "Prepare test cases, validate changes, and support controlled deployment of ERP enhancements, fixes, and process adjustments."
+        },
+        {
+          "title": "User Enablement",
+          "description": "Support key users with issue clarification, practical workarounds, training reinforcement, and improved understanding of ERP process behavior."
+        },
+        {
+          "title": "Documentation & Knowledge Management",
+          "description": "Maintain clear documentation of recurring issues, process specifics, support resolutions, and functional design decisions."
+        },
+        {
+          "title": "Data & Master Data Troubleshooting",
+          "description": "Help identify and resolve issues related to configuration, process setup, or master data that impact ERP execution quality."
+        },
+        {
+          "title": "Continuous Improvement Support",
+          "description": "Contribute to the ERP improvement backlog by translating recurring business pain points into well-scoped support or enhancement proposals."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "incident resolution time, issue backlog quality, testing effectiveness, enhancement readiness, and user satisfaction for supported ERP processes."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/IFS Application Specialist.docx"
+    },
+    {
+      "name": "Barbora Klinec",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Business Intelligence Developer.docx",
+      "manager_name": "Filip Hruby",
+      "team": "Data and Analytics",
+      "primary_topics": [
+        "executive dashboards",
+        "sales analytics",
+        "planning reports"
+      ],
+      "skills_person_specific": [
+        "Power BI",
+        "SQL",
+        "dashboard design",
+        "KPI modeling",
+        "sales reporting"
+      ],
+      "systems_known": [
+        "Power BI",
+        "SQL Server",
+        "ERP reporting layer"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Business Intelligence Developer",
+      "department_from_jd": "Data and Analytics / Information Technology",
+      "location_from_jd": "Bratislava, Slovakia",
+      "reports_to_from_jd": "IT Director",
+      "direct_reports_from_jd": "No direct reports",
+      "role_level_from_jd": "Professional / Specialist",
+      "technical_skills_baseline_from_jd": [
+        "BI Development & Visualization - Advanced",
+        "SQL & Data Querying - Advanced",
+        "Data Modeling & KPI Logic - Advanced",
+        "Reporting Automation - Advanced",
+        "Stakeholder Requirement Translation - Advanced",
+        "Data Quality Diagnosis - Advanced",
+        "Documentation & Reporting Governance - Intermediate to Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Good understanding of how reporting supports operational, financial, commercial, and planning decisions, including the importance of clear KPI ownership and data definitions.",
+      "jd_role_summary": "Designs and delivers reporting, dashboards, and data models that help business and operational teams make better decisions. Translates business questions into usable analytics outputs while balancing data quality, usability, and maintainability across multiple stakeholder groups.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Dashboard & Report Delivery",
+          "description": "Build and maintain reports, dashboards, and self-service analytics outputs for executive, functional, and operational users."
+        },
+        {
+          "title": "Data Modeling",
+          "description": "Design and refine data models that support consistent KPI logic, reusable reporting structures, and practical business interpretation."
+        },
+        {
+          "title": "Requirements Translation",
+          "description": "Work with business stakeholders to convert reporting needs into data, logic, and visualization requirements that can be delivered and sustained."
+        },
+        {
+          "title": "Data Quality Support",
+          "description": "Identify data inconsistencies, logic gaps, and reporting issues; partner with source-system owners and data stewards to improve trust in analytics outputs."
+        },
+        {
+          "title": "Automation & Efficiency",
+          "description": "Streamline recurring reporting flows, reduce manual effort, and improve the timeliness and reliability of key business reporting."
+        },
+        {
+          "title": "Documentation & Knowledge Sharing",
+          "description": "Document logic, assumptions, and dependencies in a way that supports continuity, governance, and easier maintenance."
+        },
+        {
+          "title": "Cross-functional Analytics Support",
+          "description": "Support reporting needs across Finance, Supply Chain, Commercial, HR, or Operations depending on business priorities."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "dashboard adoption, report accuracy, delivery lead time, automation impact, stakeholder satisfaction, and KPI consistency."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Business Intelligence Developer.docx"
+    },
+    {
+      "name": "David Mraz",
+      "profile_type": "jd_backed_additional",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Business Intelligence Developer.docx",
+      "manager_name": "Filip Hruby",
+      "team": "Data and Analytics",
+      "primary_topics": [
+        "finance dashboards",
+        "ETL support",
+        "data validation"
+      ],
+      "skills_person_specific": [
+        "Python",
+        "ETL pipelines",
+        "data quality checks",
+        "finance reporting",
+        "API integrations",
+        "SQL"
+      ],
+      "systems_known": [
+        "Python",
+        "SQL Server",
+        "BI data pipelines"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Business Intelligence Developer",
+      "department_from_jd": "Data and Analytics / Information Technology",
+      "location_from_jd": "Bratislava, Slovakia",
+      "reports_to_from_jd": "IT Director",
+      "direct_reports_from_jd": "No direct reports",
+      "role_level_from_jd": "Professional / Specialist",
+      "technical_skills_baseline_from_jd": [
+        "BI Development & Visualization - Advanced",
+        "SQL & Data Querying - Advanced",
+        "Data Modeling & KPI Logic - Advanced",
+        "Reporting Automation - Advanced",
+        "Stakeholder Requirement Translation - Advanced",
+        "Data Quality Diagnosis - Advanced",
+        "Documentation & Reporting Governance - Intermediate to Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Good understanding of how reporting supports operational, financial, commercial, and planning decisions, including the importance of clear KPI ownership and data definitions.",
+      "jd_role_summary": "Designs and delivers reporting, dashboards, and data models that help business and operational teams make better decisions. Translates business questions into usable analytics outputs while balancing data quality, usability, and maintainability across multiple stakeholder groups.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Dashboard & Report Delivery",
+          "description": "Build and maintain reports, dashboards, and self-service analytics outputs for executive, functional, and operational users."
+        },
+        {
+          "title": "Data Modeling",
+          "description": "Design and refine data models that support consistent KPI logic, reusable reporting structures, and practical business interpretation."
+        },
+        {
+          "title": "Requirements Translation",
+          "description": "Work with business stakeholders to convert reporting needs into data, logic, and visualization requirements that can be delivered and sustained."
+        },
+        {
+          "title": "Data Quality Support",
+          "description": "Identify data inconsistencies, logic gaps, and reporting issues; partner with source-system owners and data stewards to improve trust in analytics outputs."
+        },
+        {
+          "title": "Automation & Efficiency",
+          "description": "Streamline recurring reporting flows, reduce manual effort, and improve the timeliness and reliability of key business reporting."
+        },
+        {
+          "title": "Documentation & Knowledge Sharing",
+          "description": "Document logic, assumptions, and dependencies in a way that supports continuity, governance, and easier maintenance."
+        },
+        {
+          "title": "Cross-functional Analytics Support",
+          "description": "Support reporting needs across Finance, Supply Chain, Commercial, HR, or Operations depending on business priorities."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "dashboard adoption, report accuracy, delivery lead time, automation impact, stakeholder satisfaction, and KPI consistency."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Business Intelligence Developer.docx"
+    },
+    {
+      "name": "Roman Kolar",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Master Data Governance Lead.docx",
+      "manager_name": "Filip Hruby",
+      "team": "Data Governance",
+      "primary_topics": [
+        "item master",
+        "supplier master",
+        "customer master"
+      ],
+      "skills_person_specific": [
+        "master data governance",
+        "data stewardship",
+        "process design",
+        "data quality management"
+      ],
+      "systems_known": [
+        "ERP",
+        "MDM workflows",
+        "data governance logs"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Master Data Governance Lead",
+      "department_from_jd": "Data Governance / Information Technology",
+      "location_from_jd": "Bratislava, Slovakia",
+      "reports_to_from_jd": "IT Director",
+      "direct_reports_from_jd": "No formal direct reports; may coordinate data stewards and business owners through governance structures",
+      "role_level_from_jd": "Lead / Domain Owner",
+      "technical_skills_baseline_from_jd": [
+        "Master Data Governance - Expert",
+        "Data Quality Management - Advanced",
+        "Cross-functional Process Design - Advanced",
+        "Ownership & Workflow Definition - Advanced",
+        "ERP Data Structures - Advanced",
+        "Documentation & Standards Management - Advanced",
+        "Stakeholder Facilitation - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of how master data affects planning, procurement, reporting, customer execution, and financial accuracy across enterprise processes.",
+      "jd_role_summary": "Leads the governance of critical master data domains to improve data quality, ownership clarity, and process consistency across the organization. Connects business process reality with governance discipline so that data standards become workable, not merely documented.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Data Governance Framework",
+          "description": "Define and maintain governance principles, ownership structures, and practical control points for key master data domains."
+        },
+        {
+          "title": "Domain Ownership Coordination",
+          "description": "Coordinate business and system owners for item, customer, supplier, and related master data areas to improve accountability and decision quality."
+        },
+        {
+          "title": "Data Quality Improvement",
+          "description": "Identify recurring data quality issues, prioritize high-impact remediation themes, and support sustainable improvement actions."
+        },
+        {
+          "title": "Workflow & Control Design",
+          "description": "Design or refine governance workflows for creation, change, review, and validation of master data across relevant systems and teams."
+        },
+        {
+          "title": "Business Process Alignment",
+          "description": "Ensure that master data governance is aligned with operational, planning, procurement, finance, and commercial process needs rather than treated as a detached control exercise."
+        },
+        {
+          "title": "Standards & Documentation",
+          "description": "Own standards, definitions, and documentation that clarify how master data should be created, maintained, and used."
+        },
+        {
+          "title": "Cross-functional Enablement",
+          "description": "Support stakeholders in understanding the business impact of poor data quality and the practical value of stronger governance routines."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "data quality issue recurrence, governance cycle time, master data completeness, ownership clarity, and reduction of process disruption caused by poor data."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Master Data Governance Lead.docx"
+    },
+    {
+      "name": "Saskia de Vries",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Group Research and Development.docx",
+      "manager_name": "Anna Weber",
+      "team": "Group R&D",
+      "primary_topics": [
+        "group innovation roadmap",
+        "product development standards",
+        "R&D prioritization"
+      ],
+      "skills_person_specific": [
+        "product innovation",
+        "formulation strategy",
+        "portfolio development",
+        "stage-gate delivery"
+      ],
+      "systems_known": [
+        "product lifecycle files",
+        "innovation portfolio tracking"
+      ],
+      "languages": [
+        "English",
+        "Dutch"
+      ],
+      "role_from_jd": "Head of Group Research and Development",
+      "department_from_jd": "Research & Development / Product Innovation",
+      "location_from_jd": "Landgraaf, Netherlands",
+      "reports_to_from_jd": "Chief Executive Officer",
+      "direct_reports_from_jd": "R&D managers, product development specialists, and innovation resources across sites as applicable",
+      "role_level_from_jd": "Enterprise/Group (Senior Leadership Level - Head)",
+      "technical_skills_baseline_from_jd": [
+        "Innovation Strategy & Portfolio Leadership - Expert",
+        "Product Development Governance - Advanced",
+        "Cross-functional Launch Readiness - Advanced",
+        "Formulation & Technical Evaluation - Advanced",
+        "Stage-gate Decision Making - Advanced",
+        "Supplier & External Insight Integration - Advanced",
+        "Documentation & Development Standards - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of how product innovation interacts with customer needs, manufacturing feasibility, quality expectations, supply implications, and portfolio economics.",
+      "jd_role_summary": "Leads the Group's product innovation agenda, shaping the pipeline, standards, and delivery model for research and development. Connects commercial opportunity, technical feasibility, quality requirements, and operational readiness to bring viable innovation into the business at pace.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Innovation Strategy",
+          "description": "Define and lead the Group innovation and product development strategy in line with growth ambitions, customer needs, and brand priorities."
+        },
+        {
+          "title": "Portfolio Prioritization",
+          "description": "Own the innovation pipeline and stage-gate governance; prioritize initiatives based on strategic fit, technical feasibility, commercial value, and execution capacity."
+        },
+        {
+          "title": "Product Development Leadership",
+          "description": "Guide formulation, product improvement, and new product development activities across categories and sites."
+        },
+        {
+          "title": "Cross-functional Coordination",
+          "description": "Work closely with Commercial, Operations, Quality, Procurement, and Finance to ensure new concepts are scalable, compliant, and economically viable."
+        },
+        {
+          "title": "Standards & Ways of Working",
+          "description": "Define development standards, documentation expectations, and decision criteria that improve consistency and execution quality across the R&D function."
+        },
+        {
+          "title": "Launch Readiness",
+          "description": "Ensure that development work translates into practical manufacturing, quality, and supply readiness for successful market introduction."
+        },
+        {
+          "title": "External Insight & Partnerships",
+          "description": "Leverage supplier, market, and technical insight to strengthen innovation quality and accelerate learning in key categories."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "innovation pipeline health, launch success, development cycle time, reformulation impact, and portfolio value creation."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Group Research and Development.docx"
+    },
+    {
+      "name": "Katarina Urban",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Group Quality.docx",
+      "manager_name": "Eva Kralikova",
+      "team": "Group Quality",
+      "primary_topics": [
+        "group quality standards",
+        "audit findings",
+        "quality escalation"
+      ],
+      "skills_person_specific": [
+        "quality governance",
+        "audit readiness",
+        "food safety compliance",
+        "quality systems"
+      ],
+      "systems_known": [
+        "quality records",
+        "audit logs",
+        "document control"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Head of Group Quality",
+      "department_from_jd": "Quality / Food Safety / Compliance",
+      "location_from_jd": "Banska Bystrica, Slovakia",
+      "reports_to_from_jd": "Chief Operating Officer",
+      "direct_reports_from_jd": "Quality managers, quality systems specialists, and selected quality experts across sites",
+      "role_level_from_jd": "Enterprise/Group (Senior Leadership Level - Head)",
+      "technical_skills_baseline_from_jd": [
+        "Quality Governance & Systems - Expert",
+        "Food Safety & Regulatory Coordination - Expert",
+        "Audit Readiness & CAPA Management - Advanced",
+        "Deviation & Incident Leadership - Advanced",
+        "Cross-functional Quality Integration - Advanced",
+        "Supplier and Process Quality Understanding - Advanced",
+        "Quality Capability Building - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of how quality systems, plant execution, supplier performance, innovation choices, and customer expectations interact in a regulated manufacturing environment.",
+      "jd_role_summary": "Leads the Group quality agenda across food safety, compliance, quality systems, and operational quality performance. Sets the standards and governance needed to protect customers, brands, and operations while enabling scalable growth across sites and product categories.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Quality Strategy & Governance",
+          "description": "Define and maintain the Group quality and food safety strategy, standards, and management routines across all relevant entities."
+        },
+        {
+          "title": "Quality Systems",
+          "description": "Own the core quality management framework, including policy expectations, audit readiness, deviation handling, CAPA discipline, and documentation standards."
+        },
+        {
+          "title": "Compliance & Regulatory Coordination",
+          "description": "Ensure that the organization remains aligned with relevant food safety, product, and regulatory requirements across markets and sites."
+        },
+        {
+          "title": "Operational Quality Performance",
+          "description": "Partner with plants and functional leaders to improve quality performance, reduce recurring deviations, and strengthen preventive discipline."
+        },
+        {
+          "title": "Escalation & Incident Leadership",
+          "description": "Lead or coordinate the response to significant quality incidents, audit findings, or compliance risks with material business impact."
+        },
+        {
+          "title": "Cross-functional Integration",
+          "description": "Work closely with R&D, Operations, Procurement, Supply Chain, and Commercial where product, process, supplier, or customer requirements affect quality outcomes."
+        },
+        {
+          "title": "Capability Building",
+          "description": "Develop quality leadership, systems understanding, and practical quality ownership across teams and sites."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "audit outcomes, deviation recurrence, customer complaints, quality-related waste, CAPA closure quality, and compliance readiness."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Group Quality.docx"
+    },
+    {
+      "name": "Martin Pospisil",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Group Supply Chain Director.docx",
+      "manager_name": "Eva Kralikova",
+      "team": "Group Supply Chain",
+      "primary_topics": [
+        "group supply planning",
+        "logistics governance",
+        "service level management"
+      ],
+      "skills_person_specific": [
+        "supply chain leadership",
+        "planning governance",
+        "logistics coordination",
+        "service operations"
+      ],
+      "systems_known": [
+        "planning tools",
+        "ERP",
+        "supply chain dashboards"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role_from_jd": "Group Supply Chain Director",
+      "department_from_jd": "Supply Chain / Planning / Logistics / Customer Service",
+      "location_from_jd": "Oberwart, Austria",
+      "reports_to_from_jd": "Chief Operating Officer",
+      "direct_reports_from_jd": "Production Planning Manager, logistics leaders, customer service leadership, and selected supply chain experts",
+      "role_level_from_jd": "Enterprise/Group (Senior Leadership Level - Director)",
+      "technical_skills_baseline_from_jd": [
+        "Supply Chain Strategy & Governance - Expert",
+        "Planning Leadership - Advanced",
+        "Inventory & Service Trade-off Management - Advanced",
+        "Logistics & Fulfillment Oversight - Advanced",
+        "Customer Service Integration - Advanced",
+        "Cross-functional Supply Decision Making - Advanced",
+        "Supply Chain Transformation - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of how demand, planning, plant capacity, procurement constraints, customer commitments, and financial objectives interact in an integrated supply model.",
+      "jd_role_summary": "Leads the Group supply chain agenda across planning, logistics, customer service, and supply coordination. Balances service, inventory, capacity, and execution constraints to create a more reliable, responsive, and scalable supply model across markets and sites.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Supply Chain Strategy",
+          "description": "Define and execute the Group supply chain strategy across planning, logistics, and customer service in line with business growth and service ambitions."
+        },
+        {
+          "title": "Planning Governance",
+          "description": "Establish the planning model, decision forums, and KPI routines needed to balance demand, production, inventory, and service trade-offs consistently."
+        },
+        {
+          "title": "Logistics & Fulfillment Oversight",
+          "description": "Own the operating standards and performance expectations for logistics, transport coordination, and order fulfillment support."
+        },
+        {
+          "title": "Customer Service Integration",
+          "description": "Ensure that customer service and supply execution work as one operating model with clear escalation pathways and realistic service commitments."
+        },
+        {
+          "title": "Inventory & Service Optimization",
+          "description": "Improve inventory health, planning discipline, and supply responsiveness while protecting cash, service, and plant stability."
+        },
+        {
+          "title": "Cross-functional Coordination",
+          "description": "Work closely with Commercial, Procurement, Operations, Finance, and IT on supply decisions, constraints, and operating improvements."
+        },
+        {
+          "title": "Transformation & Standardization",
+          "description": "Lead programs that improve supply chain visibility, planning maturity, process consistency, and digital support for decision-making."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "OTIF, inventory health, forecast bias/accuracy, planning adherence, logistics service, order issue rate, and supply chain cost performance."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Group Supply Chain Director.docx"
+    },
+    {
+      "name": "Veronika Duda",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Production Planning Manager.docx",
+      "manager_name": "Martin Pospisil",
+      "team": "Production Planning",
+      "primary_topics": [
+        "production schedule",
+        "capacity planning",
+        "allocation decisions"
+      ],
+      "skills_person_specific": [
+        "production planning",
+        "capacity balancing",
+        "schedule management",
+        "supply planning"
+      ],
+      "systems_known": [
+        "planning tools",
+        "ERP",
+        "production trackers"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "Production Planning Manager",
+      "department_from_jd": "Supply Chain / Production Planning",
+      "location_from_jd": "Banska Bystrica, Slovakia",
+      "reports_to_from_jd": "Group Supply Chain Director",
+      "direct_reports_from_jd": "Production planners and planning support resources as assigned",
+      "role_level_from_jd": "Manager / Functional Lead",
+      "technical_skills_baseline_from_jd": [
+        "Production Planning & Scheduling - Expert",
+        "Capacity Balancing - Advanced",
+        "Inventory & Service Trade-off Management - Advanced",
+        "Cross-functional Coordination - Advanced",
+        "Planning Data Interpretation - Advanced",
+        "Escalation Structuring - Advanced",
+        "Continuous Improvement in Planning Processes - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of line behavior, supply constraints, customer implications, and the practical costs of schedule instability in a production environment.",
+      "jd_role_summary": "Leads production planning for the site or assigned manufacturing scope, turning supply requirements into achievable schedules that balance demand, capacity, inventory, and operational constraints. Coordinates closely with plant, supply chain, and customer-facing functions to keep execution realistic and responsive.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Production Scheduling",
+          "description": "Own the production planning process and scheduling logic for assigned lines or site scope, translating supply requirements into executable plans."
+        },
+        {
+          "title": "Capacity & Constraint Management",
+          "description": "Balance demand priorities with line capacity, labor, maintenance windows, material availability, and operational limitations."
+        },
+        {
+          "title": "Cross-functional Planning Alignment",
+          "description": "Coordinate with plant leadership, supply chain, procurement, customer service, and commercial stakeholders on planning assumptions, risks, and trade-offs."
+        },
+        {
+          "title": "Inventory & Service Support",
+          "description": "Support decisions that balance stock position, customer commitments, manufacturing efficiency, and production stability."
+        },
+        {
+          "title": "Planning Discipline",
+          "description": "Improve planning routines, data quality, and schedule adherence to reduce last-minute instability and reactive decision-making."
+        },
+        {
+          "title": "Escalation Management",
+          "description": "Highlight plan risks early and structure escalation options when demand, supply, or operational constraints cannot all be met simultaneously."
+        },
+        {
+          "title": "Continuous Improvement",
+          "description": "Identify opportunities to improve planning accuracy, sequencing, schedule robustness, and communication quality across the process."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "schedule attainment, adherence to plan, inventory health, planning responsiveness, service impact, and reduction of avoidable replanning."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Production Planning Manager.docx"
+    },
+    {
+      "name": "Manuela Kovacova",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/HR Manager - Banska Bystrica Plant.docx",
+      "manager_name": "Petra Novakova",
+      "team": "Site HR",
+      "primary_topics": [
+        "site HR operations",
+        "employee onboarding",
+        "manager coaching"
+      ],
+      "skills_person_specific": [
+        "employee relations",
+        "workforce planning",
+        "onboarding",
+        "performance management",
+        "labor law compliance"
+      ],
+      "systems_known": [
+        "HRIS",
+        "document workflows"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role_from_jd": "HR Manager",
+      "department_from_jd": "Human Resources",
+      "location_from_jd": "Banska Bystrica Plant, Slovakia",
+      "reports_to_from_jd": "HR Director",
+      "direct_reports_from_jd": "HR specialists, HR administrators, and onboarding support resources as assigned",
+      "role_level_from_jd": "Site/Local Management",
+      "technical_skills_baseline_from_jd": [
+        "Employee Relations - Advanced",
+        "Site Workforce Planning - Advanced",
+        "Onboarding & Employee Lifecycle Management - Advanced",
+        "Local Labor Law & Compliance - Advanced",
+        "Manager Coaching - Advanced",
+        "HR Process Execution - Advanced",
+        "HR Reporting & Coordination - Intermediate to Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Good understanding of plant operations, shift-based workforce dynamics, and the people implications of production pressure, staffing gaps, and local leadership capability.",
+      "jd_role_summary": "Leads site-level HR execution for the Banska Bystrica plant, ensuring that workforce planning, employee relations, onboarding, and people processes support stable plant operations. Acts as the main HR partner for local leadership while aligning site decisions with Group HR standards and legal requirements.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Site Workforce Planning",
+          "description": "Coordinate hiring, workforce planning, and staffing priorities for the plant in line with production needs, shift models, and growth requirements."
+        },
+        {
+          "title": "Employee Relations & Engagement",
+          "description": "Handle employee relations cases, support local leadership on people issues, and reinforce engagement and communication practices appropriate for a manufacturing environment."
+        },
+        {
+          "title": "Onboarding & Employee Lifecycle",
+          "description": "Ensure structured onboarding, probation follow-up, employee documentation, and local lifecycle processes are executed consistently and compliantly."
+        },
+        {
+          "title": "HR Process Execution",
+          "description": "Implement HR policies, processes, and reporting routines at the site level while identifying where local adaptation is needed to support operational realities."
+        },
+        {
+          "title": "Manager Support",
+          "description": "Coach line managers and supervisors on performance conversations, absence topics, employee handling, and practical people leadership."
+        },
+        {
+          "title": "Compliance & Labor Discipline",
+          "description": "Ensure alignment with local labor regulations, internal HR policies, and site-specific compliance requirements affecting people processes."
+        },
+        {
+          "title": "Change & Plant Support",
+          "description": "Support organizational changes, workforce adjustments, and local integration needs linked to production changes or restructuring."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "time-to-fill for plant roles, onboarding completion, absenteeism trends, employee relations case closure, and local HR process compliance."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/HR Manager - Banska Bystrica Plant.docx"
+    },
+    {
+      "name": "Ioana Marinescu",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/HR Manager - Romania Country Organization.docx",
+      "manager_name": "Petra Novakova",
+      "team": "Romania HR",
+      "primary_topics": [
+        "country HR operations",
+        "local hiring support",
+        "employee relations"
+      ],
+      "skills_person_specific": [
+        "country HR operations",
+        "recruitment coordination",
+        "employee relations",
+        "local labor compliance",
+        "HR administration"
+      ],
+      "systems_known": [
+        "HRIS",
+        "employee documentation workflows"
+      ],
+      "languages": [
+        "English",
+        "Romanian"
+      ],
+      "role_from_jd": "HR Manager",
+      "department_from_jd": "Human Resources",
+      "location_from_jd": "Bucharest, Romania",
+      "reports_to_from_jd": "HR Director",
+      "direct_reports_from_jd": "Local HR administrators and support resources as assigned",
+      "role_level_from_jd": "Country/Local Management",
+      "technical_skills_baseline_from_jd": [
+        "Country HR Operations - Advanced",
+        "Employee Relations - Advanced",
+        "Recruitment & Workforce Coordination - Advanced",
+        "Local Labor Compliance - Advanced",
+        "Manager Support - Advanced",
+        "Policy Translation into Local Practice - Advanced",
+        "HR Administration & Documentation - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Good understanding of local market-facing business environments, leadership support needs, and how to apply Group HR standards in a smaller country context.",
+      "jd_role_summary": "Leads HR execution for the Romania country organization, supporting commercial, office, and local operational teams with compliant people processes, hiring coordination, employee relations, and organizational support. Translates Group HR standards into practical local execution in a market-facing environment.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Country HR Operations",
+          "description": "Own day-to-day HR delivery for the Romania organization, including employee lifecycle coordination, documentation, and local process execution."
+        },
+        {
+          "title": "Hiring & Workforce Support",
+          "description": "Coordinate hiring and workforce planning across local business roles in partnership with country leadership and Group HR."
+        },
+        {
+          "title": "Employee Relations",
+          "description": "Handle employee relations matters, provide HR guidance to local managers, and support a healthy and compliant working environment."
+        },
+        {
+          "title": "Policy Implementation",
+          "description": "Apply Group HR policies within local legal and market realities, ensuring consistency where possible and appropriate local adaptation where necessary."
+        },
+        {
+          "title": "Organizational Support",
+          "description": "Support local restructuring, role changes, and capability needs as the country organization evolves."
+        },
+        {
+          "title": "Manager Enablement",
+          "description": "Act as the main HR partner to local business leaders on performance, employee handling, communication, and organizational questions."
+        },
+        {
+          "title": "Compliance & Administration",
+          "description": "Ensure sound execution of employment documentation, local labor compliance, and HR administration processes."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "time-to-fill, onboarding completion, local compliance quality, employee issue resolution, and HR process reliability."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/HR Manager - Romania Country Organization.docx"
+    },
+    {
+      "name": "Julia Hartmann",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Marketing Manager - Vienna HQ.docx",
+      "manager_name": "Stefan Maurer",
+      "team": "Central Marketing",
+      "primary_topics": [
+        "central campaigns",
+        "launch coordination",
+        "brand asset management"
+      ],
+      "skills_person_specific": [
+        "campaign coordination",
+        "brand support",
+        "agency management",
+        "cross-market launch support"
+      ],
+      "systems_known": [
+        "campaign planning files",
+        "asset libraries",
+        "performance reporting"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role_from_jd": "Marketing Manager",
+      "department_from_jd": "Marketing / Brand Management",
+      "location_from_jd": "Wien, Austria",
+      "reports_to_from_jd": "Marketing Director",
+      "direct_reports_from_jd": "No formal direct reports; may coordinate agencies, junior marketers, and cross-functional launch teams",
+      "role_level_from_jd": "Manager / HQ Functional Role",
+      "technical_skills_baseline_from_jd": [
+        "Campaign Coordination - Advanced",
+        "Brand Support & Launch Readiness - Advanced",
+        "Agency Management - Advanced",
+        "Cross-functional Marketing Execution - Advanced",
+        "Content Briefing & Asset Coordination - Advanced",
+        "Performance Tracking - Intermediate to Advanced",
+        "Marketing Planning Discipline - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Understanding of how central brand direction, local activation needs, product readiness, and commercial timing interact in a multi-market consumer business.",
+      "jd_role_summary": "Supports the central marketing agenda from Vienna HQ, translating brand and portfolio strategy into coordinated campaigns, launch support, and communication materials across markets. Acts as a cross-functional coordinator between Marketing, Commercial, R&D, and external partners.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Brand & Campaign Coordination",
+          "description": "Support the planning and execution of central marketing campaigns, product communication, and brand initiatives aligned with Group priorities."
+        },
+        {
+          "title": "Portfolio & Launch Support",
+          "description": "Coordinate launch assets, messaging, and readiness activities in partnership with Commercial, R&D, Quality, and external agencies."
+        },
+        {
+          "title": "Content & Communication Development",
+          "description": "Develop or coordinate communication materials, campaign briefs, and brand-supporting content across channels and stakeholders."
+        },
+        {
+          "title": "Agency & Partner Management",
+          "description": "Work with creative, media, and production partners to deliver materials on time and to expected quality standards."
+        },
+        {
+          "title": "Cross-market Alignment",
+          "description": "Help ensure that central marketing direction is translated into usable guidance for local market teams without creating unnecessary complexity."
+        },
+        {
+          "title": "Performance Tracking",
+          "description": "Monitor campaign effectiveness, execution quality, and feedback from local teams to improve future marketing output."
+        },
+        {
+          "title": "Operational Marketing Support",
+          "description": "Maintain marketing planning routines, asset management discipline, and coordination points that keep central activity moving efficiently."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "campaign delivery timeliness, launch readiness, asset quality, stakeholder satisfaction, and selected brand or activation performance measures."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Marketing Manager - Vienna HQ.docx"
+    },
+    {
+      "name": "Andreea Popescu",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Marketing Manager - Romania Local Market.docx",
+      "manager_name": "Radu Ionescu",
+      "team": "Romania Marketing",
+      "primary_topics": [
+        "local campaigns",
+        "market activation",
+        "commercial support"
+      ],
+      "skills_person_specific": [
+        "local campaign execution",
+        "brand adaptation",
+        "trade marketing support",
+        "agency coordination"
+      ],
+      "systems_known": [
+        "campaign calendars",
+        "market activation plans"
+      ],
+      "languages": [
+        "English",
+        "Romanian"
+      ],
+      "role_from_jd": "Marketing Manager",
+      "department_from_jd": "Marketing / Local Market Activation",
+      "location_from_jd": "Bucharest, Romania",
+      "reports_to_from_jd": "Country Manager Romania",
+      "direct_reports_from_jd": "No formal direct reports; may coordinate agencies and local activation partners",
+      "role_level_from_jd": "Manager / Local Market Role",
+      "technical_skills_baseline_from_jd": [
+        "Local Campaign Execution - Advanced",
+        "Brand Adaptation for Market Use - Advanced",
+        "Commercial & Trade Marketing Support - Advanced",
+        "Agency Coordination - Advanced",
+        "Budget & Activation Management - Advanced",
+        "Market Insight Application - Intermediate to Advanced",
+        "Cross-functional Local Execution - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Good understanding of local market dynamics, customer realities, channel activation, and how central brand direction must be adapted to work in-country.",
+      "jd_role_summary": "Leads local marketing execution in Romania, adapting central brand direction to the realities of the local market, customers, and channels. Focuses on activation, campaign delivery, market relevance, and commercial support rather than central portfolio ownership.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Local Market Activation",
+          "description": "Plan and execute local campaigns, promotions, and communication activities that support commercial growth and brand presence in Romania."
+        },
+        {
+          "title": "Brand Adaptation",
+          "description": "Translate central brand and campaign direction into market-relevant activation suited to local consumers, retail realities, and channel needs."
+        },
+        {
+          "title": "Commercial Support",
+          "description": "Partner with local commercial teams to support sell-in, visibility, promotions, trade priorities, and customer-facing initiatives."
+        },
+        {
+          "title": "Agency & Partner Coordination",
+          "description": "Coordinate local agencies, media, production, and activation partners to deliver campaigns and in-market execution effectively."
+        },
+        {
+          "title": "Market Insight Use",
+          "description": "Incorporate local market feedback, competitor signals, and consumer context into campaign planning and marketing recommendations."
+        },
+        {
+          "title": "Budget & Execution Discipline",
+          "description": "Manage local marketing spend and execution plans with strong attention to practical impact, timing, and resource constraints."
+        },
+        {
+          "title": "Cross-functional Coordination",
+          "description": "Stay aligned with HQ Marketing, Commercial, and external partners so local execution remains connected to the broader brand direction."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "campaign execution quality, activation timeliness, in-market visibility, promotion support effectiveness, and selected local growth indicators."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Marketing Manager - Romania Local Market.docx"
+    },
+    {
+      "name": "Klara Novak",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Key Account Manager - Czech Republic.docx",
+      "manager_name": "Daniel Richter",
+      "team": "Commercial Czech Republic",
+      "primary_topics": [
+        "key accounts",
+        "customer escalations",
+        "trade planning"
+      ],
+      "skills_person_specific": [
+        "account management",
+        "trade negotiations",
+        "customer planning",
+        "promotion planning"
+      ],
+      "systems_known": [
+        "CRM",
+        "sales dashboards"
+      ],
+      "languages": [
+        "English",
+        "Czech"
+      ],
+      "role_from_jd": "Key Account Manager",
+      "department_from_jd": "Commercial / Sales",
+      "location_from_jd": "Brno, Czech Republic",
+      "reports_to_from_jd": "Sales Director for Brand Products",
+      "direct_reports_from_jd": "No direct reports",
+      "role_level_from_jd": "Manager / Local Market Commercial Role",
+      "technical_skills_baseline_from_jd": [
+        "Key Account Management - Advanced",
+        "Negotiation & Trade Terms Management - Advanced",
+        "Joint Business Planning - Advanced",
+        "Forecast & Demand Input - Advanced",
+        "Cross-functional Commercial Coordination - Advanced",
+        "Commercial Performance Tracking - Advanced",
+        "Customer Relationship Development - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of customer dynamics, retail expectations, promotional mechanics, and the operational implications of commercial commitments in the Czech market.",
+      "jd_role_summary": "Owns key customer relationships in the Czech market, balancing commercial growth, customer negotiation, forecasting input, and execution discipline. Acts as the main commercial interface for assigned accounts and translates customer priorities into actionable internal coordination.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Account Ownership",
+          "description": "Manage the end-to-end relationship with assigned key accounts in the Czech Republic, including customer planning, negotiation, and day-to-day commercial coordination."
+        },
+        {
+          "title": "Joint Business Planning",
+          "description": "Develop account plans, growth opportunities, and promotional priorities aligned with company objectives and customer potential."
+        },
+        {
+          "title": "Negotiation & Commercial Delivery",
+          "description": "Lead customer negotiations on pricing, assortment, promotions, visibility, and trading terms within approved boundaries."
+        },
+        {
+          "title": "Forecast & Demand Input",
+          "description": "Provide grounded input into demand expectations, customer changes, and promotional impact to support supply and planning alignment."
+        },
+        {
+          "title": "Cross-functional Coordination",
+          "description": "Work closely with marketing, supply chain, finance, and customer service to ensure customer commitments are realistic and well supported."
+        },
+        {
+          "title": "Execution Monitoring",
+          "description": "Track account performance, customer compliance, and commercial execution quality; identify risks and opportunities early."
+        },
+        {
+          "title": "Relationship Development",
+          "description": "Build trusted relationships with customer stakeholders and represent the company with professionalism and commercial discipline."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "sales growth, account profitability, promotional effectiveness, forecast quality, customer satisfaction, and execution against account plans."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Key Account Manager - Czech Republic.docx"
+    },
+    {
+      "name": "Marta Zielinska",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Key Account Manager - Poland Modern Trade.docx",
+      "manager_name": "Piotr Lewandowski",
+      "team": "Commercial Poland",
+      "primary_topics": [
+        "modern trade accounts",
+        "promotional planning",
+        "channel execution"
+      ],
+      "skills_person_specific": [
+        "key account management",
+        "modern trade planning",
+        "negotiation",
+        "promotional coordination"
+      ],
+      "systems_known": [
+        "CRM",
+        "account plans",
+        "promotion trackers"
+      ],
+      "languages": [
+        "English",
+        "Polish"
+      ],
+      "role_from_jd": "Key Account Manager",
+      "department_from_jd": "Commercial / Sales",
+      "location_from_jd": "Warszawa, Poland",
+      "reports_to_from_jd": "Commercial Director Poland",
+      "direct_reports_from_jd": "No direct reports",
+      "role_level_from_jd": "Manager / Channel-Focused Commercial Role",
+      "technical_skills_baseline_from_jd": [
+        "Key Account Management - Advanced",
+        "Modern Trade Channel Planning - Advanced",
+        "Negotiation & Promotional Planning - Advanced",
+        "Account Performance Management - Advanced",
+        "Cross-functional Commercial Coordination - Advanced",
+        "Forecast & Activity Alignment - Advanced",
+        "Customer Relationship Development - Advanced"
+      ],
+      "business_knowledge_baseline_from_jd": "Strong understanding of modern trade dynamics, customer planning cycles, promotional economics, and the operational implications of retail-facing commercial commitments in Poland.",
+      "jd_role_summary": "Owns modern trade key accounts in Poland, focusing on structured customer development, commercial negotiation, promotional planning, and channel execution. Operates in a more concentrated retailer environment with strong emphasis on account discipline, promotional mechanics, and execution quality.",
+      "jd_key_responsibilities": [
+        {
+          "title": "Modern Trade Account Ownership",
+          "description": "Manage the relationship, growth agenda, and commercial execution for assigned modern trade customers in Poland."
+        },
+        {
+          "title": "Channel Planning",
+          "description": "Build account plans and activity calendars that reflect modern trade promotional cycles, customer expectations, and channel economics."
+        },
+        {
+          "title": "Negotiation & Terms Management",
+          "description": "Lead negotiations on pricing, assortment, promotions, trade support, and execution conditions within approved commercial boundaries."
+        },
+        {
+          "title": "Promotional & Demand Coordination",
+          "description": "Coordinate promotional assumptions and customer plans with supply chain and planning teams to improve readiness and reduce avoidable execution risk."
+        },
+        {
+          "title": "Performance Management",
+          "description": "Monitor account performance, customer-specific profitability, execution quality, and activity outcomes to improve commercial decision-making."
+        },
+        {
+          "title": "Cross-functional Coordination",
+          "description": "Partner with trade marketing, customer service, supply chain, and finance to support customer commitments and resolve issues effectively."
+        },
+        {
+          "title": "Relationship Development",
+          "description": "Build durable working relationships with customer stakeholders and maintain a credible commercial presence in a competitive modern trade environment."
+        },
+        {
+          "title": "Illustrative KPIs",
+          "description": "modern trade revenue growth, promotional ROI, account profitability, plan execution quality, service support, and forecast reliability."
+        }
+      ],
+      "jd_relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Key Account Manager - Poland Modern Trade.docx"
+    },
+    {
+      "name": "Daniel Richter",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Commercial Leadership",
+      "primary_topics": [
+        "brand sales strategy",
+        "commercial planning",
+        "market coordination"
+      ],
+      "skills_person_specific": [
+        "commercial strategy",
+        "channel development",
+        "revenue planning"
+      ],
+      "systems_known": [
+        "CRM",
+        "sales reporting"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Sales Director for Brand Products",
+      "site": "Bratislava",
+      "country": "Slovakia"
+    },
+    {
+      "name": "Stefan Maurer",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Central Marketing",
+      "primary_topics": [
+        "brand strategy",
+        "central campaigns",
+        "portfolio communication"
+      ],
+      "skills_person_specific": [
+        "marketing leadership",
+        "brand strategy",
+        "campaign governance"
+      ],
+      "systems_known": [
+        "campaign planning",
+        "brand asset systems"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Marketing Director",
+      "site": "Wien HQ",
+      "country": "Austria"
+    },
+    {
+      "name": "Radu Ionescu",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Romania Leadership",
+      "primary_topics": [
+        "local market growth",
+        "country operations",
+        "commercial coordination"
+      ],
+      "skills_person_specific": [
+        "country leadership",
+        "commercial coordination",
+        "market development"
+      ],
+      "systems_known": [
+        "local performance reports"
+      ],
+      "languages": [
+        "English",
+        "Romanian"
+      ],
+      "role": "Country Manager Romania",
+      "site": "Bucharest",
+      "country": "Romania"
+    },
+    {
+      "name": "Piotr Lewandowski",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Poland Commercial Leadership",
+      "primary_topics": [
+        "poland commercial strategy",
+        "channel priorities",
+        "market growth"
+      ],
+      "skills_person_specific": [
+        "commercial leadership",
+        "channel strategy",
+        "customer development"
+      ],
+      "systems_known": [
+        "CRM",
+        "sales reporting"
+      ],
+      "languages": [
+        "English",
+        "Polish"
+      ],
+      "role": "Commercial Director Poland",
+      "site": "Warszawa",
+      "country": "Poland"
+    },
+    {
+      "name": "Alena Kralova",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Petra Novakova",
+      "team": "Group HR",
+      "primary_topics": [
+        "HR onboarding",
+        "starter checklists",
+        "training schedules"
+      ],
+      "skills_person_specific": [
+        "onboarding coordination",
+        "HR administration",
+        "training coordination"
+      ],
+      "systems_known": [
+        "HRIS",
+        "SharePoint",
+        "learning records"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role": "HR Specialist and Onboarding",
+      "site": "Bratislava",
+      "country": "Slovakia"
+    },
+    {
+      "name": "Zuzana Balaz",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Martin Pospisil",
+      "team": "Customer Service",
+      "primary_topics": [
+        "customer service escalations",
+        "order issue resolution",
+        "service workflows"
+      ],
+      "skills_person_specific": [
+        "customer service operations",
+        "order coordination",
+        "escalation handling"
+      ],
+      "systems_known": [
+        "ERP",
+        "service cases",
+        "order tracking"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Customer Service Manager",
+      "site": "Oberwart",
+      "country": "Austria"
+    }
+  ]
+}

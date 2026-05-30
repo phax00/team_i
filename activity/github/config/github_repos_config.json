@@ -1,0 +1,14 @@
+{
+  "repos": [
+    "FastAPI/FastAPI",
+    "apache/airflow",
+    "dbt-labs/dbt-core"
+  ],
+  "limits": {
+    "contributors_per_repo": 20,
+    "commits_per_repo": 25,
+    "pull_requests_per_repo": 12,
+    "pr_commits_per_pr": 8
+  },
+  "since": null
+}

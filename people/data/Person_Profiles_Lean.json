@@ -1,0 +1,930 @@
+{
+  "meta": {
+    "purpose": "Lean person profiles linked to the finalized job description document set.",
+    "source_jd_folder": "job_descriptions/generated_final/Generated Job Descriptions Final",
+    "modeling_rule": "JD-backed profiles keep only person-specific fields. Role, location, reporting baseline, and core skill baseline should be resolved from the linked JD catalog.",
+    "source_precedence": {
+      "role": "JD first",
+      "location": "JD first",
+      "reports_to": "JD first",
+      "core_skills_baseline": "JD first",
+      "person_specific_skills": "Person profile layer",
+      "names": "Synthetic person layer"
+    },
+    "person_specific_fields_for_jd_backed_profiles": [
+      "name",
+      "profile_type",
+      "jd_file",
+      "manager_name",
+      "team",
+      "primary_topics",
+      "skills_person_specific",
+      "systems_known",
+      "languages"
+    ],
+    "org_support_profile_fields": [
+      "name",
+      "profile_type",
+      "jd_file",
+      "role",
+      "site",
+      "country",
+      "manager_name",
+      "team",
+      "primary_topics",
+      "skills_person_specific",
+      "systems_known",
+      "languages"
+    ],
+    "dataset_summary": {
+      "total_people": 32,
+      "jd_backed_people": 24,
+      "org_support_people": 8,
+      "shared_jd_examples": [
+        "Project and Process Engineer.docx",
+        "Business Intelligence Developer.docx"
+      ]
+    }
+  },
+  "people": [
+    {
+      "name": "Anna Weber",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": null,
+      "team": "Executive Leadership",
+      "primary_topics": [
+        "company strategy",
+        "portfolio priorities",
+        "executive decision making"
+      ],
+      "skills_person_specific": [
+        "enterprise strategy",
+        "growth leadership",
+        "stakeholder management"
+      ],
+      "systems_known": [
+        "executive reporting"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Chief Executive Officer",
+      "site": "Wien HQ",
+      "country": "Austria"
+    },
+    {
+      "name": "Lukas Steiner",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Executive Leadership",
+      "primary_topics": [
+        "group budgeting",
+        "financial governance",
+        "investment approvals"
+      ],
+      "skills_person_specific": [
+        "financial governance",
+        "budget steering",
+        "risk management"
+      ],
+      "systems_known": [
+        "ERP",
+        "BI"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Chief Financial Officer",
+      "site": "Wien HQ",
+      "country": "Austria"
+    },
+    {
+      "name": "Petra Novakova",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/source_docs/Job Descriptions/HR Director.docx",
+      "manager_name": "Lukas Steiner",
+      "team": "Group HR",
+      "primary_topics": [
+        "group HR policy",
+        "talent strategy",
+        "people governance"
+      ],
+      "skills_person_specific": [
+        "organizational design",
+        "talent acquisition",
+        "succession planning",
+        "HR analytics",
+        "change management",
+        "performance management"
+      ],
+      "systems_known": [
+        "HRIS",
+        "ATS",
+        "SharePoint"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Filip Hruby",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/source_docs/Job Descriptions/IT Director.docx",
+      "manager_name": "Lukas Steiner",
+      "team": "Group IT",
+      "primary_topics": [
+        "group IT strategy",
+        "application portfolio",
+        "data governance"
+      ],
+      "skills_person_specific": [
+        "IT strategy",
+        "enterprise architecture",
+        "systems integration",
+        "cloud computing",
+        "information security"
+      ],
+      "systems_known": [
+        "ERP",
+        "Azure",
+        "BI platform",
+        "identity management"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Marek Sramek",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/source_docs/Job Descriptions/Finance Director.docx",
+      "manager_name": "Lukas Steiner",
+      "team": "Group Finance",
+      "primary_topics": [
+        "group financial planning",
+        "budget governance",
+        "performance reviews"
+      ],
+      "skills_person_specific": [
+        "FP&A",
+        "budgeting",
+        "forecasting",
+        "controlling",
+        "cash flow management",
+        "financial governance"
+      ],
+      "systems_known": [
+        "ERP",
+        "BI",
+        "consolidation tools"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Tomas Benes",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/source_docs/Job Descriptions/Procurement Director.docx",
+      "manager_name": "Anna Weber",
+      "team": "Group Procurement",
+      "primary_topics": [
+        "group sourcing strategy",
+        "supplier governance",
+        "procurement policy"
+      ],
+      "skills_person_specific": [
+        "strategic sourcing",
+        "category management",
+        "supplier negotiations",
+        "cost optimization",
+        "risk management",
+        "procurement analytics"
+      ],
+      "systems_known": [
+        "ERP",
+        "e-procurement tools"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Eva Kralikova",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Chief Operating Officer.docx",
+      "manager_name": "Anna Weber",
+      "team": "Operations Leadership",
+      "primary_topics": [
+        "group operations",
+        "plant performance",
+        "operating model"
+      ],
+      "skills_person_specific": [
+        "operations leadership",
+        "manufacturing governance",
+        "supply chain coordination",
+        "cross-site alignment"
+      ],
+      "systems_known": [
+        "executive reporting",
+        "operations dashboards"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Jozef Polak",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Plant Director.docx",
+      "manager_name": "Eva Kralikova",
+      "team": "Plant Leadership",
+      "primary_topics": [
+        "site operations",
+        "plant escalation",
+        "production performance"
+      ],
+      "skills_person_specific": [
+        "plant leadership",
+        "production governance",
+        "quality escalation",
+        "operations planning"
+      ],
+      "systems_known": [
+        "plant KPIs",
+        "operations reports"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Michal Hronec",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Engineering and Reliability.docx",
+      "manager_name": "Jozef Polak",
+      "team": "Engineering and Reliability",
+      "primary_topics": [
+        "line reliability",
+        "maintenance governance",
+        "engineering roadmap"
+      ],
+      "skills_person_specific": [
+        "reliability engineering",
+        "maintenance strategy",
+        "capex planning",
+        "process improvement",
+        "root cause analysis"
+      ],
+      "systems_known": [
+        "maintenance planning",
+        "asset registers",
+        "engineering documentation"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Lucia Benesova",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Project and Process Engineer.docx",
+      "manager_name": "Michal Hronec",
+      "team": "Engineering and Reliability",
+      "primary_topics": [
+        "process improvement",
+        "line optimization",
+        "technical change requests"
+      ],
+      "skills_person_specific": [
+        "process optimization",
+        "industrialization",
+        "line balancing",
+        "technical documentation",
+        "project delivery"
+      ],
+      "systems_known": [
+        "engineering documentation",
+        "process tracking",
+        "project plans"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Andrej Varga",
+      "profile_type": "jd_backed_additional",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Project and Process Engineer.docx",
+      "manager_name": "Michal Hronec",
+      "team": "Engineering and Reliability",
+      "primary_topics": [
+        "automation projects",
+        "process validation",
+        "factory rollouts"
+      ],
+      "skills_person_specific": [
+        "industrial equipment",
+        "automation support",
+        "process validation",
+        "continuous improvement"
+      ],
+      "systems_known": [
+        "process tracking",
+        "automation interfaces"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Nina Havel",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Application Manager and Smart Factory.docx",
+      "manager_name": "Filip Hruby",
+      "team": "Industrial IT",
+      "primary_topics": [
+        "smart factory roadmap",
+        "MES and shopfloor applications",
+        "application rollout"
+      ],
+      "skills_person_specific": [
+        "MES integration",
+        "smart factory systems",
+        "application ownership",
+        "process automation"
+      ],
+      "systems_known": [
+        "ERP",
+        "MES",
+        "SCADA"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Erik Sykora",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/IFS Application Specialist.docx",
+      "manager_name": "Nina Havel",
+      "team": "Industrial IT",
+      "primary_topics": [
+        "ERP support",
+        "IFS process changes",
+        "user issue triage"
+      ],
+      "skills_person_specific": [
+        "IFS ERP",
+        "incident resolution",
+        "business process mapping",
+        "user support",
+        "release testing"
+      ],
+      "systems_known": [
+        "IFS ERP",
+        "workflow approvals",
+        "reporting extracts"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Barbora Klinec",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Business Intelligence Developer.docx",
+      "manager_name": "Filip Hruby",
+      "team": "Data and Analytics",
+      "primary_topics": [
+        "executive dashboards",
+        "sales analytics",
+        "planning reports"
+      ],
+      "skills_person_specific": [
+        "Power BI",
+        "SQL",
+        "dashboard design",
+        "KPI modeling",
+        "sales reporting"
+      ],
+      "systems_known": [
+        "Power BI",
+        "SQL Server",
+        "ERP reporting layer"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "David Mraz",
+      "profile_type": "jd_backed_additional",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Business Intelligence Developer.docx",
+      "manager_name": "Filip Hruby",
+      "team": "Data and Analytics",
+      "primary_topics": [
+        "finance dashboards",
+        "ETL support",
+        "data validation"
+      ],
+      "skills_person_specific": [
+        "Python",
+        "ETL pipelines",
+        "data quality checks",
+        "finance reporting",
+        "API integrations",
+        "SQL"
+      ],
+      "systems_known": [
+        "Python",
+        "SQL Server",
+        "BI data pipelines"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Roman Kolar",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Master Data Governance Lead.docx",
+      "manager_name": "Filip Hruby",
+      "team": "Data Governance",
+      "primary_topics": [
+        "item master",
+        "supplier master",
+        "customer master"
+      ],
+      "skills_person_specific": [
+        "master data governance",
+        "data stewardship",
+        "process design",
+        "data quality management"
+      ],
+      "systems_known": [
+        "ERP",
+        "MDM workflows",
+        "data governance logs"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Saskia de Vries",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Group Research and Development.docx",
+      "manager_name": "Anna Weber",
+      "team": "Group R&D",
+      "primary_topics": [
+        "group innovation roadmap",
+        "product development standards",
+        "R&D prioritization"
+      ],
+      "skills_person_specific": [
+        "product innovation",
+        "formulation strategy",
+        "portfolio development",
+        "stage-gate delivery"
+      ],
+      "systems_known": [
+        "product lifecycle files",
+        "innovation portfolio tracking"
+      ],
+      "languages": [
+        "English",
+        "Dutch"
+      ]
+    },
+    {
+      "name": "Katarina Urban",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Group Quality.docx",
+      "manager_name": "Eva Kralikova",
+      "team": "Group Quality",
+      "primary_topics": [
+        "group quality standards",
+        "audit findings",
+        "quality escalation"
+      ],
+      "skills_person_specific": [
+        "quality governance",
+        "audit readiness",
+        "food safety compliance",
+        "quality systems"
+      ],
+      "systems_known": [
+        "quality records",
+        "audit logs",
+        "document control"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Martin Pospisil",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Group Supply Chain Director.docx",
+      "manager_name": "Eva Kralikova",
+      "team": "Group Supply Chain",
+      "primary_topics": [
+        "group supply planning",
+        "logistics governance",
+        "service level management"
+      ],
+      "skills_person_specific": [
+        "supply chain leadership",
+        "planning governance",
+        "logistics coordination",
+        "service operations"
+      ],
+      "systems_known": [
+        "planning tools",
+        "ERP",
+        "supply chain dashboards"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ]
+    },
+    {
+      "name": "Veronika Duda",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Production Planning Manager.docx",
+      "manager_name": "Martin Pospisil",
+      "team": "Production Planning",
+      "primary_topics": [
+        "production schedule",
+        "capacity planning",
+        "allocation decisions"
+      ],
+      "skills_person_specific": [
+        "production planning",
+        "capacity balancing",
+        "schedule management",
+        "supply planning"
+      ],
+      "systems_known": [
+        "planning tools",
+        "ERP",
+        "production trackers"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Manuela Kovacova",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/HR Manager - Banska Bystrica Plant.docx",
+      "manager_name": "Petra Novakova",
+      "team": "Site HR",
+      "primary_topics": [
+        "site HR operations",
+        "employee onboarding",
+        "manager coaching"
+      ],
+      "skills_person_specific": [
+        "employee relations",
+        "workforce planning",
+        "onboarding",
+        "performance management",
+        "labor law compliance"
+      ],
+      "systems_known": [
+        "HRIS",
+        "document workflows"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ]
+    },
+    {
+      "name": "Ioana Marinescu",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/HR Manager - Romania Country Organization.docx",
+      "manager_name": "Petra Novakova",
+      "team": "Romania HR",
+      "primary_topics": [
+        "country HR operations",
+        "local hiring support",
+        "employee relations"
+      ],
+      "skills_person_specific": [
+        "country HR operations",
+        "recruitment coordination",
+        "employee relations",
+        "local labor compliance",
+        "HR administration"
+      ],
+      "systems_known": [
+        "HRIS",
+        "employee documentation workflows"
+      ],
+      "languages": [
+        "English",
+        "Romanian"
+      ]
+    },
+    {
+      "name": "Julia Hartmann",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Marketing Manager - Vienna HQ.docx",
+      "manager_name": "Stefan Maurer",
+      "team": "Central Marketing",
+      "primary_topics": [
+        "central campaigns",
+        "launch coordination",
+        "brand asset management"
+      ],
+      "skills_person_specific": [
+        "campaign coordination",
+        "brand support",
+        "agency management",
+        "cross-market launch support"
+      ],
+      "systems_known": [
+        "campaign planning files",
+        "asset libraries",
+        "performance reporting"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ]
+    },
+    {
+      "name": "Andreea Popescu",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Marketing Manager - Romania Local Market.docx",
+      "manager_name": "Radu Ionescu",
+      "team": "Romania Marketing",
+      "primary_topics": [
+        "local campaigns",
+        "market activation",
+        "commercial support"
+      ],
+      "skills_person_specific": [
+        "local campaign execution",
+        "brand adaptation",
+        "trade marketing support",
+        "agency coordination"
+      ],
+      "systems_known": [
+        "campaign calendars",
+        "market activation plans"
+      ],
+      "languages": [
+        "English",
+        "Romanian"
+      ]
+    },
+    {
+      "name": "Klara Novak",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Key Account Manager - Czech Republic.docx",
+      "manager_name": "Daniel Richter",
+      "team": "Commercial Czech Republic",
+      "primary_topics": [
+        "key accounts",
+        "customer escalations",
+        "trade planning"
+      ],
+      "skills_person_specific": [
+        "account management",
+        "trade negotiations",
+        "customer planning",
+        "promotion planning"
+      ],
+      "systems_known": [
+        "CRM",
+        "sales dashboards"
+      ],
+      "languages": [
+        "English",
+        "Czech"
+      ]
+    },
+    {
+      "name": "Marta Zielinska",
+      "profile_type": "jd_backed_primary",
+      "jd_file": "job_descriptions/generated_final/Generated Job Descriptions Final/Key Account Manager - Poland Modern Trade.docx",
+      "manager_name": "Piotr Lewandowski",
+      "team": "Commercial Poland",
+      "primary_topics": [
+        "modern trade accounts",
+        "promotional planning",
+        "channel execution"
+      ],
+      "skills_person_specific": [
+        "key account management",
+        "modern trade planning",
+        "negotiation",
+        "promotional coordination"
+      ],
+      "systems_known": [
+        "CRM",
+        "account plans",
+        "promotion trackers"
+      ],
+      "languages": [
+        "English",
+        "Polish"
+      ]
+    },
+    {
+      "name": "Daniel Richter",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Commercial Leadership",
+      "primary_topics": [
+        "brand sales strategy",
+        "commercial planning",
+        "market coordination"
+      ],
+      "skills_person_specific": [
+        "commercial strategy",
+        "channel development",
+        "revenue planning"
+      ],
+      "systems_known": [
+        "CRM",
+        "sales reporting"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Sales Director for Brand Products",
+      "site": "Bratislava",
+      "country": "Slovakia"
+    },
+    {
+      "name": "Stefan Maurer",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Central Marketing",
+      "primary_topics": [
+        "brand strategy",
+        "central campaigns",
+        "portfolio communication"
+      ],
+      "skills_person_specific": [
+        "marketing leadership",
+        "brand strategy",
+        "campaign governance"
+      ],
+      "systems_known": [
+        "campaign planning",
+        "brand asset systems"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Marketing Director",
+      "site": "Wien HQ",
+      "country": "Austria"
+    },
+    {
+      "name": "Radu Ionescu",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Romania Leadership",
+      "primary_topics": [
+        "local market growth",
+        "country operations",
+        "commercial coordination"
+      ],
+      "skills_person_specific": [
+        "country leadership",
+        "commercial coordination",
+        "market development"
+      ],
+      "systems_known": [
+        "local performance reports"
+      ],
+      "languages": [
+        "English",
+        "Romanian"
+      ],
+      "role": "Country Manager Romania",
+      "site": "Bucharest",
+      "country": "Romania"
+    },
+    {
+      "name": "Piotr Lewandowski",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Anna Weber",
+      "team": "Poland Commercial Leadership",
+      "primary_topics": [
+        "poland commercial strategy",
+        "channel priorities",
+        "market growth"
+      ],
+      "skills_person_specific": [
+        "commercial leadership",
+        "channel strategy",
+        "customer development"
+      ],
+      "systems_known": [
+        "CRM",
+        "sales reporting"
+      ],
+      "languages": [
+        "English",
+        "Polish"
+      ],
+      "role": "Commercial Director Poland",
+      "site": "Warszawa",
+      "country": "Poland"
+    },
+    {
+      "name": "Alena Kralova",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Petra Novakova",
+      "team": "Group HR",
+      "primary_topics": [
+        "HR onboarding",
+        "starter checklists",
+        "training schedules"
+      ],
+      "skills_person_specific": [
+        "onboarding coordination",
+        "HR administration",
+        "training coordination"
+      ],
+      "systems_known": [
+        "HRIS",
+        "SharePoint",
+        "learning records"
+      ],
+      "languages": [
+        "English",
+        "Slovak"
+      ],
+      "role": "HR Specialist and Onboarding",
+      "site": "Bratislava",
+      "country": "Slovakia"
+    },
+    {
+      "name": "Zuzana Balaz",
+      "profile_type": "org_support",
+      "jd_file": null,
+      "manager_name": "Martin Pospisil",
+      "team": "Customer Service",
+      "primary_topics": [
+        "customer service escalations",
+        "order issue resolution",
+        "service workflows"
+      ],
+      "skills_person_specific": [
+        "customer service operations",
+        "order coordination",
+        "escalation handling"
+      ],
+      "systems_known": [
+        "ERP",
+        "service cases",
+        "order tracking"
+      ],
+      "languages": [
+        "English",
+        "German"
+      ],
+      "role": "Customer Service Manager",
+      "site": "Oberwart",
+      "country": "Austria"
+    }
+  ]
+}

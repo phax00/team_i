@@ -1,0 +1,61 @@
+{
+  "rules_file": "graphs/normalization/normalization_rules.json",
+  "outputs": {
+    "core": {
+      "input": "graphs/core/knowledge_graph_core.json",
+      "output": "graphs/core/knowledge_graph_core_normalized.json",
+      "node_merges": [
+        {
+          "merged_into": "Department:human-resources",
+          "source_node_id": "Department:human-resources",
+          "source_name": "Human Resources",
+          "canonical_name": "Human Resources"
+        },
+        {
+          "merged_into": "Topic:employee-onboarding",
+          "source_node_id": "Topic:hr-onboarding",
+          "source_name": "HR onboarding",
+          "canonical_name": "Employee onboarding"
+        }
+      ],
+      "total_nodes_before": 570,
+      "total_nodes_after": 568,
+      "total_relationships_before": 746,
+      "total_relationships_after": 746
+    },
+    "school": {
+      "input": "graphs/school_mvp/knowledge_graph_school_mvp.json",
+      "output": "graphs/school_mvp/knowledge_graph_school_mvp_normalized.json",
+      "node_merges": [
+        {
+          "merged_into": "Department:human-resources",
+          "source_node_id": "Department:human-resources",
+          "source_name": "Human Resources",
+          "canonical_name": "Human Resources"
+        },
+        {
+          "merged_into": "Skill:analytics-engineering",
+          "source_node_id": "Skill:analytics-engineering",
+          "source_name": "Analytics engineering",
+          "canonical_name": "Analytics engineering"
+        },
+        {
+          "merged_into": "Skill:data-governance",
+          "source_node_id": "Skill:governance",
+          "source_name": "Governance",
+          "canonical_name": "Data Governance"
+        },
+        {
+          "merged_into": "Topic:employee-onboarding",
+          "source_node_id": "Topic:hr-onboarding",
+          "source_name": "HR onboarding",
+          "canonical_name": "Employee onboarding"
+        }
+      ],
+      "total_nodes_before": 682,
+      "total_nodes_after": 678,
+      "total_relationships_before": 1103,
+      "total_relationships_after": 1103
+    }
+  }
+}
