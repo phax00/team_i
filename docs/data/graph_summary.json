@@ -1,14 +1,16 @@
 {
-  "knowledge_graph_core.json": {
+  "knowledge_graph_core_normalized.json": {
     "meta": {
       "generated_from": [
-        "JD_Catalog.json",
-        "Person_Profiles_Linked.verbose_backup.json"
+        "job_descriptions/catalog/JD_Catalog.json",
+        "people/data/Person_Profiles_Graph_Input.json"
       ],
       "activity_sources_included": [],
-      "graph_scope": "Core enterprise knowledge graph without GitHub or Jira activity",
-      "node_count": 566,
-      "relationship_count": 751
+      "graph_scope": "Enterprise knowledge graph for organizational structure, job descriptions, skills, topics, systems, and reporting relationships",
+      "node_count": 568,
+      "relationship_count": 746,
+      "normalization_rules": "graphs/normalization/normalization_rules.json",
+      "normalization_applied": true
     },
     "node_labels": [
       "Country",
@@ -41,20 +43,22 @@
       "SCOPES_TO_DEPARTMENT"
     ]
   },
-  "knowledge_graph_school_mvp.json": {
+  "knowledge_graph_school_mvp_normalized.json": {
     "meta": {
       "generated_from": [
-        "knowledge_graph_core.json",
-        "github_activity_mapped.json",
-        "jira_synthetic.json"
+        "graphs/core/knowledge_graph_core.json",
+        "activity/github/data/github_activity_mapped.json",
+        "activity/jira/data/jira_synthetic.json"
       ],
       "activity_sources_included": [
         "GitHub public activity",
         "Synthetic Jira"
       ],
-      "graph_scope": "School MVP knowledge graph with HR baseline plus GitHub and Jira activity",
+      "graph_scope": "Expanded enterprise knowledge graph with organizational context, job descriptions, skills, topics, systems, engineering activity, and project work evidence",
       "node_count": 678,
-      "relationship_count": 1108
+      "relationship_count": 1103,
+      "normalization_rules": "graphs/normalization/normalization_rules.json",
+      "normalization_applied": true
     },
     "node_labels": [
       "Commit",

@@ -1,18 +1,18 @@
 {
   "meta": {
     "generated_from": [
-      "knowledge_graph_core.json",
-      "github_activity_mapped.json",
-      "jira_synthetic.json"
+      "graphs/core/knowledge_graph_core.json",
+      "activity/github/data/github_activity_mapped.json",
+      "activity/jira/data/jira_synthetic.json"
     ],
     "activity_sources_included": [
       "GitHub public activity",
       "Synthetic Jira"
     ],
     "graph_scope": "Expanded enterprise knowledge graph with organizational context, job descriptions, skills, topics, systems, engineering activity, and project work evidence",
-    "node_count": 674,
-    "relationship_count": 1108,
-    "normalization_rules": "normalization_rules.json",
+    "node_count": 678,
+    "relationship_count": 1103,
+    "normalization_rules": "graphs/normalization/normalization_rules.json",
     "normalization_applied": true
   },
   "nodes": [
@@ -548,7 +548,7 @@
       "id": "JobDescription:application-manager-and-smart-factory",
       "label": "JobDescription",
       "name": "Application Manager and Smart Factory",
-      "relative_path": "Generated Job Descriptions Final/Application Manager and Smart Factory.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Application Manager and Smart Factory.docx",
       "role_name": "Application Manager and Smart Factory",
       "department": "Information Technology / Industrial Applications",
       "location_context": "Banska Bystrica, Slovakia",
@@ -560,7 +560,7 @@
       "id": "JobDescription:business-intelligence-developer",
       "label": "JobDescription",
       "name": "Business Intelligence Developer",
-      "relative_path": "Generated Job Descriptions Final/Business Intelligence Developer.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Business Intelligence Developer.docx",
       "role_name": "Business Intelligence Developer",
       "department": "Data and Analytics / Information Technology",
       "location_context": "Bratislava, Slovakia",
@@ -572,7 +572,7 @@
       "id": "JobDescription:chief-operating-officer",
       "label": "JobDescription",
       "name": "Chief Operating Officer",
-      "relative_path": "Generated Job Descriptions Final/Chief Operating Officer.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Chief Operating Officer.docx",
       "role_name": "Chief Operating Officer",
       "department": "Operations / Manufacturing Leadership",
       "location_context": "Group / Multi-site (Europe HQ with frequent travel to production sites and sales subsidiaries)",
@@ -584,7 +584,7 @@
       "id": "JobDescription:finance-director",
       "label": "JobDescription",
       "name": "Finance Director",
-      "relative_path": "Job Descriptions/Finance Director.docx",
+      "relative_path": "job_descriptions/source_docs/Job Descriptions/Finance Director.docx",
       "role_name": "Finance Director / Head of Finance",
       "department": "Finance",
       "location_context": "Enterprise / Multi-site (Europe HQ with regular travel to production sites and sales subsidiaries)",
@@ -596,7 +596,7 @@
       "id": "JobDescription:group-supply-chain-director",
       "label": "JobDescription",
       "name": "Group Supply Chain Director",
-      "relative_path": "Generated Job Descriptions Final/Group Supply Chain Director.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Group Supply Chain Director.docx",
       "role_name": "Group Supply Chain Director",
       "department": "Supply Chain / Planning / Logistics / Customer Service",
       "location_context": "Oberwart, Austria",
@@ -608,7 +608,7 @@
       "id": "JobDescription:head-of-engineering-and-reliability",
       "label": "JobDescription",
       "name": "Head of Engineering and Reliability",
-      "relative_path": "Generated Job Descriptions Final/Head of Engineering and Reliability.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Engineering and Reliability.docx",
       "role_name": "Head of Engineering and Reliability",
       "department": "Engineering / Reliability / Technical Operations",
       "location_context": "Banska Bystrica, Slovakia",
@@ -620,7 +620,7 @@
       "id": "JobDescription:head-of-group-quality",
       "label": "JobDescription",
       "name": "Head of Group Quality",
-      "relative_path": "Generated Job Descriptions Final/Head of Group Quality.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Group Quality.docx",
       "role_name": "Head of Group Quality",
       "department": "Quality / Food Safety / Compliance",
       "location_context": "Banska Bystrica, Slovakia",
@@ -632,7 +632,7 @@
       "id": "JobDescription:head-of-group-research-and-development",
       "label": "JobDescription",
       "name": "Head of Group Research and Development",
-      "relative_path": "Generated Job Descriptions Final/Head of Group Research and Development.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Head of Group Research and Development.docx",
       "role_name": "Head of Group Research and Development",
       "department": "Research & Development / Product Innovation",
       "location_context": "Landgraaf, Netherlands",
@@ -644,7 +644,7 @@
       "id": "JobDescription:hr-director",
       "label": "JobDescription",
       "name": "HR Director",
-      "relative_path": "Job Descriptions/HR Director.docx",
+      "relative_path": "job_descriptions/source_docs/Job Descriptions/HR Director.docx",
       "role_name": "HR Director/ Head of HR",
       "department": "HR",
       "location_context": "Group / Multi-site (Europe HQ with frequent travel to production sites and sales subsidiaries)",
@@ -656,7 +656,7 @@
       "id": "JobDescription:hr-lead",
       "label": "JobDescription",
       "name": "HR Lead",
-      "relative_path": "Job Descriptions/HR Lead.docx",
+      "relative_path": "job_descriptions/source_docs/Job Descriptions/HR Lead.docx",
       "role_name": "HR Manager",
       "department": "Human Resources",
       "location_context": "[Specify Site or Region]",
@@ -668,7 +668,7 @@
       "id": "JobDescription:hr-manager-banska-bystrica-plant",
       "label": "JobDescription",
       "name": "HR Manager - Banska Bystrica Plant",
-      "relative_path": "Generated Job Descriptions Final/HR Manager - Banska Bystrica Plant.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/HR Manager - Banska Bystrica Plant.docx",
       "role_name": "HR Manager",
       "department": "Human Resources",
       "location_context": "Banska Bystrica Plant, Slovakia",
@@ -680,7 +680,7 @@
       "id": "JobDescription:hr-manager-romania-country-organization",
       "label": "JobDescription",
       "name": "HR Manager - Romania Country Organization",
-      "relative_path": "Generated Job Descriptions Final/HR Manager - Romania Country Organization.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/HR Manager - Romania Country Organization.docx",
       "role_name": "HR Manager",
       "department": "Human Resources",
       "location_context": "Bucharest, Romania",
@@ -692,7 +692,7 @@
       "id": "JobDescription:ifs-application-specialist",
       "label": "JobDescription",
       "name": "IFS Application Specialist",
-      "relative_path": "Generated Job Descriptions Final/IFS Application Specialist.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/IFS Application Specialist.docx",
       "role_name": "IFS Application Specialist",
       "department": "Information Technology / ERP Applications",
       "location_context": "Banska Bystrica, Slovakia",
@@ -704,7 +704,7 @@
       "id": "JobDescription:it-director",
       "label": "JobDescription",
       "name": "IT Director",
-      "relative_path": "Job Descriptions/IT Director.docx",
+      "relative_path": "job_descriptions/source_docs/Job Descriptions/IT Director.docx",
       "role_name": "IT Director / Head of IT",
       "department": "Information Technology (Digital & Systems)",
       "location_context": "Multi-site (Europe HQ with frequent travel to production sites and sales subsidiaries)",
@@ -716,7 +716,7 @@
       "id": "JobDescription:key-account-manager-czech-republic",
       "label": "JobDescription",
       "name": "Key Account Manager - Czech Republic",
-      "relative_path": "Generated Job Descriptions Final/Key Account Manager - Czech Republic.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Key Account Manager - Czech Republic.docx",
       "role_name": "Key Account Manager",
       "department": "Commercial / Sales",
       "location_context": "Brno, Czech Republic",
@@ -728,7 +728,7 @@
       "id": "JobDescription:key-account-manager-poland-modern-trade",
       "label": "JobDescription",
       "name": "Key Account Manager - Poland Modern Trade",
-      "relative_path": "Generated Job Descriptions Final/Key Account Manager - Poland Modern Trade.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Key Account Manager - Poland Modern Trade.docx",
       "role_name": "Key Account Manager",
       "department": "Commercial / Sales",
       "location_context": "Warszawa, Poland",
@@ -740,7 +740,7 @@
       "id": "JobDescription:marketing-manager-romania-local-market",
       "label": "JobDescription",
       "name": "Marketing Manager - Romania Local Market",
-      "relative_path": "Generated Job Descriptions Final/Marketing Manager - Romania Local Market.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Marketing Manager - Romania Local Market.docx",
       "role_name": "Marketing Manager",
       "department": "Marketing / Local Market Activation",
       "location_context": "Bucharest, Romania",
@@ -752,7 +752,7 @@
       "id": "JobDescription:marketing-manager-vienna-hq",
       "label": "JobDescription",
       "name": "Marketing Manager - Vienna HQ",
-      "relative_path": "Generated Job Descriptions Final/Marketing Manager - Vienna HQ.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Marketing Manager - Vienna HQ.docx",
       "role_name": "Marketing Manager",
       "department": "Marketing / Brand Management",
       "location_context": "Wien, Austria",
@@ -764,7 +764,7 @@
       "id": "JobDescription:master-data-governance-lead",
       "label": "JobDescription",
       "name": "Master Data Governance Lead",
-      "relative_path": "Generated Job Descriptions Final/Master Data Governance Lead.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Master Data Governance Lead.docx",
       "role_name": "Master Data Governance Lead",
       "department": "Data Governance / Information Technology",
       "location_context": "Bratislava, Slovakia",
@@ -776,7 +776,7 @@
       "id": "JobDescription:plant-director",
       "label": "JobDescription",
       "name": "Plant Director",
-      "relative_path": "Generated Job Descriptions Final/Plant Director.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Plant Director.docx",
       "role_name": "Plant Director",
       "department": "Operations / Manufacturing",
       "location_context": "Banska Bystrica, Slovakia",
@@ -788,7 +788,7 @@
       "id": "JobDescription:procurement-director",
       "label": "JobDescription",
       "name": "Procurement Director",
-      "relative_path": "Job Descriptions/Procurement Director.docx",
+      "relative_path": "job_descriptions/source_docs/Job Descriptions/Procurement Director.docx",
       "role_name": "Head of Procurement / Procurement Director",
       "department": "Procurement & Supply Chain",
       "location_context": "Group (covering all production sites and sales subsidiaries)",
@@ -800,7 +800,7 @@
       "id": "JobDescription:production-planning-manager",
       "label": "JobDescription",
       "name": "Production Planning Manager",
-      "relative_path": "Generated Job Descriptions Final/Production Planning Manager.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Production Planning Manager.docx",
       "role_name": "Production Planning Manager",
       "department": "Supply Chain / Production Planning",
       "location_context": "Banska Bystrica, Slovakia",
@@ -812,7 +812,7 @@
       "id": "JobDescription:project-and-process-engineer",
       "label": "JobDescription",
       "name": "Project and Process Engineer",
-      "relative_path": "Generated Job Descriptions Final/Project and Process Engineer.docx",
+      "relative_path": "job_descriptions/generated_final/Generated Job Descriptions Final/Project and Process Engineer.docx",
       "role_name": "Project and Process Engineer",
       "department": "Engineering / Process Improvement",
       "location_context": "Banska Bystrica, Slovakia",
@@ -825,224 +825,224 @@
       "label": "Person",
       "name": "Alena Kralova",
       "profile_type": "org_support",
-      "seniority": "Specialist"
+      "seniority": null
     },
     {
       "id": "Person:andreea-popescu",
       "label": "Person",
       "name": "Andreea Popescu",
       "profile_type": "jd_backed_primary",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Person:andrej-varga",
       "label": "Person",
       "name": "Andrej Varga",
       "profile_type": "jd_backed_additional",
-      "seniority": "Specialist"
+      "seniority": null
     },
     {
       "id": "Person:anna-weber",
       "label": "Person",
       "name": "Anna Weber",
       "profile_type": "org_support",
-      "seniority": "Executive"
+      "seniority": null
     },
     {
       "id": "Person:barbora-klinec",
       "label": "Person",
       "name": "Barbora Klinec",
       "profile_type": "jd_backed_primary",
-      "seniority": "Specialist"
+      "seniority": null
     },
     {
       "id": "Person:daniel-richter",
       "label": "Person",
       "name": "Daniel Richter",
       "profile_type": "org_support",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:david-mraz",
       "label": "Person",
       "name": "David Mraz",
       "profile_type": "jd_backed_additional",
-      "seniority": "Specialist"
+      "seniority": null
     },
     {
       "id": "Person:erik-sykora",
       "label": "Person",
       "name": "Erik Sykora",
       "profile_type": "jd_backed_primary",
-      "seniority": "Specialist"
+      "seniority": null
     },
     {
       "id": "Person:eva-kralikova",
       "label": "Person",
       "name": "Eva Kralikova",
       "profile_type": "jd_backed_primary",
-      "seniority": "Executive"
+      "seniority": null
     },
     {
       "id": "Person:filip-hruby",
       "label": "Person",
       "name": "Filip Hruby",
       "profile_type": "jd_backed_primary",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:ioana-marinescu",
       "label": "Person",
       "name": "Ioana Marinescu",
       "profile_type": "jd_backed_primary",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Person:jozef-polak",
       "label": "Person",
       "name": "Jozef Polak",
       "profile_type": "jd_backed_primary",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:julia-hartmann",
       "label": "Person",
       "name": "Julia Hartmann",
       "profile_type": "jd_backed_primary",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Person:katarina-urban",
       "label": "Person",
       "name": "Katarina Urban",
       "profile_type": "jd_backed_primary",
-      "seniority": "Head"
+      "seniority": null
     },
     {
       "id": "Person:klara-novak",
       "label": "Person",
       "name": "Klara Novak",
       "profile_type": "jd_backed_primary",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Person:lucia-benesova",
       "label": "Person",
       "name": "Lucia Benesova",
       "profile_type": "jd_backed_primary",
-      "seniority": "Specialist"
+      "seniority": null
     },
     {
       "id": "Person:lukas-steiner",
       "label": "Person",
       "name": "Lukas Steiner",
       "profile_type": "org_support",
-      "seniority": "Executive"
+      "seniority": null
     },
     {
       "id": "Person:manuela-kovacova",
       "label": "Person",
       "name": "Manuela Kovacova",
       "profile_type": "jd_backed_primary",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Person:marek-sramek",
       "label": "Person",
       "name": "Marek Sramek",
       "profile_type": "jd_backed_primary",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:marta-zielinska",
       "label": "Person",
       "name": "Marta Zielinska",
       "profile_type": "jd_backed_primary",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Person:martin-pospisil",
       "label": "Person",
       "name": "Martin Pospisil",
       "profile_type": "jd_backed_primary",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:michal-hronec",
       "label": "Person",
       "name": "Michal Hronec",
       "profile_type": "jd_backed_primary",
-      "seniority": "Head"
+      "seniority": null
     },
     {
       "id": "Person:nina-havel",
       "label": "Person",
       "name": "Nina Havel",
       "profile_type": "jd_backed_primary",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Person:petra-novakova",
       "label": "Person",
       "name": "Petra Novakova",
       "profile_type": "jd_backed_primary",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:piotr-lewandowski",
       "label": "Person",
       "name": "Piotr Lewandowski",
       "profile_type": "org_support",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:radu-ionescu",
       "label": "Person",
       "name": "Radu Ionescu",
       "profile_type": "org_support",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:roman-kolar",
       "label": "Person",
       "name": "Roman Kolar",
       "profile_type": "jd_backed_primary",
-      "seniority": "Lead"
+      "seniority": null
     },
     {
       "id": "Person:saskia-de-vries",
       "label": "Person",
       "name": "Saskia de Vries",
       "profile_type": "jd_backed_primary",
-      "seniority": "Head"
+      "seniority": null
     },
     {
       "id": "Person:stefan-maurer",
       "label": "Person",
       "name": "Stefan Maurer",
       "profile_type": "org_support",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:tomas-benes",
       "label": "Person",
       "name": "Tomas Benes",
       "profile_type": "jd_backed_primary",
-      "seniority": "Director"
+      "seniority": null
     },
     {
       "id": "Person:veronika-duda",
       "label": "Person",
       "name": "Veronika Duda",
       "profile_type": "jd_backed_primary",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Person:zuzana-balaz",
       "label": "Person",
       "name": "Zuzana Balaz",
       "profile_type": "org_support",
-      "seniority": "Manager"
+      "seniority": null
     },
     {
       "id": "Project:account-planning-excellence",
@@ -1426,9 +1426,29 @@
       "name": "Bucharest"
     },
     {
+      "id": "Site:enterprise-multi-site-europe-hq-with-regular-travel-to-production-sites-and-sales-subsidiaries",
+      "label": "Site",
+      "name": "Enterprise / Multi-site (Europe HQ with regular travel to production sites and sales subsidiaries)"
+    },
+    {
+      "id": "Site:group-covering-all-production-sites-and-sales-subsidiaries",
+      "label": "Site",
+      "name": "Group (covering all production sites and sales subsidiaries)"
+    },
+    {
+      "id": "Site:group-multi-site-europe-hq-with-frequent-travel-to-production-sites-and-sales-subsidiaries",
+      "label": "Site",
+      "name": "Group / Multi-site (Europe HQ with frequent travel to production sites and sales subsidiaries)"
+    },
+    {
       "id": "Site:landgraaf",
       "label": "Site",
       "name": "Landgraaf"
+    },
+    {
+      "id": "Site:multi-site-europe-hq-with-frequent-travel-to-production-sites-and-sales-subsidiaries",
+      "label": "Site",
+      "name": "Multi-site (Europe HQ with frequent travel to production sites and sales subsidiaries)"
     },
     {
       "id": "Site:oberwart",
@@ -5649,12 +5669,7 @@
     {
       "start": "Person:petra-novakova",
       "type": "AT_SITE",
-      "end": "Site:wien-hq"
-    },
-    {
-      "start": "Person:petra-novakova",
-      "type": "LOCATED_IN",
-      "end": "Country:austria"
+      "end": "Site:group-multi-site-europe-hq-with-frequent-travel-to-production-sites-and-sales-subsidiaries"
     },
     {
       "start": "Person:petra-novakova",
@@ -5740,12 +5755,7 @@
     {
       "start": "Person:filip-hruby",
       "type": "AT_SITE",
-      "end": "Site:banska-bystrica"
-    },
-    {
-      "start": "Person:filip-hruby",
-      "type": "LOCATED_IN",
-      "end": "Country:slovakia"
+      "end": "Site:multi-site-europe-hq-with-frequent-travel-to-production-sites-and-sales-subsidiaries"
     },
     {
       "start": "Person:filip-hruby",
@@ -5830,12 +5840,7 @@
     {
       "start": "Person:marek-sramek",
       "type": "AT_SITE",
-      "end": "Site:wien-hq"
-    },
-    {
-      "start": "Person:marek-sramek",
-      "type": "LOCATED_IN",
-      "end": "Country:austria"
+      "end": "Site:enterprise-multi-site-europe-hq-with-regular-travel-to-production-sites-and-sales-subsidiaries"
     },
     {
       "start": "Person:marek-sramek",
@@ -5921,12 +5926,7 @@
     {
       "start": "Person:tomas-benes",
       "type": "AT_SITE",
-      "end": "Site:bratislava"
-    },
-    {
-      "start": "Person:tomas-benes",
-      "type": "LOCATED_IN",
-      "end": "Country:slovakia"
+      "end": "Site:group-covering-all-production-sites-and-sales-subsidiaries"
     },
     {
       "start": "Person:tomas-benes",
@@ -6007,12 +6007,7 @@
     {
       "start": "Person:eva-kralikova",
       "type": "AT_SITE",
-      "end": "Site:banska-bystrica"
-    },
-    {
-      "start": "Person:eva-kralikova",
-      "type": "LOCATED_IN",
-      "end": "Country:slovakia"
+      "end": "Site:group-multi-site-europe-hq-with-frequent-travel-to-production-sites-and-sales-subsidiaries"
     },
     {
       "start": "Person:eva-kralikova",
@@ -7129,7 +7124,7 @@
     {
       "start": "Person:manuela-kovacova",
       "type": "AT_SITE",
-      "end": "Site:banska-bystrica"
+      "end": "Site:banska-bystrica-plant"
     },
     {
       "start": "Person:manuela-kovacova",
@@ -7289,7 +7284,7 @@
     {
       "start": "Person:julia-hartmann",
       "type": "AT_SITE",
-      "end": "Site:wien-hq"
+      "end": "Site:wien"
     },
     {
       "start": "Person:julia-hartmann",
