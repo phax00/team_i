@@ -1,0 +1,33 @@
+{
+  "aliases": {
+    "coo": "chief operating officer",
+    "ceo": "chief executive officer",
+    "cfo": "chief financial officer",
+    "cio": "chief information officer",
+    "cto": "chief technology officer",
+    "hr": "human resources",
+    "bi": "business intelligence",
+    "rd": "research and development",
+    "r&d": "research and development",
+    "mdm": "master data governance",
+    "ifs": "ifs application specialist ifs erp",
+    "czechia": "czech republic",
+    "slovak republic": "slovakia"
+  },
+  "similar_roles": {
+    "chief information officer": [
+      "IT Director / Head of IT"
+    ],
+    "chief technology officer": [
+      "IT Director / Head of IT",
+      "Head of Engineering and Reliability"
+    ],
+    "cio": [
+      "IT Director / Head of IT"
+    ],
+    "cto": [
+      "IT Director / Head of IT",
+      "Head of Engineering and Reliability"
+    ]
+  }
+}
