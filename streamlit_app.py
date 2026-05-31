@@ -20,10 +20,7 @@ GRAPH_OPTIONS = {
     "Basic Graph": DATA_DIR / "knowledge_graph_core_normalized.json",
     "Detailed Graph": DATA_DIR / "knowledge_graph_school_mvp_normalized.json",
 }
-GEMINI_MODEL_OPTIONS = {
-    "Fast": "gemini-2.5-flash",
-    "Balanced": "gemini-2.5-flash",
-}
+DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 STOPWORDS = {
     "a",
     "an",
@@ -597,8 +594,10 @@ Available roles:
 
     outputs: list[str] = []
     ollama_available = bool(ollama_host) and is_ollama_available(ollama_host)
-    chain = provider_chain(ollama_available)
-    gemini_ready = bool(get_api_key())
+    runtime_mode = detect_runtime_mode(ollama_available)
+    gemini_ready = bool(gemini_model_name) and bool(get_api_key()) and not bool(st.session_state.get("gemini_model_disabled", False))
+    use_model = bool(ollama_model_name) or gemini_ready
+    chain = provider_chain(runtime_mode, use_model, ollama_available, gemini_ready)
 
     for backend in chain:
         try:
@@ -612,7 +611,9 @@ Available roles:
                 response = call_gemini(prompt, gemini_model_name)
             else:
                 continue
-        except Exception:
+        except Exception as error:
+            if backend == "gemini" and is_gemini_quota_error(error):
+                mark_gemini_unavailable("Gemini is temporarily unavailable because the API quota or rate limit was reached.")
             continue
 
         outputs = [line.strip() for line in response.splitlines() if line.strip()]
@@ -1153,6 +1154,8 @@ def try_membership_answer(
     match = re.search(r"who\s+is\s+in\s+(.+)", normalized)
     if not match:
         match = re.search(r"who'?s\s+in\s+(.+)", normalized)
+    if not match:
+        match = re.search(r"who\s+works\s+in\s+(.+)", normalized)
     if not match:
         return None
 
@@ -1797,11 +1800,43 @@ def detect_runtime_mode(ollama_available: bool) -> str:
     return "local" if ollama_available else "cloud"
 
 
-def provider_chain(ollama_available: bool) -> list[str]:
-    runtime_mode = detect_runtime_mode(ollama_available)
+def is_gemini_quota_error(error: Exception) -> bool:
+    message = str(error).casefold()
+    markers = [
+        "quota",
+        "resource exhausted",
+        "resource_exhausted",
+        "rate limit",
+        "429",
+        "too many requests",
+        "insufficient",
+        "billing",
+    ]
+    return any(marker in message for marker in markers)
+
+
+def mark_gemini_unavailable(reason: str) -> None:
+    try:
+        st.session_state["gemini_model_disabled"] = True
+        st.session_state["gemini_model_disabled_reason"] = reason
+    except Exception:
+        pass
+
+
+def clear_gemini_unavailable() -> None:
+    try:
+        st.session_state["gemini_model_disabled"] = False
+        st.session_state["gemini_model_disabled_reason"] = None
+    except Exception:
+        pass
+
+
+def provider_chain(runtime_mode: str, use_model: bool, ollama_available: bool, gemini_ready: bool) -> list[str]:
+    if not use_model:
+        return ["search"]
     if runtime_mode == "local":
-        return ["ollama", "gemini", "search"]
-    return ["gemini", "search"]
+        return ["ollama", "search"] if ollama_available else ["search"]
+    return ["gemini", "search"] if gemini_ready else ["search"]
 
 
 def natural_search_answer(question: str, evidence: dict[str, Any]) -> str:
@@ -2035,8 +2070,10 @@ User question:
 """
 
     ollama_available = bool(ollama_host) and is_ollama_available(ollama_host)
-    chain = provider_chain(ollama_available)
-    gemini_ready = bool(get_api_key())
+    runtime_mode = detect_runtime_mode(ollama_available)
+    gemini_ready = bool(gemini_model_name) and bool(get_api_key()) and not bool(st.session_state.get("gemini_model_disabled", False))
+    use_model = bool(ollama_model_name) or gemini_ready
+    chain = provider_chain(runtime_mode, use_model, ollama_available, gemini_ready)
 
     for backend in chain:
         try:
@@ -2050,7 +2087,9 @@ User question:
                 raw = call_gemini(prompt, gemini_model_name)
             else:
                 continue
-        except Exception:
+        except Exception as error:
+            if backend == "gemini" and is_gemini_quota_error(error):
+                mark_gemini_unavailable("Gemini is temporarily unavailable because the API quota or rate limit was reached.")
             continue
 
         parsed = extract_json_object(raw)
@@ -2106,6 +2145,18 @@ def call_ollama(prompt: str, model_name: str, host: str) -> str:
     return str(body.get("response", "")).strip()
 
 
+def make_answer_trace(
+    final_backend: str,
+    resolution_mode: str,
+    interpreter_backend: str | None = None,
+) -> dict[str, str]:
+    return {
+        "final_backend": final_backend,
+        "resolution_mode": resolution_mode,
+        "interpreter_backend": interpreter_backend or "None",
+    }
+
+
 def answer_question(
     question: str,
     dataset_name: str,
@@ -2118,27 +2169,29 @@ def answer_question(
     recent_messages: list[dict[str, str]] | None = None,
     last_query_state: dict[str, Any] | None = None,
     last_evidence: dict[str, Any] | None = None,
-) -> tuple[str, dict[str, Any], str, dict[str, Any] | None]:
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None, dict[str, str]]:
     why_followup_answer = try_why_followup_answer(question, last_query_state, last_evidence)
     if why_followup_answer:
-        return why_followup_answer
+        answer, evidence, backend, query_state = why_followup_answer
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up explanation from graph evidence")
 
     more_results_answer = try_more_results_answer(question, indexes, last_query_state)
     if more_results_answer:
-        return more_results_answer
+        answer, evidence, backend, query_state = more_results_answer
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up expansion from graph evidence")
 
     fallback_question = resolve_followup_question(question, conversation_focus)
 
-    def dispatch_safe(question_text: str) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    def dispatch_safe(question_text: str) -> tuple[str, dict[str, Any], str, dict[str, Any] | None, str] | None:
         location_people_sites_answer = try_location_people_and_sites_answer(question_text, indexes)
         if location_people_sites_answer:
             answer, evidence, backend = location_people_sites_answer
-            return answer, evidence, backend, None
+            return answer, evidence, backend, None, "Structured graph handler: location + sites"
 
         list_answer = try_list_entities_answer(question_text, indexes)
         if list_answer:
             answer, evidence, backend = list_answer
-            return answer, evidence, backend, None
+            return answer, evidence, backend, None, "Structured graph handler: entity listing"
 
         membership_answer = try_membership_answer(
             question_text,
@@ -2149,12 +2202,12 @@ def answer_question(
         )
         if membership_answer:
             answer, evidence, backend = membership_answer
-            return answer, evidence, backend, None
+            return answer, evidence, backend, None, "Structured graph handler: membership/location"
 
         identity_answer = try_identity_answer(question_text, indexes)
         if identity_answer:
             answer, evidence, backend = identity_answer
-            return answer, evidence, backend, None
+            return answer, evidence, backend, None, "Structured graph handler: identity"
 
         if is_identity_question(question_text):
             suggested_answer = build_similar_role_suggestion(
@@ -2166,9 +2219,9 @@ def answer_question(
             )
             if suggested_answer:
                 answer, evidence, backend = suggested_answer
-                return answer, evidence, backend, None
+                return answer, evidence, backend, None, "Graph-supported similar role suggestion"
             empty_evidence = {"top_nodes": [], "related_nodes": [], "relationships": []}
-            return "I could not find a confident person or role match for that title in the current graph.", empty_evidence, "Graph Search", None
+            return "I could not find a confident person or role match for that title in the current graph.", empty_evidence, "Graph Search", None, "Structured graph handler: identity not found"
 
         reporting_answer = try_reporting_answer(
             question_text,
@@ -2179,7 +2232,7 @@ def answer_question(
         )
         if reporting_answer:
             answer, evidence, backend = reporting_answer
-            return answer, evidence, backend, None
+            return answer, evidence, backend, None, "Structured graph handler: reporting down"
 
         reverse_reporting_answer = try_reverse_reporting_answer(
             question_text,
@@ -2190,11 +2243,12 @@ def answer_question(
         )
         if reverse_reporting_answer:
             answer, evidence, backend = reverse_reporting_answer
-            return answer, evidence, backend, None
+            return answer, evidence, backend, None, "Structured graph handler: reporting up"
 
         keyword_people_answer = try_people_for_keyword_answer(question_text, indexes)
         if keyword_people_answer:
-            return keyword_people_answer
+            answer, evidence, backend, query_state = keyword_people_answer
+            return answer, evidence, backend, query_state, "Structured graph handler: broad people keyword"
 
         knows_answer = try_knows_answer(
             question_text,
@@ -2205,7 +2259,7 @@ def answer_question(
         )
         if knows_answer:
             answer, evidence, backend = knows_answer
-            return answer, evidence, backend, None
+            return answer, evidence, backend, None, "Structured graph handler: system knowledge"
 
         skill_answer = try_skill_answer(
             question_text,
@@ -2216,18 +2270,20 @@ def answer_question(
         )
         if skill_answer:
             answer, evidence, backend = skill_answer
-            return answer, evidence, backend, None
+            return answer, evidence, backend, None, "Structured graph handler: skill match"
 
         return None
 
-    if re.search(r"^\s*who('?s| is)\s+in\s+.+", expand_query(fallback_question)):
+    if re.search(r"^\s*(who('?s| is)\s+in|who\s+works\s+in)\s+.+", expand_query(fallback_question)):
         direct_membership_answer = dispatch_safe(fallback_question)
         if direct_membership_answer:
-            return direct_membership_answer
+            answer, evidence, backend, query_state, resolution_mode = direct_membership_answer
+            return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
     if re.search(r"\b(list|show|what are)\b", expand_query(fallback_question)):
         direct_list_answer = dispatch_safe(fallback_question)
         if direct_list_answer:
-            return direct_list_answer
+            answer, evidence, backend, query_state, resolution_mode = direct_list_answer
+            return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
 
     interpreted = interpret_query(
         fallback_question,
@@ -2238,17 +2294,20 @@ def answer_question(
         conversation_focus,
         recent_messages,
     )
+    interpreter_backend = str(interpreted.get("backend")) if interpreted else None
     if interpreted and interpreted.get("intent") != "unknown":
         lowered_question = fallback_question.casefold()
         interpreted_intent = str(interpreted.get("intent"))
         if interpreted_intent == "more_results":
             more_results_answer = try_more_results_answer(question, indexes, last_query_state)
             if more_results_answer:
-                return more_results_answer
+                answer, evidence, backend, query_state = more_results_answer
+                return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up expansion from graph evidence", interpreter_backend)
         if interpreted_intent == "explain_previous":
             why_answer = try_why_followup_answer(question, last_query_state, last_evidence)
             if why_answer:
-                return why_answer
+                answer, evidence, backend, query_state = why_answer
+                return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up explanation from graph evidence", interpreter_backend)
         if re.search(r"\b(reports?\s+to|works?\s+under|works?\s+for|under)\b", lowered_question):
             interpreted["intent"] = "reporting_down"
         if re.search(r"\bdoes\b.+\breport\s+to\b", lowered_question) or re.search(r"\breporting\s+to\b", lowered_question):
@@ -2256,7 +2315,8 @@ def answer_question(
         if interpreted_intent == "people_keyword" or re.search(r"\bworks?\s+(with|on|in)\b", lowered_question):
             keyword_answer = try_people_for_keyword_answer(fallback_question, indexes)
             if keyword_answer:
-                return keyword_answer
+                answer, evidence, backend, query_state = keyword_answer
+                return answer, evidence, backend, query_state, make_answer_trace(backend, "Structured graph handler: broad people keyword", interpreter_backend)
         if (
             str(interpreted.get("intent")) == "identity"
             and re.search(r"\b(team|workers?|people|staff)\b", lowered_question)
@@ -2275,15 +2335,17 @@ def answer_question(
         if canonical_question:
             interpreted_answer = dispatch_safe(canonical_question)
             if interpreted_answer:
-                return interpreted_answer
+                answer, evidence, backend, query_state, resolution_mode = interpreted_answer
+                return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode, interpreter_backend)
 
     direct_answer = dispatch_safe(fallback_question)
     if direct_answer:
-        return direct_answer
+        answer, evidence, backend, query_state, resolution_mode = direct_answer
+        return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
 
     evidence = build_evidence(indexes, fallback_question)
     if not has_sufficient_evidence(evidence):
-        return natural_search_answer(fallback_question, evidence), evidence, "Graph Search", None
+        return natural_search_answer(fallback_question, evidence), evidence, "Graph Search", None, make_answer_trace("Graph Search", "Graph-only fallback over retrieved evidence", interpreter_backend)
 
     context_text = format_context_for_llm(evidence)
     prompt = build_llm_prompt(
@@ -2293,9 +2355,11 @@ def answer_question(
         context_text=context_text,
     )
 
-    ollama_available = is_ollama_available(ollama_host)
-    chain = provider_chain(ollama_available)
-    gemini_ready = bool(get_api_key())
+    ollama_available = bool(ollama_host) and is_ollama_available(ollama_host)
+    runtime_mode = detect_runtime_mode(ollama_available)
+    gemini_ready = bool(gemini_model_name) and bool(get_api_key()) and not bool(st.session_state.get("gemini_model_disabled", False))
+    use_model = bool(ollama_model_name) or gemini_ready
+    chain = provider_chain(runtime_mode, use_model, ollama_available, gemini_ready)
 
     for backend in chain:
         if backend == "ollama":
@@ -2304,7 +2368,7 @@ def answer_question(
             try:
                 answer = call_ollama(prompt, ollama_model_name, ollama_host)
                 if answer:
-                    return answer, evidence, "Ollama", None
+                    return answer, evidence, "Ollama", None, make_answer_trace("Ollama", "LLM answer over retrieved graph context", interpreter_backend)
             except Exception:
                 continue
 
@@ -2314,14 +2378,16 @@ def answer_question(
             try:
                 answer = call_gemini(prompt, gemini_model_name)
                 if answer:
-                    return answer, evidence, "Gemini", None
-            except Exception:
+                    return answer, evidence, "Gemini", None, make_answer_trace("Gemini", "LLM answer over retrieved graph context", interpreter_backend)
+            except Exception as error:
+                if is_gemini_quota_error(error):
+                    mark_gemini_unavailable("Gemini is temporarily unavailable because the API quota or rate limit was reached.")
                 continue
 
         if backend == "search":
-            return natural_search_answer(question, evidence), evidence, "Graph Search", None
+            return natural_search_answer(question, evidence), evidence, "Graph Search", None, make_answer_trace("Graph Search", "Graph-only fallback over retrieved evidence", interpreter_backend)
 
-    return natural_search_answer(question, evidence), evidence, "Graph Search", None
+    return natural_search_answer(question, evidence), evidence, "Graph Search", None, make_answer_trace("Graph Search", "Graph-only fallback over retrieved evidence", interpreter_backend)
 
 
 def render_hero(dataset_name: str, graph_payload: dict[str, Any], backend_order: list[str]) -> None:
@@ -2370,7 +2436,7 @@ def render_hero(dataset_name: str, graph_payload: dict[str, Any], backend_order:
     st.markdown(stat_html, unsafe_allow_html=True)
 
 
-def render_evidence_panel(evidence: dict[str, Any], backend_used: str | None) -> None:
+def render_evidence_panel(evidence: dict[str, Any], backend_used: str | None, answer_trace: dict[str, str] | None = None) -> None:
     st.markdown(
         """
         <div class="section-card">
@@ -2383,7 +2449,11 @@ def render_evidence_panel(evidence: dict[str, Any], backend_used: str | None) ->
         unsafe_allow_html=True,
     )
 
-    if backend_used:
+    if answer_trace:
+        st.caption(f"Final answer: {answer_trace.get('final_backend', backend_used or 'Unknown')}")
+        st.caption(f"Question interpretation: {answer_trace.get('interpreter_backend', 'None')}")
+        st.caption(f"Resolution mode: {answer_trace.get('resolution_mode', 'Unknown')}")
+    elif backend_used:
         st.caption(f"Last answer path: {backend_used}")
 
     if not evidence["top_nodes"]:
@@ -2421,20 +2491,38 @@ def init_state() -> None:
     st.session_state.setdefault("last_evidence", {"top_nodes": [], "related_nodes": [], "relationships": []})
     st.session_state.setdefault("prompt_queue", None)
     st.session_state.setdefault("last_backend", None)
+    st.session_state.setdefault("last_answer_trace", None)
     st.session_state.setdefault("last_focus", None)
     st.session_state.setdefault("last_query_state", None)
+    st.session_state.setdefault("gemini_model_disabled", False)
+    st.session_state.setdefault("gemini_model_disabled_reason", None)
 
 
-def sidebar_controls() -> tuple[str, str, str, str, bool, list[str]]:
+def sidebar_controls() -> tuple[str, str, str, str, bool, list[str], list[str], str]:
     with st.sidebar:
         st.markdown("## Workspace")
         dataset_name = st.selectbox("Dataset", list(GRAPH_OPTIONS.keys()), index=0)
-        gemini_choice = st.selectbox("Gemini model", list(GEMINI_MODEL_OPTIONS.keys()), index=0)
         ollama_model_name = st.text_input("Ollama model", value=get_secret_or_env("OLLAMA_MODEL", "llama3.2"))
         ollama_host = st.text_input("Ollama host", value=get_secret_or_env("OLLAMA_HOST", "http://127.0.0.1:11434"))
         selected_payload = load_graph(str(GRAPH_OPTIONS[dataset_name]))
         ollama_available = is_ollama_available(ollama_host)
-        order = provider_chain(ollama_available)
+        runtime_mode = detect_runtime_mode(ollama_available)
+        gemini_disabled = bool(st.session_state.get("gemini_model_disabled", False))
+        gemini_ready = bool(get_api_key()) and not gemini_disabled
+        model_available = ollama_available if runtime_mode == "local" else gemini_ready
+        default_model_enabled = model_available
+        use_model = st.toggle(
+            "Use model assistance",
+            value=default_model_enabled,
+            disabled=not model_available,
+            help="Local mode uses Ollama. Cloud mode uses Gemini. If disabled, the app answers directly from graph logic only.",
+        )
+        if not model_available:
+            use_model = False
+
+        effective_ollama_model = ollama_model_name if runtime_mode == "local" and use_model and ollama_available else ""
+        effective_gemini_model = DEFAULT_GEMINI_MODEL if runtime_mode == "cloud" and use_model and gemini_ready else ""
+        order = provider_chain(runtime_mode, use_model, ollama_available, gemini_ready)
 
         st.markdown(
             f"""
@@ -2463,12 +2551,19 @@ def sidebar_controls() -> tuple[str, str, str, str, bool, list[str]]:
         else:
             st.info("Ollama not reachable. The app will skip it automatically.")
 
-        if get_api_key():
+        if gemini_disabled:
+            st.warning(str(st.session_state.get("gemini_model_disabled_reason", "Gemini is temporarily unavailable. The app switched to Graph Search.")))
+        elif get_api_key():
             st.success("Gemini key detected.")
         else:
             st.warning("Gemini key not found. The app will fall back to graph-only answers.")
 
-        st.caption(f"Runtime mode: {detect_runtime_mode(ollama_available).title()}")
+        if runtime_mode == "local":
+            st.caption("Model target: Ollama" if use_model and ollama_available else "Model target: Off")
+        else:
+            st.caption("Model target: Gemini" if use_model and gemini_ready else "Model target: Off")
+
+        st.caption(f"Runtime mode: {runtime_mode.title()}")
         st.caption("Answer order: " + " -> ".join(item.title() if item != "search" else "Graph Search" for item in order))
 
         st.markdown("### Graph snapshot")
@@ -2476,7 +2571,7 @@ def sidebar_controls() -> tuple[str, str, str, str, bool, list[str]]:
         st.caption(f"Relationships: {selected_payload.get('meta', {}).get('relationship_count', 0)}")
         st.caption(f"Labels: {len({node['label'] for node in selected_payload.get('nodes', [])})}")
 
-    return dataset_name, GEMINI_MODEL_OPTIONS[gemini_choice], ollama_model_name, ollama_host, ollama_available, prompts
+    return dataset_name, effective_gemini_model, effective_ollama_model, ollama_host, ollama_available, prompts, order, runtime_mode
 
 
 def render_chat(messages: list[dict[str, str]]) -> None:
@@ -2506,11 +2601,10 @@ def main() -> None:
     inject_styles()
     init_state()
 
-    dataset_name, gemini_model_name, ollama_model_name, ollama_host, ollama_available, _ = sidebar_controls()
+    dataset_name, gemini_model_name, ollama_model_name, ollama_host, ollama_available, _, backend_order, _ = sidebar_controls()
     graph_path = str(GRAPH_OPTIONS[dataset_name])
     graph_payload = load_graph(graph_path)
     indexes = build_indexes(graph_path)
-    backend_order = provider_chain(ollama_available)
 
     render_hero(dataset_name, graph_payload, backend_order)
 
@@ -2530,7 +2624,7 @@ def main() -> None:
         st.session_state["messages"].append({"role": "user", "content": active_prompt})
         with col_chat:
             with st.spinner("Searching the graph and preparing an answer..."):
-                answer, evidence, backend_used, query_state = answer_question(
+                answer, evidence, backend_used, query_state, answer_trace = answer_question(
                     question=active_prompt,
                     dataset_name=dataset_name,
                     graph_payload=graph_payload,
@@ -2546,12 +2640,17 @@ def main() -> None:
         st.session_state["messages"].append({"role": "assistant", "content": answer})
         st.session_state["last_evidence"] = evidence
         st.session_state["last_backend"] = backend_used
+        st.session_state["last_answer_trace"] = answer_trace
         st.session_state["last_focus"] = infer_focus_entity(evidence)
         st.session_state["last_query_state"] = query_state
         st.rerun()
 
     with col_evidence:
-        render_evidence_panel(st.session_state["last_evidence"], st.session_state["last_backend"])
+        render_evidence_panel(
+            st.session_state["last_evidence"],
+            st.session_state["last_backend"],
+            st.session_state.get("last_answer_trace"),
+        )
 
         with st.expander("Advanced context", expanded=False):
             context_text = format_context_for_llm(st.session_state["last_evidence"])
