@@ -1,8 +1,10 @@
 import json
 import os
 import re
+import unicodedata
 import urllib.error
 import urllib.request
+from difflib import SequenceMatcher, get_close_matches
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -47,11 +49,71 @@ STOPWORDS = {
     "what",
     "who",
 }
+QUERY_STRUCTURE_VOCAB = {
+    "who",
+    "what",
+    "where",
+    "when",
+    "why",
+    "how",
+    "works",
+    "work",
+    "with",
+    "yes",
+    "him",
+    "her",
+    "them",
+    "this",
+    "that",
+    "one",
+    "under",
+    "for",
+    "through",
+    "via",
+    "reports",
+    "report",
+    "reporting",
+    "manager",
+    "boss",
+    "supervisor",
+    "team",
+    "people",
+    "person",
+    "role",
+    "roles",
+    "skill",
+    "skills",
+    "system",
+    "systems",
+    "topic",
+    "topics",
+    "department",
+    "departments",
+    "location",
+    "locations",
+    "country",
+    "countries",
+    "site",
+    "sites",
+    "related",
+    "relationship",
+    "between",
+    "connected",
+    "somehow",
+    "does",
+    "is",
+    "are",
+    "in",
+    "the",
+    "any",
+    "other",
+    "else",
+}
 
 
 load_dotenv(ROOT / ".env")
 st.set_page_config(
-    page_title="Knowledge Graph Chat",
+    page_title="SkillWiki",
     page_icon="K",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -121,6 +183,19 @@ def inject_styles() -> None:
             font-weight: 800;
             color: var(--text);
             margin: 0 0 0.55rem 0;
+        }
+
+        .skillwiki-logo {
+            font-size: 2.25rem;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            margin: 0 0 0.55rem 0;
+            color: #141414;
+        }
+
+        .skillwiki-logo span {
+            color: var(--primary);
         }
 
         .hero-subtitle {
@@ -358,12 +433,34 @@ def build_indexes(graph_path: str) -> dict[str, Any]:
 
 
 def tokenize(text: str) -> list[str]:
-    tokens = [token.casefold() for token in re.findall(r"\w+", text, flags=re.UNICODE)]
+    tokens = [token.casefold() for token in re.findall(r"\w+", strip_diacritics(text), flags=re.UNICODE)]
     return [token for token in tokens if token not in STOPWORDS and len(token) > 1]
 
 
+def strip_diacritics(text: str) -> str:
+    normalized = unicodedata.normalize("NFKD", text)
+    return "".join(char for char in normalized if not unicodedata.combining(char))
+
+
+def correct_query_structure_typos(text: str) -> str:
+    vocab = QUERY_STRUCTURE_VOCAB
+    parts = re.split(r"(\W+)", text.casefold())
+    corrected: list[str] = []
+
+    for part in parts:
+        if not re.fullmatch(r"\w+", part):
+            corrected.append(part)
+            continue
+        if len(part) < 3 or part in vocab:
+            corrected.append(part)
+            continue
+        matches = get_close_matches(part, sorted(vocab), n=1, cutoff=0.72)
+        corrected.append(matches[0] if matches else part)
+    return "".join(corrected)
+
+
 def expand_query(text: str) -> str:
-    expanded = text.casefold()
+    expanded = correct_query_structure_typos(text)
     alias_map = load_query_normalization().get("aliases", {})
     for alias, canonical in alias_map.items():
         expanded = re.sub(rf"\b{re.escape(alias)}\b", canonical, expanded)
@@ -372,17 +469,18 @@ def expand_query(text: str) -> str:
 
 def score_node(node: dict[str, Any], blob: str, query: str, tokens: list[str]) -> float:
     score = 0.0
-    node_name = str(node.get("name", "")).casefold()
-    query_lower = query.casefold()
+    node_name = strip_diacritics(str(node.get("name", "")).casefold())
+    query_lower = strip_diacritics(query.casefold())
+    blob_lower = strip_diacritics(blob.casefold())
 
     if node_name == query_lower:
         score += 10
-    if query_lower and query_lower in blob:
+    if query_lower and query_lower in blob_lower:
         score += 4
     for token in tokens:
         if token in node_name:
             score += 2.2
-        elif token in blob:
+        elif token in blob_lower:
             score += 1.0
 
     label = node.get("label", "")
@@ -443,6 +541,11 @@ def format_human_list(items: list[str]) -> str:
     return f"{', '.join(unique_items[:-1])} and {unique_items[-1]}"
 
 
+def format_role_names(role_names: list[str]) -> str:
+    cleaned = [re.sub(r"\s*/\s*", " / ", str(role)).strip() for role in role_names if role]
+    return format_human_list(cleaned)
+
+
 def display_query_term(text: str) -> str:
     expanded = normalize_target_phrase(text)
     words = []
@@ -461,28 +564,51 @@ def normalize_target_phrase(text: str) -> str:
 
 
 def name_match_score(name: str, normalized_query: str, tokens: list[str]) -> float:
-    candidate = name.casefold()
+    candidate = strip_diacritics(name.casefold())
     if not candidate or not normalized_query:
         return 0.0
 
     score = 0.0
+    normalized_query = strip_diacritics(normalized_query.casefold())
+    candidate_tokens = [token.casefold() for token in re.findall(r"\w+", candidate, flags=re.UNICODE)]
     if candidate == normalized_query:
         score += 100
     elif normalized_query in candidate:
         score += 70
     elif candidate in normalized_query:
         score += 55
+    else:
+        phrase_ratio = SequenceMatcher(None, candidate, normalized_query).ratio()
+        if phrase_ratio >= 0.92:
+            score += 60
+        elif phrase_ratio >= 0.86:
+            score += 36
 
     token_hits = 0
+    fuzzy_token_hits = 0
     for token in tokens:
         if token in candidate:
             token_hits += 1
             score += 12
+            continue
+        best_ratio = 0.0
+        for candidate_token in candidate_tokens:
+            ratio = SequenceMatcher(None, token, candidate_token).ratio()
+            if ratio > best_ratio:
+                best_ratio = ratio
+        if best_ratio >= 0.9:
+            fuzzy_token_hits += 1
+            score += 11
+        elif best_ratio >= 0.8:
+            fuzzy_token_hits += 1
+            score += 6
 
     if tokens and token_hits == len(tokens):
         score += 26
-    elif token_hits:
-        score += token_hits * 3
+    elif tokens and token_hits + fuzzy_token_hits == len(tokens):
+        score += 18
+    elif token_hits or fuzzy_token_hits:
+        score += (token_hits + fuzzy_token_hits) * 3
     return score
 
 
@@ -536,14 +662,88 @@ def related_people_for_node(indexes: dict[str, Any], node: dict[str, Any]) -> tu
     return names, people_nodes
 
 
+def resolve_best_entity(
+    indexes: dict[str, Any],
+    phrase: str,
+    labels: set[str] | None = None,
+    min_score: float = 30,
+) -> dict[str, Any] | None:
+    candidate_labels = labels or {"Person", "Role", "JobDescription", "Department", "Team", "Country", "Site", "Skill", "Topic", "System"}
+    matches = find_named_nodes(indexes, phrase, candidate_labels, limit=5, min_score=min_score)
+    return matches[0] if matches else None
+
+
+def describe_relationship_step(start_node: dict[str, Any], rel_type: str, end_node: dict[str, Any]) -> str:
+    start_name = str(start_node.get("name", start_node.get("id", "start")))
+    end_name = str(end_node.get("name", end_node.get("id", "end")))
+    templates = {
+        "REPORTS_TO": f"{start_name} reports to {end_name}",
+        "INVERSE_REPORTS_TO": f"{end_name} reports to {start_name}",
+        "HAS_ROLE": f"{start_name} holds the role {end_name}",
+        "INVERSE_HAS_ROLE": f"{end_name} holds the role {start_name}",
+        "BELONGS_TO_DEPARTMENT": f"{start_name} belongs to the department {end_name}",
+        "INVERSE_BELONGS_TO_DEPARTMENT": f"{end_name} belongs to the department {start_name}",
+        "MEMBER_OF": f"{start_name} is a member of {end_name}",
+        "INVERSE_MEMBER_OF": f"{end_name} is a member of {start_name}",
+        "LOCATED_IN": f"{start_name} is located in {end_name}",
+        "INVERSE_LOCATED_IN": f"{end_name} is located in {start_name}",
+        "AT_SITE": f"{start_name} is at the site {end_name}",
+        "INVERSE_AT_SITE": f"{end_name} is at the site {start_name}",
+        "HAS_SKILL": f"{start_name} has the skill {end_name}",
+        "INVERSE_HAS_SKILL": f"{end_name} has the skill {start_name}",
+        "KNOWS_SYSTEM": f"{start_name} knows the system {end_name}",
+        "INVERSE_KNOWS_SYSTEM": f"{end_name} knows the system {start_name}",
+        "OWNS_TOPIC": f"{start_name} owns the topic {end_name}",
+        "INVERSE_OWNS_TOPIC": f"{end_name} owns the topic {start_name}",
+        "LINKED_TO_JD": f"{start_name} is linked to the job description {end_name}",
+        "INVERSE_LINKED_TO_JD": f"{end_name} is linked to the job description {start_name}",
+        "DESCRIBED_BY": f"{start_name} is described by {end_name}",
+        "INVERSE_DESCRIBED_BY": f"{end_name} is described by {start_name}",
+        "REQUIRES_SKILL": f"{start_name} requires the skill {end_name}",
+        "INVERSE_REQUIRES_SKILL": f"{end_name} requires the skill {start_name}",
+        "APPLIES_TO_COUNTRY": f"{start_name} applies to the country {end_name}",
+        "INVERSE_APPLIES_TO_COUNTRY": f"{end_name} applies to the country {start_name}",
+    }
+    return templates.get(rel_type, f"{start_name} --{readable_relation_type(rel_type)}--> {end_name}")
+
+
+def find_shortest_relationship_path(
+    indexes: dict[str, Any],
+    start_id: str,
+    end_id: str,
+    max_depth: int = 3,
+) -> list[dict[str, Any]] | None:
+    adjacency = indexes["adjacency"]
+    queue: list[tuple[str, list[dict[str, Any]]]] = [(start_id, [])]
+    visited: set[tuple[str, int]] = {(start_id, 0)}
+
+    while queue:
+        current_id, path = queue.pop(0)
+        if current_id == end_id and path:
+            return path
+        if len(path) >= max_depth:
+            continue
+        for rel in adjacency.get(current_id, []):
+            next_id = rel["end"]
+            state = (next_id, len(path) + 1)
+            if state in visited:
+                continue
+            visited.add(state)
+            next_path = path + [rel]
+            if next_id == end_id:
+                return next_path
+            queue.append((next_id, next_path))
+    return None
+
+
 def is_more_results_question(question: str) -> bool:
     normalized = expand_query(question)
     patterns = [
-        r"\bis\s+there\s+any\s+other\b",
-        r"\banyone\s+else\b",
-        r"\bwho\s+else\b",
-        r"\bany\s+other\b",
-        r"\bwhat\s+about\s+others\b",
+        r"^\s*is\s+there\s+any\s+other\??\s*$",
+        r"^\s*anyone\s+else\??\s*$",
+        r"^\s*who\s+else\??\s*$",
+        r"^\s*any\s+other\??\s*$",
+        r"^\s*what\s+about\s+others\??\s*$",
     ]
     return any(re.search(pattern, normalized) for pattern in patterns)
 
@@ -714,7 +914,7 @@ def build_closest_match_suggestion(
                     relationships.append({"start": best["id"], "type": "HAS_ROLE", "end": rel["end"]})
         if role_names:
             answer_lines.append(
-                f"A close match in this graph is `{best['name']}`, who holds the {format_human_list(role_names)} role."
+                f"A close match in this graph is `{best['name']}`, who holds the {format_role_names(role_names)} role."
             )
         else:
             answer_lines.append(f"A close match in this graph is `{best['name']}`.")
@@ -758,21 +958,37 @@ def find_person_ids_for_target(indexes: dict[str, Any], query: str, require_stro
     adjacency = indexes["adjacency"]
     person_ids: list[str] = []
     strong_nodes = []
-    query_tokens = [token.casefold() for token in re.findall(r"\w+", expanded_query, flags=re.UNICODE)]
+    query_tokens = [token.casefold() for token in re.findall(r"\w+", strip_diacritics(expanded_query), flags=re.UNICODE)]
 
     def is_strong_name_match(node_name: str) -> bool:
-        candidate = node_name.casefold()
+        candidate = strip_diacritics(node_name.casefold())
         candidate_tokens = [token.casefold() for token in re.findall(r"\w+", candidate, flags=re.UNICODE)]
         if not expanded_query:
             return False
-        if candidate == expanded_query:
+        expanded_plain = strip_diacritics(expanded_query.casefold())
+        if candidate == expanded_plain:
+            return True
+        phrase_ratio = SequenceMatcher(None, candidate, expanded_plain).ratio()
+        if phrase_ratio >= 0.9:
             return True
         if len(query_tokens) == 1:
             token = query_tokens[0]
             if len(token) <= 4:
-                return token in candidate_tokens
-            return bool(re.search(rf"\b{re.escape(expanded_query)}\b", candidate)) or expanded_query in candidate
-        return expanded_query in candidate or all(token in candidate_tokens for token in query_tokens)
+                if token in candidate_tokens:
+                    return True
+                return any(SequenceMatcher(None, token, candidate_token).ratio() >= 0.88 for candidate_token in candidate_tokens)
+            return (
+                bool(re.search(rf"\b{re.escape(expanded_plain)}\b", candidate))
+                or expanded_plain in candidate
+                or any(SequenceMatcher(None, expanded_plain, candidate_token).ratio() >= 0.88 for candidate_token in candidate_tokens)
+            )
+        if expanded_plain in candidate or all(token in candidate_tokens for token in query_tokens):
+            return True
+        matched = 0
+        for token in query_tokens:
+            if any(SequenceMatcher(None, token, candidate_token).ratio() >= 0.84 for candidate_token in candidate_tokens):
+                matched += 1
+        return matched == len(query_tokens)
 
     for node in top_nodes:
         node_name = str(node.get("name", "")).casefold()
@@ -821,7 +1037,7 @@ def try_reporting_answer(
     if not match:
         match = re.search(r"who\s+is\s+under\s+(.+)", normalized)
     if not match:
-        match = re.search(r"^\s*(.+?)\s+(team|workers?|people|staff)\s*\??\s*$", normalized)
+        match = re.search(r"^\s*(?!who\b)(?!does\b)(?!is\b)(?!are\b)(.+?)\s+(team|workers?|people|staff)\s*\??\s*$", normalized)
     if not match:
         return None
 
@@ -869,7 +1085,7 @@ def try_reporting_answer(
                     top_nodes.append(role_node)
 
         person_name = person_node["name"]
-        role_suffix = f", who holds the {' / '.join(role_names)} role" if role_names else ""
+        role_suffix = f", who holds the {format_role_names(role_names)} role" if role_names else ""
         if direct_reports:
             reports_text = ", ".join(direct_reports[:-1]) + (" and " + direct_reports[-1] if len(direct_reports) > 1 else direct_reports[0])
             answer_lines.append(f"{reports_text} currently report to {person_name}{role_suffix}.")
@@ -956,7 +1172,7 @@ def try_reverse_reporting_answer(
 
             if manager_names:
                 manager_text = format_human_list(manager_names)
-                role_suffix = f", who holds the {format_human_list(manager_roles)} role" if manager_roles else ""
+                role_suffix = f", who holds the {format_role_names(manager_roles)} role" if manager_roles else ""
                 answer_lines.append(f"{person_node['name']} currently reports to {manager_text}{role_suffix}.")
             else:
                 answer_lines.append(f"The graph does not show a current manager for {person_node['name']}.")
@@ -1017,7 +1233,7 @@ def try_identity_answer(question: str, indexes: dict[str, Any]) -> tuple[str, di
                     relationships.append({"start": person_id, "type": "LINKED_TO_JD", "end": rel["end"]})
 
         if role_names:
-            answers.append(f"{person_node['name']} holds the {' / '.join(role_names)} role.")
+            answers.append(f"{person_node['name']} holds the {format_role_names(role_names)} role.")
         else:
             answers.append(f"{person_node['name']} is the strongest identity match for that role or title in the graph.")
 
@@ -1376,6 +1592,7 @@ def try_skill_answer(
         return None
 
     target_phrase = match.group(1).strip(" ?.")
+    target_phrase = re.sub(r"\bas\s+a\b", "", target_phrase, flags=re.IGNORECASE).strip()
     if not target_phrase:
         return None
 
@@ -1390,8 +1607,15 @@ def try_skill_answer(
             ollama_model_name,
             ollama_host,
         )
+    normalized_target = normalize_target_phrase(target_phrase)
+    target_tokens = tokenize(normalized_target)
+    is_short_generic = len(target_tokens) == 1 and len(target_tokens[0]) <= 4
     best_score = matched_skills[0]["_score"]
-    matched_skills = [node for node in matched_skills if node["_score"] >= best_score - 5][:3]
+    if is_short_generic:
+        broader_matches = find_named_nodes(indexes, target_phrase, {"Skill"}, limit=8, min_score=18)
+        matched_skills = broader_matches[:5] if broader_matches else matched_skills[:3]
+    else:
+        matched_skills = [node for node in matched_skills if node["_score"] >= best_score - 5][:3]
 
     nodes_by_id = indexes["nodes_by_id"]
     adjacency = indexes["adjacency"]
@@ -1399,6 +1623,8 @@ def try_skill_answer(
     top_nodes = []
     relationships = []
 
+    positive_lines = []
+    empty_lines = []
     for skill_node in matched_skills:
         holder_names = []
         top_nodes.append(skill_node)
@@ -1413,9 +1639,12 @@ def try_skill_answer(
 
         if holder_names:
             verb = "has" if len(holder_names) == 1 else "have"
-            answer_lines.append(f"{format_human_list(holder_names)} currently {verb} `{skill_node['name']}` listed as a skill.")
+            positive_lines.append(f"{format_human_list(holder_names)} currently {verb} `{skill_node['name']}` listed as a skill.")
         else:
-            answer_lines.append(f"The graph contains the skill `{skill_node['name']}`, but no people are currently linked to it.")
+            empty_lines.append(f"The graph contains the skill `{skill_node['name']}`, but no people are currently linked to it.")
+
+    answer_lines.extend(positive_lines)
+    answer_lines.extend(empty_lines)
 
     seen_top = {}
     for node in top_nodes:
@@ -1434,7 +1663,7 @@ def try_people_for_keyword_answer(
     exclude_people: set[str] | None = None,
 ) -> tuple[str, dict[str, Any], str, dict[str, Any]] | None:
     normalized = expand_query(question)
-    match = re.search(r"who\s+(?:works?|is\s+working)\s+(?:with|on|in)\s+(.+)", normalized)
+    match = re.search(r"who\s+(?:all\s+)?(?:works?|is\s+working)\s+(?:with|on|in)\s+(.+)", normalized)
     if not match:
         match = re.search(r"which\s+people\s+(?:work|are\s+connected)\s+(?:with|to|on)\s+(.+)", normalized)
     if not match:
@@ -1611,6 +1840,937 @@ def try_why_followup_answer(
             lines.append(f"- {person_name}: appears through broader graph relevance around `{display_query_term(target)}`.")
 
     return "\n".join(lines), last_evidence, "Graph Search", last_query_state
+
+
+def try_person_keyword_followup_answer(
+    question: str,
+    indexes: dict[str, Any],
+    last_query_state: dict[str, Any] | None,
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    if not last_query_state or last_query_state.get("kind") != "people_for_keyword":
+        return None
+
+    normalized = expand_query(question)
+    match = re.search(r"what\s+about\s+(.+)", normalized)
+    if not match:
+        return None
+
+    target_person = match.group(1).strip(" ?.")
+    concept_target = str(last_query_state.get("target", "")).strip()
+    if not target_person or not concept_target:
+        return None
+
+    person_ids = find_person_ids_for_target(indexes, target_person, require_strong_match=True)
+    if not person_ids:
+        return None
+
+    matched_nodes = find_named_nodes(indexes, concept_target, {"Skill", "Topic", "System"}, limit=8, min_score=18)
+    if not matched_nodes:
+        return None
+
+    nodes_by_id = indexes["nodes_by_id"]
+    adjacency = indexes["adjacency"]
+    person_node = nodes_by_id.get(person_ids[0])
+    if not person_node:
+        return None
+
+    supporting: list[tuple[str, str, dict[str, Any]]] = []
+    for node in matched_nodes:
+        for rel in adjacency.get(person_node["id"], []):
+            rel_type = str(rel["type"])
+            if rel["end"] != node["id"]:
+                continue
+            if rel_type == "HAS_SKILL":
+                supporting.append(("skill", str(node["name"]), {"start": person_node["id"], "type": "HAS_SKILL", "end": node["id"]}))
+            elif rel_type == "KNOWS_SYSTEM":
+                supporting.append(("system", str(node["name"]), {"start": person_node["id"], "type": "KNOWS_SYSTEM", "end": node["id"]}))
+            elif rel_type == "OWNS_TOPIC":
+                supporting.append(("topic", str(node["name"]), {"start": person_node["id"], "type": "OWNS_TOPIC", "end": node["id"]}))
+
+    top_nodes = [dict(person_node, _score=10.0)]
+    relationships: list[dict[str, Any]] = []
+    related_nodes: list[dict[str, Any]] = [dict(person_node, _score=10.0)]
+    for kind, node_name, rel in supporting[:4]:
+        node = nodes_by_id.get(rel["end"])
+        if node:
+            top_nodes.append(dict(node, _score=9.0))
+            related_nodes.append(dict(node, _score=9.0))
+            relationships.append(rel)
+
+    evidence = {
+        "top_nodes": top_nodes,
+        "related_nodes": related_nodes,
+        "relationships": relationships[:18],
+    }
+
+    if supporting:
+        reason_text = "; ".join(f"{person_node['name']} because of {kind} `{name}`" for kind, name, _ in supporting[:3])
+        answer = f"Yes. {reason_text}."
+    else:
+        answer = f"The current graph does not show strong `{display_query_term(concept_target)}` links for {person_node['name']}."
+
+    return answer, evidence, "Graph Search", last_query_state
+
+
+def try_group_keyword_followup_answer(
+    question: str,
+    indexes: dict[str, Any],
+    last_query_state: dict[str, Any] | None,
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    if not last_query_state or last_query_state.get("kind") not in {"membership", "people_for_keyword"}:
+        return None
+
+    normalized = expand_query(question)
+    if "these people" not in normalized and "those people" not in normalized and "they" not in normalized:
+        return None
+
+    target_phrase = None
+    match = re.search(r"(?:work|works)\s+(?:with|on|in)\s+(.+)", normalized)
+    if match:
+        target_phrase = match.group(1).strip(" ?.")
+    if not target_phrase:
+        return None
+
+    shown_people = list(last_query_state.get("shown_people", []))
+    if not shown_people:
+        return None
+
+    matched_nodes = find_named_nodes(indexes, target_phrase, {"Skill", "Topic", "System"}, limit=8, min_score=18)
+    if not matched_nodes:
+        return None
+
+    person_reasons: dict[str, list[str]] = defaultdict(list)
+    supporting_nodes: dict[str, dict[str, Any]] = {}
+    person_nodes: dict[str, dict[str, Any]] = {}
+    relationships: list[dict[str, Any]] = []
+
+    for node in matched_nodes:
+        supporting_nodes[node["id"]] = node
+        relation_type = {
+            "Skill": "HAS_SKILL",
+            "Topic": "OWNS_TOPIC",
+            "System": "KNOWS_SYSTEM",
+        }.get(str(node.get("label")), "RELATED_TO")
+        reason_text = {
+            "Skill": f"skill `{node['name']}`",
+            "Topic": f"topic `{node['name']}`",
+            "System": f"system `{node['name']}`",
+        }.get(str(node.get("label")), f"graph link `{node['name']}`")
+        _, people_list = related_people_for_node(indexes, node)
+        for person in people_list:
+            person_name = person["name"]
+            if person_name not in shown_people:
+                continue
+            person_nodes[person["id"]] = person
+            person_reasons[person_name].append(reason_text)
+            relationships.append({"start": person["id"], "type": relation_type, "end": node["id"]})
+
+    supported = [name for name in shown_people if person_reasons.get(name)]
+    unsupported = [name for name in shown_people if name not in supported]
+
+    if not supported:
+        answer = (
+            f"The current graph does not show direct `{display_query_term(target_phrase)}`-related evidence for {format_human_list(shown_people)}. "
+            f"They may still work with `{display_query_term(target_phrase)}` in reality, but it is not explicitly captured in this graph."
+        )
+    elif unsupported:
+        support_parts = []
+        for name in supported:
+            reasons = []
+            seen = set()
+            for reason in person_reasons.get(name, []):
+                if reason not in seen:
+                    seen.add(reason)
+                    reasons.append(reason)
+            support_parts.append(f"{name} because of {format_human_list(reasons[:3])}")
+        answer = (
+            f"Partly. {format_human_list(supported)} has direct `{display_query_term(target_phrase)}` evidence in the graph; "
+            + "; ".join(support_parts)
+            + f". The current graph does not show equally strong `{display_query_term(target_phrase)}` links for {format_human_list(unsupported)}."
+        )
+    else:
+        support_parts = []
+        for name in supported:
+            reasons = []
+            seen = set()
+            for reason in person_reasons.get(name, []):
+                if reason not in seen:
+                    seen.add(reason)
+                    reasons.append(reason)
+            support_parts.append(f"{name} because of {format_human_list(reasons[:3])}")
+        answer = (
+            f"Yes. {format_human_list(supported)} all show direct `{display_query_term(target_phrase)}` evidence in the graph: "
+            + "; ".join(support_parts)
+            + "."
+        )
+
+    top_nodes = [dict(node, _score=10.0) for node in person_nodes.values()]
+    top_nodes.extend(list(supporting_nodes.values())[:4])
+    seen_top = {}
+    for node in top_nodes:
+        seen_top[node["id"]] = node
+    evidence = {
+        "top_nodes": list(seen_top.values()),
+        "related_nodes": list(seen_top.values()),
+        "relationships": relationships[:18],
+    }
+    return answer, evidence, "Graph Search", last_query_state
+
+
+def try_person_concept_answer(
+    question: str,
+    indexes: dict[str, Any],
+    gemini_model_name: str = "",
+    ollama_model_name: str = "",
+    ollama_host: str = "",
+) -> tuple[str, dict[str, Any], str] | None:
+    normalized = expand_query(question)
+    match = re.search(r"does\s+(.+?)\s+(know|have)\s+(.+)", normalized)
+    if not match:
+        return None
+
+    person_phrase = match.group(1).strip(" ?.")
+    relation_verb = match.group(2).strip()
+    concept_phrase = match.group(3).strip(" ?.")
+    concept_phrase = re.sub(r"\bas\s+a\s+skill\b", "", concept_phrase, flags=re.IGNORECASE).strip()
+    if not person_phrase or not concept_phrase:
+        return None
+
+    person_ids = find_person_ids_for_target(indexes, person_phrase, require_strong_match=True)
+    if not person_ids:
+        return build_closest_match_suggestion(
+            person_phrase,
+            indexes,
+            {"Person", "Role"},
+            f"I could not find the exact person or role `{display_query_term(person_phrase)}` in the current graph.",
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+
+    matched_nodes = find_named_nodes(indexes, concept_phrase, {"Skill", "System", "Topic"}, limit=6, min_score=18)
+    if not matched_nodes:
+        return build_closest_match_suggestion(
+            concept_phrase,
+            indexes,
+            {"Skill", "System", "Topic"},
+            f"I could not find a confident concept match for `{display_query_term(concept_phrase)}` in the current graph.",
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+
+    nodes_by_id = indexes["nodes_by_id"]
+    adjacency = indexes["adjacency"]
+    person_node = nodes_by_id.get(person_ids[0])
+    if not person_node:
+        return None
+
+    support_lines: list[str] = []
+    top_nodes = [dict(person_node, _score=10.0)]
+    relationships: list[dict[str, Any]] = []
+    seen_support = set()
+
+    for node in matched_nodes:
+        for rel in adjacency.get(person_node["id"], []):
+            if rel["end"] != node["id"]:
+                continue
+            rel_type = str(rel["type"])
+            if rel_type == "HAS_SKILL":
+                support_lines.append(f"{person_node['name']} currently has `{node['name']}` as a skill.")
+            elif rel_type == "KNOWS_SYSTEM":
+                support_lines.append(f"{person_node['name']} currently knows the system `{node['name']}`.")
+            elif rel_type == "OWNS_TOPIC":
+                support_lines.append(f"{person_node['name']} is currently linked to the topic `{node['name']}`.")
+            else:
+                continue
+            if node["id"] not in seen_support:
+                seen_support.add(node["id"])
+                top_nodes.append(dict(node, _score=9.0))
+            relationships.append({"start": person_node["id"], "type": rel_type, "end": node["id"]})
+
+    if not support_lines:
+        empty_evidence = {"top_nodes": [dict(person_node, _score=10.0)], "related_nodes": [dict(person_node, _score=10.0)], "relationships": []}
+        if relation_verb == "know":
+            return f"The current graph does not show `{display_query_term(concept_phrase)}` as something {person_node['name']} currently knows.", empty_evidence, "Graph Search"
+        return f"The current graph does not show `{display_query_term(concept_phrase)}` as a current skill or topic link for {person_node['name']}.", empty_evidence, "Graph Search"
+
+    evidence = {
+        "top_nodes": top_nodes,
+        "related_nodes": top_nodes,
+        "relationships": relationships[:18],
+    }
+    return " ".join(support_lines[:3]), evidence, "Graph Search"
+
+
+def try_group_relationship_followup_answer(
+    question: str,
+    indexes: dict[str, Any],
+    last_query_state: dict[str, Any] | None,
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    if not last_query_state or last_query_state.get("kind") not in {"membership", "people_for_keyword"}:
+        return None
+
+    normalized = expand_query(question)
+    if not re.search(r"\b(do|are)\s+(they|these people|those people)\b", normalized):
+        return None
+    if not re.search(r"\b(work with each other|work together|collaborate|know each other)\b", normalized):
+        return None
+
+    shown_people = list(last_query_state.get("shown_people", []))
+    if len(shown_people) < 2:
+        return None
+
+    nodes_by_id = indexes["nodes_by_id"]
+    adjacency = indexes["adjacency"]
+    people_by_name = {
+        str(node.get("name", "")).strip(): node
+        for node in nodes_by_id.values()
+        if node.get("label") == "Person" and node.get("name")
+    }
+    group_people = [people_by_name[name] for name in shown_people if name in people_by_name]
+    if len(group_people) < 2:
+        return None
+
+    group_ids = {person["id"] for person in group_people}
+    direct_reporting_pairs = []
+    shared_teams: dict[str, list[str]] = defaultdict(list)
+    shared_departments: dict[str, list[str]] = defaultdict(list)
+    relationships: list[dict[str, Any]] = []
+    top_nodes = [dict(person, _score=10.0) for person in group_people]
+
+    for person in group_people:
+        person_id = person["id"]
+        person_name = person["name"]
+        for rel in adjacency.get(person_id, []):
+            rel_type = str(rel["type"])
+            end_node = nodes_by_id.get(rel["end"])
+            if not end_node:
+                continue
+            if rel_type == "REPORTS_TO" and rel["end"] in group_ids:
+                direct_reporting_pairs.append(f"{person_name} reports to {end_node['name']}")
+                relationships.append({"start": person_id, "type": "REPORTS_TO", "end": rel["end"]})
+                top_nodes.append(dict(end_node, _score=10.0))
+            elif rel_type == "MEMBER_OF" and end_node.get("label") == "Team":
+                shared_teams[end_node["name"]].append(person_name)
+                relationships.append({"start": person_id, "type": "MEMBER_OF", "end": rel["end"]})
+                top_nodes.append(dict(end_node, _score=9.0))
+            elif rel_type == "HAS_ROLE":
+                for role_rel in adjacency.get(rel["end"], []):
+                    if role_rel["type"] == "BELONGS_TO_DEPARTMENT":
+                        dept_node = nodes_by_id.get(role_rel["end"])
+                        if dept_node and dept_node.get("label") == "Department":
+                            shared_departments[dept_node["name"]].append(person_name)
+                            relationships.append({"start": rel["end"], "type": "BELONGS_TO_DEPARTMENT", "end": role_rel["end"]})
+                            top_nodes.append(dict(dept_node, _score=8.5))
+
+    team_statements = [
+        f"{format_human_list(sorted(set(members)))} are in the team `{team}`"
+        for team, members in shared_teams.items()
+        if len(set(members)) >= 2
+    ]
+    department_statements = [
+        f"{format_human_list(sorted(set(members)))} are in the department `{department}`"
+        for department, members in shared_departments.items()
+        if len(set(members)) >= 2
+    ]
+
+    if direct_reporting_pairs or team_statements or department_statements:
+        lines = ["The graph suggests they are connected:"]
+        if direct_reporting_pairs:
+            for statement in sorted(set(direct_reporting_pairs)):
+                lines.append(f"- {statement}.")
+        if team_statements:
+            for statement in sorted(set(team_statements)):
+                lines.append(f"- {statement}.")
+        if department_statements:
+            for statement in sorted(set(department_statements)):
+                lines.append(f"- {statement}.")
+        lines.append("So while the graph does not contain an explicit `COLLABORATES_WITH` edge, it does show organizational links between them.")
+        answer = "\n".join(lines)
+    else:
+        answer = (
+            f"The graph does not show explicit collaboration links between {format_human_list(shown_people)}. "
+            "That does not mean they do not work together in reality; it only means the current graph does not capture direct evidence for it."
+        )
+
+    seen_top = {}
+    for node in top_nodes:
+        seen_top[node["id"]] = node
+    evidence = {
+        "top_nodes": list(seen_top.values()),
+        "related_nodes": list(seen_top.values()),
+        "relationships": relationships[:18],
+    }
+    return answer, evidence, "Graph Search", last_query_state
+
+
+def try_confirmation_followup_answer(
+    question: str,
+    indexes: dict[str, Any],
+    last_query_state: dict[str, Any] | None,
+    gemini_model_name: str = "",
+    ollama_model_name: str = "",
+    ollama_host: str = "",
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    if not last_query_state or last_query_state.get("kind") != "pending_suggestion":
+        return None
+
+    normalized = expand_query(question)
+    if not re.fullmatch(r"\s*(yes|yes please|yes her|yes him|yes that one|yes that person|yes that role|okay|ok)\s*\??\s*", normalized):
+        return None
+
+    suggested_name = str(last_query_state.get("suggested_name", "")).strip()
+    original_intent = str(last_query_state.get("intent", "")).strip()
+    if not suggested_name or not original_intent:
+        return None
+
+    if original_intent == "person_work_with":
+        rerun = try_person_work_with_answer(
+            f"who does {suggested_name} work with",
+            indexes,
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+        if rerun:
+            answer, evidence, backend = rerun
+            query_state = {"kind": "person_collaboration", "target": suggested_name}
+            return answer, evidence, backend, query_state
+
+    return None
+
+
+def try_relationship_followup_answer(
+    question: str,
+    indexes: dict[str, Any],
+    last_query_state: dict[str, Any] | None,
+    gemini_model_name: str = "",
+    ollama_model_name: str = "",
+    ollama_host: str = "",
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    if not last_query_state or last_query_state.get("kind") != "relationship_pair":
+        return None
+
+    normalized = expand_query(question)
+    match = re.search(r"what\s+about\s+(.+)", normalized)
+    if not match:
+        return None
+
+    new_target = match.group(1).strip(" ?.")
+    left_name = str(last_query_state.get("left_name", "")).strip()
+    right_name = str(last_query_state.get("right_name", "")).strip()
+    if not new_target or not left_name or not right_name:
+        return None
+
+    left_answer = try_node_relationship_answer(
+        f"how is {new_target} related to {left_name}",
+        indexes,
+        gemini_model_name,
+        ollama_model_name,
+        ollama_host,
+    )
+    right_answer = try_node_relationship_answer(
+        f"how is {new_target} related to {right_name}",
+        indexes,
+        gemini_model_name,
+        ollama_model_name,
+        ollama_host,
+    )
+
+    usable_answers = [item for item in [left_answer, right_answer] if item]
+    if not usable_answers:
+        return None
+
+    answer_parts: list[str] = []
+    top_nodes: dict[str, dict[str, Any]] = {}
+    relationships: list[dict[str, Any]] = []
+    for answer_text, evidence, _backend in usable_answers:
+        answer_parts.append(answer_text)
+        for node in evidence.get("top_nodes", []) + evidence.get("related_nodes", []):
+            if isinstance(node, dict) and node.get("id"):
+                top_nodes[node["id"]] = node
+        for rel in evidence.get("relationships", []):
+            if isinstance(rel, dict):
+                relationships.append(rel)
+
+    evidence = {
+        "top_nodes": list(top_nodes.values()),
+        "related_nodes": list(top_nodes.values()),
+        "relationships": relationships[:24],
+    }
+    query_state = {
+        "kind": "relationship_pair",
+        "left_name": left_name,
+        "right_name": right_name,
+        "expanded_with": new_target,
+    }
+    return "\n\n".join(answer_parts), evidence, "Graph Search", query_state
+
+
+def try_other_people_with_name_answer(
+    question: str,
+    indexes: dict[str, Any],
+    last_evidence: dict[str, Any] | None = None,
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    normalized = expand_query(question)
+    match = re.search(r"(?:are\s+there\s+)?any\s+other\s+([a-zA-Z\u00C0-\u017F]+)", normalized)
+    if not match:
+        return None
+
+    raw_target = match.group(1).strip(" ?.")
+    if not raw_target:
+        return None
+
+    target = strip_diacritics(raw_target.casefold())
+    if target.endswith("ies") and len(target) > 4:
+        target = target[:-3] + "y"
+    elif target.endswith("s") and len(target) > 3:
+        target = target[:-1]
+
+    matched_people: list[dict[str, Any]] = []
+    for node in indexes["nodes_by_id"].values():
+        if node.get("label") != "Person" or not node.get("name"):
+            continue
+        first_name = strip_diacritics(str(node["name"]).split()[0].casefold())
+        ratio = SequenceMatcher(None, first_name, target).ratio()
+        if first_name == target or ratio >= 0.88:
+            matched_people.append(node)
+
+    if not matched_people:
+        empty_evidence = {"top_nodes": [], "related_nodes": [], "relationships": []}
+        return (
+            f"I could not find any people with a first name close to `{display_query_term(raw_target)}` in the current graph.",
+            empty_evidence,
+            "Graph Search",
+            None,
+        )
+
+    already_shown_ids: set[str] = set()
+    if last_evidence:
+        for node in last_evidence.get("top_nodes", []) + last_evidence.get("related_nodes", []):
+            if isinstance(node, dict) and node.get("label") == "Person" and node.get("id"):
+                node_first = strip_diacritics(str(node.get("name", "")).split()[0].casefold()) if node.get("name") else ""
+                if node_first == target:
+                    already_shown_ids.add(str(node["id"]))
+
+    remaining = [person for person in matched_people if str(person["id"]) not in already_shown_ids]
+    focus_people = remaining or matched_people
+    people_names = [str(person["name"]) for person in focus_people[:8]]
+    top_nodes = [dict(person, _score=10.0) for person in focus_people[:8]]
+    evidence = {"top_nodes": top_nodes, "related_nodes": top_nodes, "relationships": []}
+
+    if remaining:
+        verb = "is" if len(people_names) == 1 else "are"
+        answer = f"{format_human_list(people_names)} {verb} other people with the first name `{display_query_term(target)}` in the current graph."
+    elif len(matched_people) == 1:
+        answer = f"I could not find any other people named `{display_query_term(target)}` in the current graph. The only match is {matched_people[0]['name']}."
+    else:
+        answer = f"I could not find additional people beyond {format_human_list([str(person['name']) for person in matched_people[:8]])} with the first name `{display_query_term(target)}` in the current graph."
+
+    query_state = {
+        "kind": "name_listing",
+        "target_first_name": target,
+        "shown_people": people_names,
+    }
+    return answer, evidence, "Graph Search", query_state
+
+
+def try_person_work_with_answer(
+    question: str,
+    indexes: dict[str, Any],
+    gemini_model_name: str = "",
+    ollama_model_name: str = "",
+    ollama_host: str = "",
+) -> tuple[str, dict[str, Any], str] | None:
+    normalized = expand_query(question)
+    match = re.search(r"who(?:\s+else)?\s+does\s+(.+?)\s+work\s+with", normalized)
+    if not match:
+        match = re.search(r"who\s+works\s+with\s+(.+)", normalized)
+    if not match:
+        return None
+
+    target_phrase = match.group(1).strip(" ?.")
+    if not target_phrase:
+        return None
+
+    strong_entity_nodes = find_named_nodes(
+        indexes,
+        target_phrase,
+        {"Person", "Role", "JobDescription", "Department", "Team", "Country", "Site", "Skill", "Topic", "System"},
+        limit=5,
+        min_score=30,
+    )
+    if not strong_entity_nodes:
+        near_person_or_role = find_named_nodes(indexes, target_phrase, {"Person", "Role", "JobDescription"}, limit=3, min_score=18)
+        if near_person_or_role:
+            return build_closest_match_suggestion(
+                target_phrase,
+                indexes,
+                {"Person", "Role", "JobDescription"},
+                f"I could not find the exact person or role `{display_query_term(target_phrase)}` in the current graph.",
+                gemini_model_name,
+                ollama_model_name,
+                ollama_host,
+            )
+
+        near_concepts = find_named_nodes(indexes, target_phrase, {"Skill", "Topic", "System", "Department", "Team", "Country", "Site"}, limit=3, min_score=18)
+        if near_concepts:
+            best_entity = near_concepts[0]
+            strong_entity_nodes = [best_entity]
+        else:
+            empty_evidence = {"top_nodes": [], "related_nodes": [], "relationships": []}
+            return (
+                f"I could not find a confident person, role, or concept match for `{display_query_term(target_phrase)}` in the current graph.",
+                empty_evidence,
+                "Graph Search",
+            )
+
+    best_entity = strong_entity_nodes[0]
+    best_label = str(best_entity.get("label"))
+    person_ids = find_person_ids_for_target(indexes, target_phrase, require_strong_match=True)
+
+    if best_label in {"Department", "Team", "Country", "Site"}:
+        nodes_by_id = indexes["nodes_by_id"]
+        adjacency = indexes["adjacency"]
+        people: list[dict[str, Any]] = []
+        relationships: list[dict[str, Any]] = []
+
+        if best_label == "Team":
+            for rel in adjacency.get(best_entity["id"], []):
+                if rel["type"] == "INVERSE_MEMBER_OF":
+                    person = nodes_by_id.get(rel["end"])
+                    if person and person.get("label") == "Person":
+                        people.append(person)
+                        relationships.append({"start": person["id"], "type": "MEMBER_OF", "end": best_entity["id"]})
+        elif best_label == "Department":
+            role_ids = [rel["end"] for rel in adjacency.get(best_entity["id"], []) if rel["type"] == "INVERSE_BELONGS_TO_DEPARTMENT"]
+            seen_people = set()
+            for role_id in role_ids:
+                role_node = nodes_by_id.get(role_id)
+                if role_node:
+                    relationships.append({"start": role_id, "type": "BELONGS_TO_DEPARTMENT", "end": best_entity["id"]})
+                for rel in adjacency.get(role_id, []):
+                    if rel["type"] == "INVERSE_HAS_ROLE":
+                        person = nodes_by_id.get(rel["end"])
+                        if person and person.get("label") == "Person" and person["id"] not in seen_people:
+                            seen_people.add(person["id"])
+                            people.append(person)
+                            relationships.append({"start": person["id"], "type": "HAS_ROLE", "end": role_id})
+        else:
+            inverse_rel = "INVERSE_LOCATED_IN" if best_label == "Country" else "INVERSE_AT_SITE"
+            direct_rel = "LOCATED_IN" if best_label == "Country" else "AT_SITE"
+            for rel in adjacency.get(best_entity["id"], []):
+                if rel["type"] == inverse_rel:
+                    person = nodes_by_id.get(rel["end"])
+                    if person and person.get("label") == "Person":
+                        people.append(person)
+                        relationships.append({"start": person["id"], "type": direct_rel, "end": best_entity["id"]})
+
+        deduped_people = []
+        seen_people = set()
+        for person in people:
+            if person["id"] not in seen_people:
+                seen_people.add(person["id"])
+                deduped_people.append(person)
+        people = deduped_people
+
+        if not people:
+            return None
+
+        people_names = [person["name"] for person in people[:8]]
+        verb = "is" if len(people_names) == 1 else "are"
+        answer = f"{format_human_list(people_names)} {verb} most directly associated in the graph with `{best_entity['name']}`."
+        top_nodes = [dict(best_entity, _score=best_entity.get("_score", 10.0))]
+        top_nodes.extend(dict(person, _score=10.0) for person in people[:8])
+        seen_top = {}
+        for node in top_nodes:
+            seen_top[node["id"]] = node
+        evidence = {
+            "top_nodes": list(seen_top.values()),
+            "related_nodes": list(seen_top.values()),
+            "relationships": relationships[:18],
+        }
+        return answer, evidence, "Graph Search"
+
+    if best_label in {"Skill", "Topic", "System"}:
+        return None
+
+    if not person_ids and best_label in {"Person", "Role", "JobDescription"}:
+        return build_closest_match_suggestion(
+            target_phrase,
+            indexes,
+            {"Person", "Role"},
+            f"I could not find the exact person or role `{display_query_term(target_phrase)}` in the current graph.",
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+    if not person_ids:
+        return None
+
+    nodes_by_id = indexes["nodes_by_id"]
+    adjacency = indexes["adjacency"]
+    answer_lines = []
+    top_nodes = []
+    relationships = []
+
+    for person_id in person_ids:
+        person_node = nodes_by_id.get(person_id)
+        if not person_node:
+            continue
+        person_name = person_node["name"]
+        top_nodes.append(person_node)
+
+        collaborators: dict[str, list[str]] = defaultdict(list)
+
+        for rel in adjacency.get(person_id, []):
+            rel_type = str(rel["type"])
+            end_node = nodes_by_id.get(rel["end"])
+            if not end_node:
+                continue
+
+            if rel_type == "REPORTS_TO" and end_node.get("label") == "Person":
+                collaborators[end_node["name"]].append("reporting line")
+                top_nodes.append(end_node)
+                relationships.append({"start": person_id, "type": "REPORTS_TO", "end": end_node["id"]})
+            elif rel_type == "INVERSE_REPORTS_TO" and end_node.get("label") == "Person":
+                collaborators[end_node["name"]].append("reporting line")
+                top_nodes.append(end_node)
+                relationships.append({"start": end_node["id"], "type": "REPORTS_TO", "end": person_id})
+            elif rel_type == "MEMBER_OF" and end_node.get("label") == "Team":
+                team_name = end_node["name"]
+                top_nodes.append(end_node)
+                relationships.append({"start": person_id, "type": "MEMBER_OF", "end": end_node["id"]})
+                for team_rel in adjacency.get(end_node["id"], []):
+                    if team_rel["type"] == "INVERSE_MEMBER_OF":
+                        teammate = nodes_by_id.get(team_rel["end"])
+                        if teammate and teammate.get("label") == "Person" and teammate["id"] != person_id:
+                            collaborators[teammate["name"]].append(f"team `{team_name}`")
+                            top_nodes.append(teammate)
+                            relationships.append({"start": teammate["id"], "type": "MEMBER_OF", "end": end_node["id"]})
+
+        if not collaborators:
+            answer_lines.append(
+                f"The graph does not show direct people links for {person_name} beyond their individual role, skills, topics, and systems."
+            )
+            continue
+
+        collaborator_names = list(collaborators.keys())
+        reason_parts = []
+        for collaborator_name in collaborator_names[:5]:
+            reasons = []
+            seen = set()
+            for reason in collaborators[collaborator_name]:
+                if reason not in seen:
+                    seen.add(reason)
+                    reasons.append(reason)
+            reason_parts.append(f"{collaborator_name} through {format_human_list(reasons)}")
+
+        answer_lines.append(
+            f"{person_name} is most directly connected in the graph to {format_human_list(collaborator_names[:5])}. "
+            + "; ".join(reason_parts)
+            + "."
+        )
+
+    if not answer_lines:
+        return None
+
+    seen_top = {}
+    for node in top_nodes:
+        seen_top[node["id"]] = node
+    evidence = {
+        "top_nodes": [dict(node, _score=10.0) if "_score" not in node else node for node in seen_top.values()],
+        "related_nodes": list(seen_top.values()),
+        "relationships": relationships[:20],
+    }
+    return "\n".join(answer_lines), evidence, "Graph Search"
+
+
+def try_node_relationship_answer(
+    question: str,
+    indexes: dict[str, Any],
+    gemini_model_name: str = "",
+    ollama_model_name: str = "",
+    ollama_host: str = "",
+) -> tuple[str, dict[str, Any], str] | None:
+    normalized = expand_query(question)
+    via_match = re.search(r"(?:are|is)\s+(.+?)\s+and\s+(.+?)\s+connected\s+(?:through|via)\s+(.+)", normalized)
+    if via_match:
+        left_phrase = via_match.group(1).strip(" ?.")
+        right_phrase = via_match.group(2).strip(" ?.")
+        via_phrase = via_match.group(3).strip(" ?.")
+        if not left_phrase or not right_phrase or not via_phrase:
+            return None
+
+        left_node = resolve_best_entity(indexes, left_phrase)
+        right_node = resolve_best_entity(indexes, right_phrase)
+        via_node = resolve_best_entity(indexes, via_phrase)
+        if not left_node:
+            return build_closest_match_suggestion(
+                left_phrase,
+                indexes,
+                {"Person", "Role", "JobDescription", "Department", "Team", "Country", "Site", "Skill", "Topic", "System"},
+                f"I could not find the exact node `{display_query_term(left_phrase)}` in the current graph.",
+                gemini_model_name,
+                ollama_model_name,
+                ollama_host,
+            )
+        if not right_node:
+            return build_closest_match_suggestion(
+                right_phrase,
+                indexes,
+                {"Person", "Role", "JobDescription", "Department", "Team", "Country", "Site", "Skill", "Topic", "System"},
+                f"I could not find the exact node `{display_query_term(right_phrase)}` in the current graph.",
+                gemini_model_name,
+                ollama_model_name,
+                ollama_host,
+            )
+        if not via_node:
+            return build_closest_match_suggestion(
+                via_phrase,
+                indexes,
+                {"Person", "Role", "JobDescription", "Department", "Team", "Country", "Site", "Skill", "Topic", "System"},
+                f"I could not find the exact node `{display_query_term(via_phrase)}` in the current graph.",
+                gemini_model_name,
+                ollama_model_name,
+                ollama_host,
+            )
+
+        left_path = find_shortest_relationship_path(indexes, left_node["id"], via_node["id"], max_depth=2) or find_shortest_relationship_path(indexes, via_node["id"], left_node["id"], max_depth=2)
+        right_path = find_shortest_relationship_path(indexes, right_node["id"], via_node["id"], max_depth=2) or find_shortest_relationship_path(indexes, via_node["id"], right_node["id"], max_depth=2)
+        if not left_path or not right_path:
+            evidence = {
+                "top_nodes": [dict(left_node, _score=10.0), dict(right_node, _score=10.0), dict(via_node, _score=10.0)],
+                "related_nodes": [dict(left_node, _score=10.0), dict(right_node, _score=10.0), dict(via_node, _score=10.0)],
+                "relationships": [],
+            }
+            return (
+                f"The current graph does not show a clear relationship path linking `{left_node['name']}` and `{right_node['name']}` through `{via_node['name']}`.",
+                evidence,
+                "Graph Search",
+            )
+
+        nodes_by_id = indexes["nodes_by_id"]
+        top_nodes = {
+            left_node["id"]: dict(left_node, _score=10.0),
+            right_node["id"]: dict(right_node, _score=10.0),
+            via_node["id"]: dict(via_node, _score=10.0),
+        }
+        relationships: list[dict[str, Any]] = []
+        left_steps: list[str] = []
+        right_steps: list[str] = []
+        for rel in left_path:
+            start_node = nodes_by_id.get(rel["start"], {"id": rel["start"], "name": rel["start"]})
+            end_node = nodes_by_id.get(rel["end"], {"id": rel["end"], "name": rel["end"]})
+            top_nodes[start_node["id"]] = dict(start_node, _score=9.0)
+            top_nodes[end_node["id"]] = dict(end_node, _score=9.0)
+            relationships.append({"start": rel["start"], "type": rel["type"], "end": rel["end"]})
+            left_steps.append(describe_relationship_step(start_node, str(rel["type"]), end_node))
+        for rel in right_path:
+            start_node = nodes_by_id.get(rel["start"], {"id": rel["start"], "name": rel["start"]})
+            end_node = nodes_by_id.get(rel["end"], {"id": rel["end"], "name": rel["end"]})
+            top_nodes[start_node["id"]] = dict(start_node, _score=9.0)
+            top_nodes[end_node["id"]] = dict(end_node, _score=9.0)
+            relationships.append({"start": rel["start"], "type": rel["type"], "end": rel["end"]})
+            right_steps.append(describe_relationship_step(start_node, str(rel["type"]), end_node))
+
+        answer = (
+            f"Yes. The graph connects `{left_node['name']}` and `{right_node['name']}` through `{via_node['name']}`.\n"
+            + "\n".join(f"- {step}." for step in left_steps + right_steps)
+        )
+        evidence = {
+            "top_nodes": list(top_nodes.values()),
+            "related_nodes": list(top_nodes.values()),
+            "relationships": relationships[:24],
+        }
+        return answer, evidence, "Graph Search"
+
+    patterns = [
+        r"how\s+is\s+(.+?)\s+related\s+to\s+(.+)",
+        r"(?:what\s+is\s+the\s+|any\s+)?relationship\s+between\s+(.+?)\s+and\s+(.+)",
+        r"is\s+(.+?)\s+related\s+to\s+(.+)",
+        r"is\s+(.+?)\s+connected\s+to\s+(.+)",
+        r"(?:is|are)\s+(.+?)\s+and\s+(.+?)\s+connected(?:\s+somehow)?",
+        r"does\s+(.+?)\s+work\s+with\s+(.+)",
+    ]
+    match = None
+    for pattern in patterns:
+        match = re.search(pattern, normalized)
+        if match:
+            break
+    if not match:
+        return None
+
+    left_phrase = match.group(1).strip(" ?.")
+    right_phrase = match.group(2).strip(" ?.")
+    if not left_phrase or not right_phrase:
+        return None
+
+    left_node = resolve_best_entity(indexes, left_phrase)
+    right_node = resolve_best_entity(indexes, right_phrase)
+
+    if not left_node:
+        return build_closest_match_suggestion(
+            left_phrase,
+            indexes,
+            {"Person", "Role", "JobDescription", "Department", "Team", "Country", "Site", "Skill", "Topic", "System"},
+            f"I could not find the exact node `{display_query_term(left_phrase)}` in the current graph.",
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+    if not right_node:
+        return build_closest_match_suggestion(
+            right_phrase,
+            indexes,
+            {"Person", "Role", "JobDescription", "Department", "Team", "Country", "Site", "Skill", "Topic", "System"},
+            f"I could not find the exact node `{display_query_term(right_phrase)}` in the current graph.",
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+
+    path = find_shortest_relationship_path(indexes, left_node["id"], right_node["id"], max_depth=3)
+    if not path:
+        reverse_path = find_shortest_relationship_path(indexes, right_node["id"], left_node["id"], max_depth=3)
+        path = reverse_path
+        if path:
+            left_node, right_node = right_node, left_node
+
+    if not path:
+        top_nodes = [dict(left_node, _score=10.0), dict(right_node, _score=10.0)]
+        evidence = {"top_nodes": top_nodes, "related_nodes": top_nodes, "relationships": []}
+        answer = (
+            f"The current graph does not show an explicit direct relationship path between `{left_node['name']}` "
+            f"and `{right_node['name']}` within the supported graph depth."
+        )
+        return answer, evidence, "Graph Search"
+
+    nodes_by_id = indexes["nodes_by_id"]
+    top_nodes = {left_node["id"]: dict(left_node, _score=10.0), right_node["id"]: dict(right_node, _score=10.0)}
+    compact_relationships: list[dict[str, Any]] = []
+    step_texts: list[str] = []
+    current_id = left_node["id"]
+    for rel in path:
+        start_node = nodes_by_id.get(rel["start"], {"id": rel["start"], "name": rel["start"]})
+        end_node = nodes_by_id.get(rel["end"], {"id": rel["end"], "name": rel["end"]})
+        top_nodes[start_node["id"]] = dict(start_node, _score=9.0)
+        top_nodes[end_node["id"]] = dict(end_node, _score=9.0)
+        compact_relationships.append({"start": rel["start"], "type": rel["type"], "end": rel["end"]})
+        step_texts.append(describe_relationship_step(start_node, str(rel["type"]), end_node))
+        current_id = rel["end"]
+
+    answer = (
+        f"The graph links `{left_node['name']}` and `{right_node['name']}` through this path:\n"
+        + "\n".join(f"- {step}." for step in step_texts)
+    )
+    evidence = {
+        "top_nodes": list(top_nodes.values()),
+        "related_nodes": list(top_nodes.values()),
+        "relationships": compact_relationships[:18],
+    }
+    return answer, evidence, "Graph Search"
 
 
 def is_identity_question(question: str) -> bool:
@@ -1873,6 +3033,51 @@ def natural_search_answer(question: str, evidence: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def answer_mentions_name(answer_text: str, name: str) -> bool:
+    return bool(re.search(rf"(?<!\w){re.escape(name.casefold())}(?!\w)", answer_text.casefold()))
+
+
+def extract_person_like_phrases(text: str) -> list[str]:
+    candidates = []
+    for match in re.finditer(r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\b", text):
+        candidates.append(match.group(1).strip())
+    return candidates
+
+
+def validate_llm_answer(answer_text: str, question: str, evidence: dict[str, Any], indexes: dict[str, Any]) -> tuple[bool, str]:
+    allowed_people = {
+        str(node.get("name", "")).strip()
+        for node in evidence.get("top_nodes", []) + evidence.get("related_nodes", [])
+        if isinstance(node, dict) and node.get("label") == "Person" and node.get("name")
+    }
+    all_people = {
+        str(node.get("name", "")).strip()
+        for node in indexes["nodes_by_id"].values()
+        if node.get("label") == "Person" and node.get("name")
+    }
+
+    mentioned_known_people = [name for name in all_people if answer_mentions_name(answer_text, name)]
+    unsupported_known_people = [name for name in mentioned_known_people if name not in allowed_people]
+    if unsupported_known_people:
+        return False, f"Referenced person outside current graph evidence: {format_human_list(sorted(unsupported_known_people))}."
+
+    question_lc = question.casefold()
+    known_node_names = {str(node.get("name", "")).strip().casefold() for node in indexes["nodes_by_id"].values() if node.get("name")}
+    suspicious_phrases = []
+    for phrase in extract_person_like_phrases(answer_text):
+        phrase_lc = phrase.casefold()
+        if phrase_lc in question_lc:
+            continue
+        if phrase_lc in known_node_names:
+            continue
+        suspicious_phrases.append(phrase)
+
+    if suspicious_phrases:
+        return False, f"Potential unsupported named entity in model answer: {format_human_list(sorted(set(suspicious_phrases)))}."
+
+    return True, "Validated against current graph evidence."
+
+
 def infer_focus_entity(evidence: dict[str, Any]) -> dict[str, str] | None:
     for collection_name in ("top_nodes", "related_nodes"):
         for node in evidence.get(collection_name, []):
@@ -1932,6 +3137,37 @@ def resolve_followup_question(question: str, focus: dict[str, str] | None) -> st
     if replaced:
         resolved = re.sub(r"^\s*and\s+", "", resolved, flags=re.IGNORECASE)
     return resolved
+
+
+def parse_person_work_target(question: str) -> str | None:
+    normalized = expand_query(question)
+    match = re.search(r"who(?:\s+else)?\s+does\s+(.+?)\s+work\s+with", normalized)
+    if not match:
+        match = re.search(r"who\s+works\s+with\s+(.+)", normalized)
+    if not match:
+        return None
+    target = match.group(1).strip(" ?.")
+    return target or None
+
+
+def parse_relationship_pair(question: str) -> tuple[str, str] | None:
+    normalized = expand_query(question)
+    patterns = [
+        r"how\s+is\s+(.+?)\s+related\s+to\s+(.+)",
+        r"(?:what\s+is\s+the\s+|any\s+)?relationship\s+between\s+(.+?)\s+and\s+(.+)",
+        r"is\s+(.+?)\s+related\s+to\s+(.+)",
+        r"is\s+(.+?)\s+connected\s+to\s+(.+)",
+        r"(?:is|are)\s+(.+?)\s+and\s+(.+?)\s+connected(?:\s+somehow)?",
+        r"does\s+(.+?)\s+work\s+with\s+(.+)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, normalized)
+        if match:
+            left = match.group(1).strip(" ?.")
+            right = match.group(2).strip(" ?.")
+            if left and right:
+                return left, right
+    return None
 
 
 def has_sufficient_evidence(evidence: dict[str, Any]) -> bool:
@@ -2035,6 +3271,7 @@ Rules:
 - Use knows for systems, tools, platforms, or software knowledge.
 - Use skill for capability or competency questions.
 - Use people_keyword for broad topic questions like "who works with data", "who works on ERP", or "who is connected to planning".
+- Relationship questions like "how is X related to Y", "what is the relationship between X and Y", or "does X work with Y" should return unknown unless you can confidently map them to a simpler intent, because the app has a dedicated graph relationship handler for them.
 - Use explain_previous for short follow-ups like "why?", "why them?", or "how so?" when the user is asking why the previous answer was returned.
 - Use more_results for follow-ups like "who else?", "is there any other?", or "anyone else?" when the user asks for additional results from the previous answer.
 - Use identity for "who is X" role/title identity questions.
@@ -2051,6 +3288,7 @@ Examples:
 - "who knows Azure" -> knows, target "Azure"
 - "who has skill API integrations" -> skill, target "API integrations"
 - "who works with data" -> people_keyword, target "data"
+- "how is Petra Novakova related to Manuela Kovacova" -> unknown, target ""
 - "why?" -> explain_previous, target ""
 - "who else?" -> more_results, target ""
 - "who is CIO" -> identity, target "Chief Information Officer"
@@ -2149,11 +3387,13 @@ def make_answer_trace(
     final_backend: str,
     resolution_mode: str,
     interpreter_backend: str | None = None,
+    validation: str = "Graph-grounded by structured handler",
 ) -> dict[str, str]:
     return {
         "final_backend": final_backend,
         "resolution_mode": resolution_mode,
         "interpreter_backend": interpreter_backend or "None",
+        "validation": validation,
     }
 
 
@@ -2170,19 +3410,82 @@ def answer_question(
     last_query_state: dict[str, Any] | None = None,
     last_evidence: dict[str, Any] | None = None,
 ) -> tuple[str, dict[str, Any], str, dict[str, Any] | None, dict[str, str]]:
+    other_people_name_answer = try_other_people_with_name_answer(question, indexes, last_evidence)
+    if other_people_name_answer:
+        answer, evidence, backend, query_state = other_people_name_answer
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up same-name lookup from graph evidence")
+
+    confirmation_followup = try_confirmation_followup_answer(
+        question,
+        indexes,
+        last_query_state,
+        gemini_model_name,
+        ollama_model_name,
+        ollama_host,
+    )
+    if confirmation_followup:
+        answer, evidence, backend, query_state = confirmation_followup
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up confirmation over graph evidence")
+
     why_followup_answer = try_why_followup_answer(question, last_query_state, last_evidence)
     if why_followup_answer:
         answer, evidence, backend, query_state = why_followup_answer
         return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up explanation from graph evidence")
+
+    person_keyword_followup = try_person_keyword_followup_answer(question, indexes, last_query_state)
+    if person_keyword_followup:
+        answer, evidence, backend, query_state = person_keyword_followup
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up person check against previous graph evidence")
 
     more_results_answer = try_more_results_answer(question, indexes, last_query_state)
     if more_results_answer:
         answer, evidence, backend, query_state = more_results_answer
         return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up expansion from graph evidence")
 
+    group_relationship_followup = try_group_relationship_followup_answer(question, indexes, last_query_state)
+    if group_relationship_followup:
+        answer, evidence, backend, query_state = group_relationship_followup
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up group relationship from graph evidence")
+
+    group_keyword_followup = try_group_keyword_followup_answer(question, indexes, last_query_state)
+    if group_keyword_followup:
+        answer, evidence, backend, query_state = group_keyword_followup
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up group comparison from graph evidence")
+
+    relationship_followup = try_relationship_followup_answer(
+        question,
+        indexes,
+        last_query_state,
+        gemini_model_name,
+        ollama_model_name,
+        ollama_host,
+    )
+    if relationship_followup:
+        answer, evidence, backend, query_state = relationship_followup
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up relationship expansion from graph evidence")
+
     fallback_question = resolve_followup_question(question, conversation_focus)
 
     def dispatch_safe(question_text: str) -> tuple[str, dict[str, Any], str, dict[str, Any] | None, str] | None:
+        node_relationship_answer = try_node_relationship_answer(
+            question_text,
+            indexes,
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+        if node_relationship_answer:
+            answer, evidence, backend = node_relationship_answer
+            relationship_pair = parse_relationship_pair(question_text)
+            query_state = None
+            if relationship_pair:
+                query_state = {
+                    "kind": "relationship_pair",
+                    "left_name": relationship_pair[0],
+                    "right_name": relationship_pair[1],
+                }
+            return answer, evidence, backend, query_state, "Structured graph handler: node relationship path"
+
         location_people_sites_answer = try_location_people_and_sites_answer(question_text, indexes)
         if location_people_sites_answer:
             answer, evidence, backend = location_people_sites_answer
@@ -2202,7 +3505,22 @@ def answer_question(
         )
         if membership_answer:
             answer, evidence, backend = membership_answer
-            return answer, evidence, backend, None, "Structured graph handler: membership/location"
+            membership_people = [
+                node["name"]
+                for node in evidence.get("top_nodes", [])
+                if isinstance(node, dict) and node.get("label") == "Person" and node.get("name")
+            ]
+            membership_target = ""
+            for node in evidence.get("top_nodes", []):
+                if isinstance(node, dict) and node.get("label") in {"Department", "Team", "Country", "Site"} and node.get("name"):
+                    membership_target = str(node["name"])
+                    break
+            query_state = {
+                "kind": "membership",
+                "target": membership_target,
+                "shown_people": membership_people,
+            }
+            return answer, evidence, backend, query_state, "Structured graph handler: membership/location"
 
         identity_answer = try_identity_answer(question_text, indexes)
         if identity_answer:
@@ -2245,6 +3563,43 @@ def answer_question(
             answer, evidence, backend = reverse_reporting_answer
             return answer, evidence, backend, None, "Structured graph handler: reporting up"
 
+        person_concept_answer = try_person_concept_answer(
+            question_text,
+            indexes,
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+        if person_concept_answer:
+            answer, evidence, backend = person_concept_answer
+            return answer, evidence, backend, None, "Structured graph handler: person + concept"
+
+        person_work_with_answer = try_person_work_with_answer(
+            question_text,
+            indexes,
+            gemini_model_name,
+            ollama_model_name,
+            ollama_host,
+        )
+        if person_work_with_answer:
+            answer, evidence, backend = person_work_with_answer
+            person_target = parse_person_work_target(question_text)
+            query_state = None
+            if answer.startswith("I could not find the exact person or role"):
+                suggested_person = infer_focus_entity(evidence)
+                if suggested_person and suggested_person.get("label") in {"Person", "Role"}:
+                    query_state = {
+                        "kind": "pending_suggestion",
+                        "intent": "person_work_with",
+                        "suggested_name": str(suggested_person.get("name", "")),
+                    }
+            elif person_target:
+                query_state = {
+                    "kind": "person_collaboration",
+                    "target": person_target,
+                }
+            return answer, evidence, backend, query_state, "Structured graph handler: person collaboration"
+
         keyword_people_answer = try_people_for_keyword_answer(question_text, indexes)
         if keyword_people_answer:
             answer, evidence, backend, query_state = keyword_people_answer
@@ -2278,6 +3633,20 @@ def answer_question(
         direct_membership_answer = dispatch_safe(fallback_question)
         if direct_membership_answer:
             answer, evidence, backend, query_state, resolution_mode = direct_membership_answer
+            return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
+    if re.search(r"\b(reports?\s+to|works?\s+under|works?\s+for|is\s+under|does.+report\s+to|reporting\s+to)\b", expand_query(fallback_question)):
+        direct_reporting_answer = dispatch_safe(fallback_question)
+        if direct_reporting_answer:
+            answer, evidence, backend, query_state, resolution_mode = direct_reporting_answer
+            return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
+    if (
+        re.search(r"\b(related\s+to|relationship\s+between|connected\s+to|connected\s+through|connected\s+via)\b", expand_query(fallback_question))
+        or re.search(r"\bdoes\b.+\bwork\s+with\b", expand_query(fallback_question))
+        or re.search(r"\b(?:is|are)\b.+\band\b.+\bconnected(?:\s+somehow)?\b", expand_query(fallback_question))
+    ):
+        direct_relationship_answer = dispatch_safe(fallback_question)
+        if direct_relationship_answer:
+            answer, evidence, backend, query_state, resolution_mode = direct_relationship_answer
             return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
     if re.search(r"\b(list|show|what are)\b", expand_query(fallback_question)):
         direct_list_answer = dispatch_safe(fallback_question)
@@ -2313,6 +3682,20 @@ def answer_question(
         if re.search(r"\bdoes\b.+\breport\s+to\b", lowered_question) or re.search(r"\breporting\s+to\b", lowered_question):
             interpreted["intent"] = "reporting_up"
         if interpreted_intent == "people_keyword" or re.search(r"\bworks?\s+(with|on|in)\b", lowered_question):
+            person_work_with_answer = try_person_work_with_answer(
+                fallback_question,
+                indexes,
+                gemini_model_name,
+                ollama_model_name,
+                ollama_host,
+            )
+            if person_work_with_answer:
+                answer, evidence, backend = person_work_with_answer
+                return answer, evidence, backend, None, make_answer_trace(
+                    backend,
+                    "Structured graph handler: person collaboration",
+                    interpreter_backend,
+                )
             keyword_answer = try_people_for_keyword_answer(fallback_question, indexes)
             if keyword_answer:
                 answer, evidence, backend, query_state = keyword_answer
@@ -2368,7 +3751,11 @@ def answer_question(
             try:
                 answer = call_ollama(prompt, ollama_model_name, ollama_host)
                 if answer:
-                    return answer, evidence, "Ollama", None, make_answer_trace("Ollama", "LLM answer over retrieved graph context", interpreter_backend)
+                    is_valid, validation_reason = validate_llm_answer(answer, fallback_question, evidence, indexes)
+                    if is_valid:
+                        return answer, evidence, "Ollama", None, make_answer_trace("Ollama", "LLM answer over retrieved graph context", interpreter_backend, validation_reason)
+                    fallback_answer = natural_search_answer(question, evidence)
+                    return fallback_answer, evidence, "Graph Search", None, make_answer_trace("Graph Search", "Validator fallback after unsupported Ollama answer", interpreter_backend, validation_reason)
             except Exception:
                 continue
 
@@ -2378,7 +3765,11 @@ def answer_question(
             try:
                 answer = call_gemini(prompt, gemini_model_name)
                 if answer:
-                    return answer, evidence, "Gemini", None, make_answer_trace("Gemini", "LLM answer over retrieved graph context", interpreter_backend)
+                    is_valid, validation_reason = validate_llm_answer(answer, fallback_question, evidence, indexes)
+                    if is_valid:
+                        return answer, evidence, "Gemini", None, make_answer_trace("Gemini", "LLM answer over retrieved graph context", interpreter_backend, validation_reason)
+                    fallback_answer = natural_search_answer(question, evidence)
+                    return fallback_answer, evidence, "Graph Search", None, make_answer_trace("Graph Search", "Validator fallback after unsupported Gemini answer", interpreter_backend, validation_reason)
             except Exception as error:
                 if is_gemini_quota_error(error):
                     mark_gemini_unavailable("Gemini is temporarily unavailable because the API quota or rate limit was reached.")
@@ -2402,8 +3793,8 @@ def render_hero(dataset_name: str, graph_payload: dict[str, Any], backend_order:
     )
     stat_html = f"""
     <div class="hero-card">
-      <div class="hero-eyebrow">Enterprise Knowledge Graph Chat</div>
-      <div class="hero-title">Ask the graph like a teammate.</div>
+      <div class="hero-eyebrow">Enterprise Assistant</div>
+      <div class="skillwiki-logo">Skill<span>Wiki</span></div>
       <div class="hero-subtitle">
         Explore people, roles, skills, systems, teams, and evidence through a clear conversational layer.
         The app retrieves graph context first, then answers through the best available model path.
@@ -2453,6 +3844,7 @@ def render_evidence_panel(evidence: dict[str, Any], backend_used: str | None, an
         st.caption(f"Final answer: {answer_trace.get('final_backend', backend_used or 'Unknown')}")
         st.caption(f"Question interpretation: {answer_trace.get('interpreter_backend', 'None')}")
         st.caption(f"Resolution mode: {answer_trace.get('resolution_mode', 'Unknown')}")
+        st.caption(f"Validation: {answer_trace.get('validation', 'Unknown')}")
     elif backend_used:
         st.caption(f"Last answer path: {backend_used}")
 
@@ -2510,7 +3902,7 @@ def sidebar_controls() -> tuple[str, str, str, str, bool, list[str], list[str], 
         gemini_disabled = bool(st.session_state.get("gemini_model_disabled", False))
         gemini_ready = bool(get_api_key()) and not gemini_disabled
         model_available = ollama_available if runtime_mode == "local" else gemini_ready
-        default_model_enabled = model_available
+        default_model_enabled = model_available if runtime_mode == "local" else False
         use_model = st.toggle(
             "Use model assistance",
             value=default_model_enabled,
