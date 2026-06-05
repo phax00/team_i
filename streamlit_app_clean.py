@@ -1,3 +1,6 @@
+import html
+import re
+
 import streamlit as st
 
 import streamlit_app as core
@@ -37,10 +40,10 @@ def inject_clean_styles() -> None:
         .clean-hero {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 1.3rem 1.4rem 1.1rem 1.4rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 16px 40px rgba(123, 58, 237, 0.08);
+            border-radius: 22px;
+            padding: 1.15rem 1.3rem 1rem 1.3rem;
+            margin-bottom: 1.1rem;
+            box-shadow: 0 14px 32px rgba(123, 58, 237, 0.08);
         }
 
         .clean-eyebrow {
@@ -78,44 +81,121 @@ def inject_clean_styles() -> None:
             line-height: 1.55;
         }
 
-        .chip-row {
+        .conversation {
             display: flex;
-            gap: 0.55rem;
-            flex-wrap: wrap;
-            margin-top: 0.9rem;
+            flex-direction: column;
+            gap: 0.9rem;
         }
 
-        .chip {
+        .msg-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            width: 100%;
+        }
+
+        .msg-row.user {
+            align-items: flex-end;
+        }
+
+        .msg-row.assistant {
+            align-items: flex-start;
+        }
+
+        .msg-label {
+            font-size: 0.77rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--muted);
+            padding: 0 0.15rem;
+        }
+
+        .msg-bubble {
+            width: min(100%, 780px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 26px rgba(123, 58, 237, 0.06);
+            padding: 0.95rem 1rem 0.8rem 1rem;
+        }
+
+        .msg-bubble.user {
+            background: linear-gradient(180deg, #FFFFFF 0%, #FBF7FF 100%);
+        }
+
+        .msg-bubble.assistant {
+            background: #FFFFFF;
+        }
+
+        .msg-body {
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.62;
+            word-break: break-word;
+        }
+
+        .msg-body p {
+            margin: 0 0 0.55rem 0;
+        }
+
+        .msg-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .msg-body ul {
+            margin: 0.2rem 0 0.5rem 1.1rem;
+            padding: 0;
+        }
+
+        .msg-body li {
+            margin: 0.18rem 0;
+        }
+
+        .inline-tag {
+            display: inline-block;
+            padding: 0.08rem 0.42rem;
+            border-radius: 999px;
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+            font-size: 0.94em;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        .answer-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.38rem;
+            margin-top: 0.72rem;
+        }
+
+        .meta-pill {
             display: inline-flex;
             align-items: center;
-            padding: 0.44rem 0.72rem;
             border-radius: 999px;
             border: 1px solid var(--border);
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 0.83rem;
+            font-size: 0.75rem;
             font-weight: 700;
+            padding: 0.22rem 0.55rem;
         }
 
-        .stChatMessage {
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 0.15rem 0.2rem;
-        }
-
-        .stChatMessage [data-testid="stMarkdownContainer"] p {
-            line-height: 1.58;
-        }
-
-        .answer-meta {
-            margin-top: 0.45rem;
+        .meta-pill span {
             color: var(--muted);
-            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.28rem;
         }
 
-        .answer-meta strong {
-            color: var(--primary-dark);
+        .thinking-card {
+            width: min(100%, 780px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.88);
+            padding: 0.9rem 1rem;
+            color: var(--muted);
+            font-weight: 700;
+            box-shadow: 0 10px 26px rgba(123, 58, 237, 0.06);
         }
 
         .stButton > button,
@@ -139,17 +219,63 @@ def inject_clean_styles() -> None:
             border-color: var(--border) !important;
             background: #FFFFFF !important;
         }
+
+        [data-testid="stChatInput"] {
+            margin-top: 1rem;
+        }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
 
+def _render_inline_tags(text: str) -> str:
+    placeholders: list[str] = []
+
+    def capture(match: re.Match[str]) -> str:
+        placeholders.append(match.group(1))
+        return f"__INLINE_TAG_{len(placeholders) - 1}__"
+
+    protected = re.sub(r"`([^`]+)`", capture, text)
+    escaped = html.escape(protected)
+
+    for index, value in enumerate(placeholders):
+        token = f"__INLINE_TAG_{index}__"
+        escaped = escaped.replace(
+            token,
+            f'<span class="inline-tag">{html.escape(value)}</span>',
+        )
+
+    return escaped
+
+
+def format_message_html(text: str) -> str:
+    rendered_blocks: list[str] = []
+    paragraphs = [block.strip() for block in text.strip().split("\n\n") if block.strip()]
+
+    if not paragraphs:
+        return "<p></p>"
+
+    for block in paragraphs:
+        lines = [line.strip() for line in block.splitlines() if line.strip()]
+        if lines and all(line.startswith("- ") for line in lines):
+            items = "".join(f"<li>{_render_inline_tags(line[2:])}</li>" for line in lines)
+            rendered_blocks.append(f"<ul>{items}</ul>")
+            continue
+
+        joined = "<br>".join(_render_inline_tags(line) for line in lines)
+        rendered_blocks.append(f"<p>{joined}</p>")
+
+    return "".join(rendered_blocks)
+
+
 def build_sidebar() -> tuple[str, str, str, str]:
     with st.sidebar:
         st.markdown("### SkillWiki")
 
-        dataset_name = st.selectbox("Dataset", list(core.GRAPH_OPTIONS.keys()), index=0)
+        dataset_options = list(core.GRAPH_OPTIONS.keys())
+        default_dataset_index = dataset_options.index("Detailed Graph") if "Detailed Graph" in dataset_options else 0
+        dataset_name = st.selectbox("Dataset", dataset_options, index=default_dataset_index)
         ollama_model_name = core.get_secret_or_env("OLLAMA_MODEL", "llama3.2")
         ollama_host = core.get_secret_or_env("OLLAMA_HOST", "http://127.0.0.1:11434")
 
@@ -210,20 +336,38 @@ def render_header(dataset_name: str) -> None:
     )
 
 
-def render_trace(trace: dict[str, str] | None) -> None:
+def render_trace_html(trace: dict[str, str] | None) -> str:
     if not trace:
-        return
+        return ""
     final_backend = trace.get("final_backend", "Unknown")
     interpreter_backend = trace.get("interpreter_backend", "None")
     resolution_mode = trace.get("resolution_mode", "Unknown")
-    st.markdown(
+
+    return (
         f"""
         <div class="answer-meta">
-          <strong>Answered with:</strong> {final_backend}
-          &nbsp;|&nbsp;
-          <strong>Interpreted with:</strong> {interpreter_backend}
-          &nbsp;|&nbsp;
-          <strong>Mode:</strong> {resolution_mode}
+          <div class="meta-pill"><span>Answered with</span>{html.escape(final_backend)}</div>
+          <div class="meta-pill"><span>Interpreted with</span>{html.escape(interpreter_backend)}</div>
+          <div class="meta-pill"><span>Mode</span>{html.escape(resolution_mode)}</div>
+        </div>
+        """
+    )
+
+
+def render_message(role: str, content: str, trace: dict[str, str] | None = None) -> None:
+    label = "You" if role == "user" else "SkillWiki"
+    role_class = "user" if role == "user" else "assistant"
+    body_html = format_message_html(content)
+    trace_html = render_trace_html(trace) if role == "assistant" else ""
+
+    st.markdown(
+        f"""
+        <div class="msg-row {role_class}">
+          <div class="msg-label">{label}</div>
+          <div class="msg-bubble {role_class}">
+            <div class="msg-body">{body_html}</div>
+            {trace_html}
+          </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -249,37 +393,44 @@ def main() -> None:
     if not st.session_state["messages"]:
         st.info("Try a question like `Who reports to the COO?`, `Who knows Azure?`, or `How is Petra related to Filip?`")
 
+    st.markdown('<div class="conversation">', unsafe_allow_html=True)
     for message in st.session_state["messages"]:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-            if message["role"] == "assistant":
-                render_trace(message.get("trace"))
+        render_message(message["role"], message["content"], message.get("trace"))
+    st.markdown("</div>", unsafe_allow_html=True)
 
     prompt = st.chat_input("Ask about people, roles, skills, systems, or reporting lines")
     if not prompt:
         return
 
     st.session_state["messages"].append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    render_message("user", prompt)
 
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            answer, evidence, backend_used, query_state, answer_trace = core.answer_question(
-                prompt,
-                dataset_name,
-                graph_payload,
-                indexes,
-                gemini_model_name,
-                ollama_model_name,
-                ollama_host,
-                conversation_focus=st.session_state.get("last_focus"),
-                recent_messages=st.session_state.get("messages"),
-                last_query_state=st.session_state.get("last_query_state"),
-                last_evidence=st.session_state.get("last_evidence"),
-            )
-        st.markdown(answer)
-        render_trace(answer_trace)
+    thinking_placeholder = st.empty()
+    thinking_placeholder.markdown(
+        """
+        <div class="msg-row assistant">
+          <div class="msg-label">SkillWiki</div>
+          <div class="thinking-card">Thinking...</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    answer, evidence, backend_used, query_state, answer_trace = core.answer_question(
+        prompt,
+        dataset_name,
+        graph_payload,
+        indexes,
+        gemini_model_name,
+        ollama_model_name,
+        ollama_host,
+        conversation_focus=st.session_state.get("last_focus"),
+        recent_messages=st.session_state.get("messages"),
+        last_query_state=st.session_state.get("last_query_state"),
+        last_evidence=st.session_state.get("last_evidence"),
+    )
+    thinking_placeholder.empty()
+    render_message("assistant", answer, answer_trace)
 
     st.session_state["messages"].append(
         {
