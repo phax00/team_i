@@ -4268,9 +4268,11 @@ def sidebar_controls() -> tuple[str, str, str, str, bool, list[str], list[str], 
         gemini_ready = bool(get_api_key()) and not gemini_disabled
         model_available = ollama_available if runtime_mode == "local" else gemini_ready
         default_model_enabled = model_available if runtime_mode == "local" else False
+        if "use_model_assistance" not in st.session_state:
+            st.session_state["use_model_assistance"] = default_model_enabled
         use_model = st.toggle(
             "Use model assistance",
-            value=default_model_enabled,
+            key="use_model_assistance",
             disabled=not model_available,
             help="Local mode uses Ollama. Cloud mode uses Gemini. If disabled, the app answers directly from graph logic only.",
         )
