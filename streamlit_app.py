@@ -60,9 +60,13 @@ QUERY_STRUCTURE_VOCAB = {
     "work",
     "with",
     "yes",
+    "they",
     "him",
     "her",
     "them",
+    "their",
+    "these",
+    "those",
     "this",
     "that",
     "one",
@@ -444,12 +448,24 @@ def strip_diacritics(text: str) -> str:
 
 def correct_query_structure_typos(text: str) -> str:
     vocab = QUERY_STRUCTURE_VOCAB
+    explicit_typos = {
+        "thez": "they",
+        "tehy": "they",
+        "thye": "they",
+        "tyhe": "they",
+        "htey": "they",
+        "theyr": "their",
+        "thier": "their",
+    }
     parts = re.split(r"(\W+)", text.casefold())
     corrected: list[str] = []
 
     for part in parts:
         if not re.fullmatch(r"\w+", part):
             corrected.append(part)
+            continue
+        if part in explicit_typos:
+            corrected.append(explicit_typos[part])
             continue
         if len(part) < 3 or part in vocab:
             corrected.append(part)
@@ -1251,6 +1267,238 @@ def try_identity_answer(question: str, indexes: dict[str, Any]) -> tuple[str, di
     return "\n".join(answers), evidence, "Graph Search"
 
 
+def try_person_location_answer(
+    question: str,
+    indexes: dict[str, Any],
+    last_query_state: dict[str, Any] | None = None,
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    normalized = expand_query(question)
+
+    target_phrase = ""
+    group_people: list[str] = []
+
+    if re.search(r"\bwhere\b", normalized):
+        person_match = re.search(r"where\s+is\s+(.+?)\s+(?:based|located|working|work)\b", normalized)
+        if not person_match:
+            person_match = re.search(r"where\s+does\s+(.+?)\s+work\b", normalized)
+        if person_match:
+            target_phrase = person_match.group(1).strip(" ?.!<")
+        else:
+            group_match = re.search(r"where\s+are\s+(.+?)\s+(?:based|located|working)\b", normalized)
+            if not group_match:
+                group_match = re.search(r"where\s+do\s+(.+?)\s+work\b", normalized)
+            if group_match:
+                raw_target = group_match.group(1).strip(" ?.!<")
+                if raw_target in {"they", "them", "these people", "those people"} and last_query_state:
+                    if last_query_state.get("kind") in {"membership", "people_for_keyword", "person_location"}:
+                        group_people = [str(name) for name in last_query_state.get("shown_people", []) if str(name).strip()]
+                else:
+                    target_phrase = raw_target
+
+    if not target_phrase and not group_people:
+        shorthand_match = re.search(
+            r"^(?:what\s+is\s+)?(.+?)\s+(?:site|sites|location|locations|locality|localities|locali\w*|locati\w*)\s*$",
+            normalized,
+        )
+        if shorthand_match:
+            target_phrase = shorthand_match.group(1).strip(" ?.!<")
+
+    nodes_by_id = indexes["nodes_by_id"]
+    adjacency = indexes["adjacency"]
+
+    person_ids: list[str] = []
+    if group_people:
+        for person_name in group_people:
+            person_ids.extend(find_person_ids_for_target(indexes, person_name, require_strong_match=True))
+    elif target_phrase:
+        person_ids = find_person_ids_for_target(indexes, target_phrase, require_strong_match=True)
+    else:
+        return None
+
+    deduped_person_ids: list[str] = []
+    seen_person_ids = set()
+    for person_id in person_ids:
+        if person_id not in seen_person_ids:
+            seen_person_ids.add(person_id)
+            deduped_person_ids.append(person_id)
+    person_ids = deduped_person_ids
+
+    if not person_ids:
+        return None
+
+    answers: list[str] = []
+    top_nodes: list[dict[str, Any]] = []
+    relationships: list[dict[str, Any]] = []
+    shown_people: list[str] = []
+
+    for person_id in person_ids:
+        person_node = nodes_by_id.get(person_id)
+        if not person_node:
+            continue
+
+        sites: list[dict[str, Any]] = []
+        countries: list[dict[str, Any]] = []
+        for rel in adjacency.get(person_id, []):
+            if rel["type"] == "AT_SITE":
+                site_node = nodes_by_id.get(rel["end"])
+                if site_node and site_node.get("label") == "Site":
+                    sites.append(site_node)
+                    relationships.append({"start": person_id, "type": "AT_SITE", "end": rel["end"]})
+            elif rel["type"] == "LOCATED_IN":
+                country_node = nodes_by_id.get(rel["end"])
+                if country_node and country_node.get("label") == "Country":
+                    countries.append(country_node)
+                    relationships.append({"start": person_id, "type": "LOCATED_IN", "end": rel["end"]})
+
+        site_names = sorted({str(site["name"]) for site in sites if site.get("name")})
+        country_names = sorted({str(country["name"]) for country in countries if country.get("name")})
+
+        if not site_names and not country_names:
+            continue
+
+        shown_people.append(str(person_node["name"]))
+        top_nodes.append(person_node)
+        top_nodes.extend(sites)
+        top_nodes.extend(countries)
+
+        if site_names and country_names:
+            answers.append(
+                f"{person_node['name']} is based at {format_human_list(site_names)} in {format_human_list(country_names)}."
+            )
+        elif site_names:
+            answers.append(f"{person_node['name']} is based at {format_human_list(site_names)}.")
+        else:
+            answers.append(f"{person_node['name']} is based in {format_human_list(country_names)}.")
+
+    if not answers:
+        return None
+
+    seen_top = {}
+    for node in top_nodes:
+        seen_top[node["id"]] = dict(node, _score=10.0) if "_score" not in node else node
+    evidence = {
+        "top_nodes": list(seen_top.values()),
+        "related_nodes": list(seen_top.values()),
+        "relationships": relationships[:24],
+    }
+    query_state = {
+        "kind": "person_location",
+        "shown_people": shown_people,
+    }
+    return "\n".join(answers), evidence, "Graph Search", query_state
+
+
+def try_person_summary_answer(question: str, indexes: dict[str, Any]) -> tuple[str, dict[str, Any], str] | None:
+    normalized = expand_query(question)
+    match = re.search(r"(?:tell\s+me\s+everything\s+about|tell\s+me\s+about|what\s+do\s+you\s+know\s+about|everything\s+about)\s+(.+)", normalized)
+    if not match:
+        return None
+
+    target_phrase = match.group(1).strip(" ?.!<")
+    if not target_phrase:
+        return None
+
+    person_ids = find_person_ids_for_target(indexes, target_phrase, require_strong_match=True)
+    if not person_ids:
+        return None
+
+    nodes_by_id = indexes["nodes_by_id"]
+    adjacency = indexes["adjacency"]
+    answers: list[str] = []
+    top_nodes: list[dict[str, Any]] = []
+    relationships: list[dict[str, Any]] = []
+
+    for person_id in person_ids:
+        person_node = nodes_by_id.get(person_id)
+        if not person_node:
+            continue
+
+        roles: list[str] = []
+        teams: list[str] = []
+        sites: list[str] = []
+        countries: list[str] = []
+        managers: list[str] = []
+        skills: list[str] = []
+        topics: list[str] = []
+        systems: list[str] = []
+
+        top_nodes.append(person_node)
+
+        for rel in adjacency.get(person_id, []):
+            rel_type = str(rel["type"])
+            node = nodes_by_id.get(rel["end"])
+            if not node:
+                continue
+
+            if rel_type == "HAS_ROLE" and node.get("label") == "Role":
+                roles.append(str(node["name"]))
+                top_nodes.append(node)
+                relationships.append({"start": person_id, "type": "HAS_ROLE", "end": rel["end"]})
+            elif rel_type == "MEMBER_OF" and node.get("label") == "Team":
+                teams.append(str(node["name"]))
+                top_nodes.append(node)
+                relationships.append({"start": person_id, "type": "MEMBER_OF", "end": rel["end"]})
+            elif rel_type == "AT_SITE" and node.get("label") == "Site":
+                sites.append(str(node["name"]))
+                top_nodes.append(node)
+                relationships.append({"start": person_id, "type": "AT_SITE", "end": rel["end"]})
+            elif rel_type == "LOCATED_IN" and node.get("label") == "Country":
+                countries.append(str(node["name"]))
+                top_nodes.append(node)
+                relationships.append({"start": person_id, "type": "LOCATED_IN", "end": rel["end"]})
+            elif rel_type == "REPORTS_TO" and node.get("label") == "Person":
+                managers.append(str(node["name"]))
+                top_nodes.append(node)
+                relationships.append({"start": person_id, "type": "REPORTS_TO", "end": rel["end"]})
+            elif rel_type == "HAS_SKILL" and node.get("label") == "Skill":
+                skills.append(str(node["name"]))
+                top_nodes.append(node)
+                relationships.append({"start": person_id, "type": "HAS_SKILL", "end": rel["end"]})
+            elif rel_type == "OWNS_TOPIC" and node.get("label") == "Topic":
+                topics.append(str(node["name"]))
+                top_nodes.append(node)
+                relationships.append({"start": person_id, "type": "OWNS_TOPIC", "end": rel["end"]})
+            elif rel_type == "KNOWS_SYSTEM" and node.get("label") == "System":
+                systems.append(str(node["name"]))
+                top_nodes.append(node)
+                relationships.append({"start": person_id, "type": "KNOWS_SYSTEM", "end": rel["end"]})
+
+        role_text = format_role_names(sorted(set(roles))) if roles else "no explicitly linked role"
+        summary_parts = [f"{person_node['name']} currently holds the {role_text} role." if roles else f"The graph does not show an explicitly linked role for {person_node['name']}."]
+
+        if teams:
+            summary_parts.append(f"They are in {format_human_list(sorted(set(teams)))}.")
+        if sites and countries:
+            summary_parts.append(f"They are based at {format_human_list(sorted(set(sites)))} in {format_human_list(sorted(set(countries)))}.")
+        elif sites:
+            summary_parts.append(f"They are based at {format_human_list(sorted(set(sites)))}.")
+        elif countries:
+            summary_parts.append(f"They are based in {format_human_list(sorted(set(countries)))}.")
+        if managers:
+            summary_parts.append(f"They report to {format_human_list(sorted(set(managers)))}.")
+        if skills:
+            summary_parts.append(f"Key skills include {format_human_list(sorted(set(skills))[:5])}.")
+        if topics:
+            summary_parts.append(f"Owned topics include {format_human_list(sorted(set(topics))[:4])}.")
+        if systems:
+            summary_parts.append(f"Known systems include {format_human_list(sorted(set(systems))[:4])}.")
+
+        answers.append(" ".join(summary_parts))
+
+    if not answers:
+        return None
+
+    seen_top = {}
+    for node in top_nodes:
+        seen_top[node["id"]] = dict(node, _score=10.0) if "_score" not in node else node
+    evidence = {
+        "top_nodes": list(seen_top.values()),
+        "related_nodes": list(seen_top.values()),
+        "relationships": relationships[:28],
+    }
+    return "\n".join(answers), evidence, "Graph Search"
+
+
 def try_location_people_and_sites_answer(question: str, indexes: dict[str, Any]) -> tuple[str, dict[str, Any], str] | None:
     normalized = expand_query(question)
     if "site" not in normalized and "sites" not in normalized:
@@ -1840,6 +2088,106 @@ def try_why_followup_answer(
             lines.append(f"- {person_name}: appears through broader graph relevance around `{display_query_term(target)}`.")
 
     return "\n".join(lines), last_evidence, "Graph Search", last_query_state
+
+
+def try_group_location_followup_answer(
+    question: str,
+    indexes: dict[str, Any],
+    last_query_state: dict[str, Any] | None,
+) -> tuple[str, dict[str, Any], str, dict[str, Any] | None] | None:
+    if not last_query_state or last_query_state.get("kind") not in {"membership", "people_for_keyword", "person_location"}:
+        return None
+
+    normalized = expand_query(question)
+    if not re.search(r"\bwhere\b", normalized):
+        return None
+    if not re.search(r"\b(based|located)\b", normalized):
+        return None
+    if not re.search(r"\b(they|them|these people|those people)\b", normalized):
+        return None
+
+    shown_people = [str(name).strip() for name in last_query_state.get("shown_people", []) if str(name).strip()]
+    if not shown_people:
+        return None
+
+    nodes_by_id = indexes["nodes_by_id"]
+    adjacency = indexes["adjacency"]
+    person_ids: list[str] = []
+    for person_name in shown_people:
+        direct_matches = find_named_nodes(indexes, person_name, {"Person"}, limit=3, min_score=1)
+        if direct_matches:
+            person_ids.extend([str(node["id"]) for node in direct_matches if node.get("label") == "Person" and node.get("id")])
+        else:
+            person_ids.extend(find_person_ids_for_target(indexes, person_name, require_strong_match=True))
+
+    deduped_person_ids: list[str] = []
+    seen_ids = set()
+    for person_id in person_ids:
+        if person_id not in seen_ids:
+            seen_ids.add(person_id)
+            deduped_person_ids.append(person_id)
+    person_ids = deduped_person_ids
+    if not person_ids:
+        return None
+
+    lines: list[str] = []
+    top_nodes: list[dict[str, Any]] = []
+    relationships: list[dict[str, Any]] = []
+    resolved_people: list[str] = []
+
+    for person_id in person_ids:
+        person_node = nodes_by_id.get(person_id)
+        if not person_node:
+            continue
+
+        sites: list[dict[str, Any]] = []
+        countries: list[dict[str, Any]] = []
+        for rel in adjacency.get(person_id, []):
+            if rel["type"] == "AT_SITE":
+                site_node = nodes_by_id.get(rel["end"])
+                if site_node and site_node.get("label") == "Site":
+                    sites.append(site_node)
+                    relationships.append({"start": person_id, "type": "AT_SITE", "end": rel["end"]})
+            elif rel["type"] == "LOCATED_IN":
+                country_node = nodes_by_id.get(rel["end"])
+                if country_node and country_node.get("label") == "Country":
+                    countries.append(country_node)
+                    relationships.append({"start": person_id, "type": "LOCATED_IN", "end": rel["end"]})
+
+        site_names = sorted({str(site["name"]) for site in sites if site.get("name")})
+        country_names = sorted({str(country["name"]) for country in countries if country.get("name")})
+        if not site_names and not country_names:
+            continue
+
+        resolved_people.append(str(person_node["name"]))
+        top_nodes.append(person_node)
+        top_nodes.extend(sites)
+        top_nodes.extend(countries)
+
+        if site_names and country_names:
+            lines.append(f"- {person_node['name']}: based at {format_human_list(site_names)} in {format_human_list(country_names)}.")
+        elif site_names:
+            lines.append(f"- {person_node['name']}: based at {format_human_list(site_names)}.")
+        else:
+            lines.append(f"- {person_node['name']}: based in {format_human_list(country_names)}.")
+
+    if not lines:
+        return None
+
+    seen_top = {}
+    for node in top_nodes:
+        seen_top[node["id"]] = dict(node, _score=10.0) if "_score" not in node else node
+    evidence = {
+        "top_nodes": list(seen_top.values()),
+        "related_nodes": list(seen_top.values()),
+        "relationships": relationships[:24],
+    }
+    query_state = {
+        "kind": "person_location",
+        "shown_people": resolved_people,
+    }
+    answer = "Here is where they are based:\n" + "\n".join(lines)
+    return answer, evidence, "Graph Search", query_state
 
 
 def try_person_keyword_followup_answer(
@@ -3442,6 +3790,11 @@ def answer_question(
         answer, evidence, backend, query_state = more_results_answer
         return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up expansion from graph evidence")
 
+    group_location_followup = try_group_location_followup_answer(question, indexes, last_query_state)
+    if group_location_followup:
+        answer, evidence, backend, query_state = group_location_followup
+        return answer, evidence, backend, query_state, make_answer_trace(backend, "Follow-up group location from graph evidence")
+
     group_relationship_followup = try_group_relationship_followup_answer(question, indexes, last_query_state)
     if group_relationship_followup:
         answer, evidence, backend, query_state = group_relationship_followup
@@ -3467,6 +3820,16 @@ def answer_question(
     fallback_question = resolve_followup_question(question, conversation_focus)
 
     def dispatch_safe(question_text: str) -> tuple[str, dict[str, Any], str, dict[str, Any] | None, str] | None:
+        person_location_answer = try_person_location_answer(question_text, indexes, last_query_state)
+        if person_location_answer:
+            answer, evidence, backend, query_state = person_location_answer
+            return answer, evidence, backend, query_state, "Structured graph handler: person location"
+
+        person_summary_answer = try_person_summary_answer(question_text, indexes)
+        if person_summary_answer:
+            answer, evidence, backend = person_summary_answer
+            return answer, evidence, backend, None, "Structured graph handler: person summary"
+
         node_relationship_answer = try_node_relationship_answer(
             question_text,
             indexes,
@@ -3654,6 +4017,11 @@ def answer_question(
             answer, evidence, backend, query_state, resolution_mode = direct_list_answer
             return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
 
+    direct_answer = dispatch_safe(fallback_question)
+    if direct_answer:
+        answer, evidence, backend, query_state, resolution_mode = direct_answer
+        return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
+
     interpreted = interpret_query(
         fallback_question,
         indexes,
@@ -3720,11 +4088,6 @@ def answer_question(
             if interpreted_answer:
                 answer, evidence, backend, query_state, resolution_mode = interpreted_answer
                 return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode, interpreter_backend)
-
-    direct_answer = dispatch_safe(fallback_question)
-    if direct_answer:
-        answer, evidence, backend, query_state, resolution_mode = direct_answer
-        return answer, evidence, backend, query_state, make_answer_trace(backend, resolution_mode)
 
     evidence = build_evidence(indexes, fallback_question)
     if not has_sufficient_evidence(evidence):
@@ -3893,7 +4256,9 @@ def init_state() -> None:
 def sidebar_controls() -> tuple[str, str, str, str, bool, list[str], list[str], str]:
     with st.sidebar:
         st.markdown("## Workspace")
-        dataset_name = st.selectbox("Dataset", list(GRAPH_OPTIONS.keys()), index=0)
+        dataset_options = list(GRAPH_OPTIONS.keys())
+        default_dataset_index = dataset_options.index("Detailed Graph") if "Detailed Graph" in dataset_options else 0
+        dataset_name = st.selectbox("Dataset", dataset_options, index=default_dataset_index)
         ollama_model_name = st.text_input("Ollama model", value=get_secret_or_env("OLLAMA_MODEL", "llama3.2"))
         ollama_host = st.text_input("Ollama host", value=get_secret_or_env("OLLAMA_HOST", "http://127.0.0.1:11434"))
         selected_payload = load_graph(str(GRAPH_OPTIONS[dataset_name]))
