@@ -343,6 +343,7 @@ def render_trace_html(trace: dict[str, str] | None) -> str:
         return ""
     final_backend = trace.get("final_backend", "Unknown")
     interpreter_backend = trace.get("interpreter_backend", "None")
+    internal_model_use = trace.get("internal_model_use", "None")
     resolution_mode = trace.get("resolution_mode", "Unknown")
 
     return (
@@ -350,6 +351,7 @@ def render_trace_html(trace: dict[str, str] | None) -> str:
         <div class="answer-meta">
           <div class="meta-pill"><span>Answered with</span>{html.escape(final_backend)}</div>
           <div class="meta-pill"><span>Interpreted with</span>{html.escape(interpreter_backend)}</div>
+          <div class="meta-pill"><span>Internal model use</span>{html.escape(internal_model_use)}</div>
           <div class="meta-pill"><span>Mode</span>{html.escape(resolution_mode)}</div>
         </div>
         """

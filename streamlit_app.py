@@ -820,10 +820,12 @@ Available roles:
             if backend == "ollama":
                 if not ollama_available:
                     continue
+                note_internal_model_use("Ollama", "similar role suggestion")
                 response = call_ollama(prompt, ollama_model_name, ollama_host)
             elif backend == "gemini":
                 if not gemini_ready:
                     continue
+                note_internal_model_use("Gemini", "similar role suggestion")
                 response = call_gemini(prompt, gemini_model_name)
             else:
                 continue
@@ -3739,6 +3741,26 @@ def call_ollama(prompt: str, model_name: str, host: str) -> str:
     return str(body.get("response", "")).strip()
 
 
+def reset_internal_model_usage_trace() -> None:
+    st.session_state["internal_model_usage_trace"] = []
+
+
+def note_internal_model_use(backend: str, reason: str) -> None:
+    if not backend:
+        return
+    backend_label = backend.title()
+    entry = f"{backend_label} ({reason})" if reason else backend_label
+    current = list(st.session_state.get("internal_model_usage_trace", []))
+    if entry not in current:
+        current.append(entry)
+    st.session_state["internal_model_usage_trace"] = current
+
+
+def get_internal_model_usage_trace() -> str:
+    entries = list(st.session_state.get("internal_model_usage_trace", []))
+    return ", ".join(entries) if entries else "None"
+
+
 def make_answer_trace(
     final_backend: str,
     resolution_mode: str,
@@ -3749,6 +3771,7 @@ def make_answer_trace(
         "final_backend": final_backend,
         "resolution_mode": resolution_mode,
         "interpreter_backend": interpreter_backend or "None",
+        "internal_model_use": get_internal_model_usage_trace(),
         "validation": validation,
     }
 
@@ -3766,6 +3789,7 @@ def answer_question(
     last_query_state: dict[str, Any] | None = None,
     last_evidence: dict[str, Any] | None = None,
 ) -> tuple[str, dict[str, Any], str, dict[str, Any] | None, dict[str, str]]:
+    reset_internal_model_usage_trace()
     other_people_name_answer = try_other_people_with_name_answer(question, indexes, last_evidence)
     if other_people_name_answer:
         answer, evidence, backend, query_state = other_people_name_answer
@@ -4214,6 +4238,7 @@ def render_evidence_panel(evidence: dict[str, Any], backend_used: str | None, an
     if answer_trace:
         st.caption(f"Final answer: {answer_trace.get('final_backend', backend_used or 'Unknown')}")
         st.caption(f"Question interpretation: {answer_trace.get('interpreter_backend', 'None')}")
+        st.caption(f"Model assistance used internally: {answer_trace.get('internal_model_use', 'None')}")
         st.caption(f"Resolution mode: {answer_trace.get('resolution_mode', 'Unknown')}")
         st.caption(f"Validation: {answer_trace.get('validation', 'Unknown')}")
     elif backend_used:
