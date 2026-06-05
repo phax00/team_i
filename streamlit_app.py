@@ -1210,6 +1210,10 @@ def try_reverse_reporting_answer(
 
 def try_identity_answer(question: str, indexes: dict[str, Any]) -> tuple[str, dict[str, Any], str] | None:
     normalized = expand_query(question)
+    if re.search(r"\b(?:boss|manager|supervisor)\b", normalized):
+        return None
+    if re.search(r"\b(?:does\s+.+\s+report\s+to|reporting\s+to)\b", normalized):
+        return None
     match = re.search(r"who\s+is\s+(.+)", normalized)
     if not match:
         return None
@@ -3123,6 +3127,10 @@ def try_node_relationship_answer(
 
 def is_identity_question(question: str) -> bool:
     normalized = expand_query(question)
+    if re.search(r"\b(?:boss|manager|supervisor)\b", normalized):
+        return False
+    if re.search(r"\b(?:does\s+.+\s+report\s+to|reporting\s+to)\b", normalized):
+        return False
     return bool(re.search(r"^\s*who\s+is\s+.+", normalized))
 
 
