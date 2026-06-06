@@ -591,152 +591,29 @@ h1 {
   display: block;
 }
 
-#graph-network .vis-navigation {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  z-index: 7;
-}
-
-#graph-network .vis-navigation .vis-button {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 999px !important;
-  border: 1px solid rgba(123, 58, 237, 0.22) !important;
-  background: rgba(255, 255, 255, 0.92) !important;
-  box-shadow: 0 10px 24px rgba(31, 23, 56, 0.12) !important;
-  color: var(--accent-deep) !important;
-  cursor: pointer;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
-}
-
-#graph-network .vis-navigation .vis-button::before {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: var(--accent-deep);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-#graph-network .vis-navigation .vis-button:hover {
-  transform: translateY(-1px);
-  background: rgba(123, 58, 237, 0.12) !important;
-  box-shadow: 0 14px 30px rgba(123, 58, 237, 0.18) !important;
-}
-
-#graph-network .vis-navigation .vis-button.vis-up::before {
-  content: "↑";
-}
-
-#graph-network .vis-navigation .vis-button.vis-down::before {
-  content: "↓";
-}
-
-#graph-network .vis-navigation .vis-button.vis-left::before {
-  content: "←";
-}
-
-#graph-network .vis-navigation .vis-button.vis-right::before {
-  content: "→";
-}
-
-#graph-network .vis-navigation .vis-button.vis-zoomIn::before {
-  content: "+";
-}
-
-#graph-network .vis-navigation .vis-button.vis-zoomOut::before {
-  content: "−";
-}
-
-#graph-network .vis-navigation .vis-button.vis-zoomExtends::before {
-  content: "⌂";
-  font-size: 15px;
-}
-
 .graph-resize-handle {
-  display: none;
-}
-
-#graph-network .vis-navigation .vis-button.vis-up::before {
-  content: "\2191";
-}
-
-#graph-network .vis-navigation .vis-button.vis-down::before {
-  content: "\2193";
-}
-
-#graph-network .vis-navigation .vis-button.vis-left::before {
-  content: "\2190";
-}
-
-#graph-network .vis-navigation .vis-button.vis-right::before {
-  content: "\2192";
-}
-
-#graph-network .vis-navigation .vis-button.vis-zoomOut::before {
-  content: "\2212";
-}
-
-#graph-network .vis-navigation .vis-button.vis-zoomExtends::before {
-  content: "\2302";
-  font-size: 15px;
-}
-
-#graph-network .vis-navigation .vis-button.vis-up {
-  right: 52px !important;
-  bottom: 96px !important;
-  left: auto !important;
-  top: auto !important;
-}
-
-#graph-network .vis-navigation .vis-button.vis-down {
-  right: 52px !important;
-  bottom: 14px !important;
-  left: auto !important;
-  top: auto !important;
-}
-
-#graph-network .vis-navigation .vis-button.vis-left {
-  right: 96px !important;
-  bottom: 55px !important;
-  left: auto !important;
-  top: auto !important;
-}
-
-#graph-network .vis-navigation .vis-button.vis-right {
-  right: 8px !important;
-  bottom: 55px !important;
-  left: auto !important;
-  top: auto !important;
-}
-
-#graph-network .vis-navigation .vis-button.vis-zoomIn {
-  right: 52px !important;
-  bottom: 55px !important;
-  left: auto !important;
-  top: auto !important;
-}
-
-#graph-network .vis-navigation .vis-button.vis-zoomOut {
-  right: 96px !important;
-  bottom: 14px !important;
-  left: auto !important;
-  top: auto !important;
-}
-
-#graph-network .vis-navigation .vis-button.vis-zoomExtends {
-  right: 8px !important;
-  bottom: 14px !important;
-  left: auto !important;
-  top: auto !important;
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, transparent 0 44%, rgba(123, 58, 237, 0.32) 44% 52%, transparent 52% 100%),
+    linear-gradient(135deg, transparent 0 64%, rgba(20, 20, 20, 0.36) 64% 72%, transparent 72% 100%),
+    rgba(255, 255, 255, 0.96);
+  box-shadow: 0 4px 12px rgba(31, 23, 56, 0.18);
+  cursor: ns-resize;
+  z-index: 8;
+  touch-action: none;
 }
 
 .graph-resize-handle:hover {
-  display: none;
+  background:
+    linear-gradient(135deg, transparent 0 44%, rgba(123, 58, 237, 0.44) 44% 52%, transparent 52% 100%),
+    linear-gradient(135deg, transparent 0 64%, rgba(20, 20, 20, 0.5) 64% 72%, transparent 72% 100%),
+    rgba(255, 255, 255, 1);
 }
 
 body.is-resizing-graph,
@@ -823,9 +700,9 @@ body.is-resizing-graph * {
 
 .detail-section {
   padding: 14px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(249, 244, 255, 0.9));
-  border: 1px solid rgba(123, 58, 237, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 250, 242, 0.86);
+  border: 1px solid rgba(24, 50, 71, 0.08);
 }
 
 .detail-section-title {
@@ -835,39 +712,29 @@ body.is-resizing-graph * {
 
 .kv-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .kv-card {
-  min-width: 0;
-  padding: 11px 12px;
+  padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(123, 58, 237, 0.08);
+  background: rgba(244, 237, 227, 0.8);
 }
 
 .kv-card span {
   display: block;
   color: var(--ink-soft);
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
   font-weight: 700;
-  overflow-wrap: anywhere;
 }
 
 .kv-card strong {
   display: block;
-  min-width: 0;
-  color: var(--ink);
-  font-size: 0.9rem;
-  line-height: 1.42;
-  font-weight: 700;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  hyphens: auto;
+  font-size: 0.96rem;
 }
 
 .token-list,

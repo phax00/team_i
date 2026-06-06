@@ -108,10 +108,13 @@ const state = {
   manualNetworkHeight: null,
   appliedNetworkHeight: null,
   programmaticHeightSync: false,
+  performanceProfile: null,
   postLoadRenderTimer: null,
   resizeObserver: null,
   network: null,
   networkFrameKey: null,
+  networkSizeKey: null,
+  networkFitAfterStabilizeHandler: null,
   visNodes: null,
   visEdges: null
 };
@@ -120,6 +123,7 @@ const el = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
   cacheElements();
+  state.performanceProfile = buildPerformanceProfile();
   bindUI();
   await loadDataset(state.datasetKey);
   schedulePostLoadRender();
@@ -158,10 +162,17 @@ function cacheElements() {
 
 function bindUI() {
   window.addEventListener("resize", debounce(() => {
+    state.performanceProfile = buildPerformanceProfile();
     if (state.raw) {
       state.manualNetworkHeight = null;
-      syncNetworkSize();
-      render();
+      state.appliedNetworkHeight = null;
+      if (el.networkWrap) {
+        el.networkWrap.style.flex = "";
+        el.networkWrap.style.height = "";
+      }
+      el.network.style.height = "";
+      syncNetworkSize(true);
+      fitNetwork(false);
     }
   }, 120));
 
@@ -265,8 +276,10 @@ function bindUI() {
 function createNetwork() {
   const width = Math.max(320, Math.round(el.network.clientWidth || 0));
   const height = Math.max(260, Math.round(el.network.clientHeight || 0));
+  const profile = state.performanceProfile || buildPerformanceProfile();
   state.visNodes = new vis.DataSet([]);
   state.visEdges = new vis.DataSet([]);
+  state.networkSizeKey = null;
 
   state.network = new vis.Network(
     el.network,
@@ -275,28 +288,8 @@ function createNetwork() {
       width: `${width}px`,
       height: `${height}px`,
       autoResize: true,
-      interaction: {
-        hover: true,
-        navigationButtons: true,
-        keyboard: true
-      },
-      physics: {
-        enabled: true,
-        solver: "forceAtlas2Based",
-        forceAtlas2Based: {
-          gravitationalConstant: -80,
-          centralGravity: 0.02,
-          springLength: 170,
-          springConstant: 0.05,
-          damping: 0.7,
-          avoidOverlap: 0.9
-        },
-        stabilization: {
-          enabled: true,
-          iterations: 100,
-          fit: true
-        }
-      },
+      interaction: getInteractionOptions(profile),
+      physics: getPhysicsOptions(0, profile),
       nodes: {
         shape: "dot",
         borderWidth: 1.5,
@@ -312,9 +305,7 @@ function createNetwork() {
           color: "rgba(24, 50, 71, 0.16)",
           highlight: "#145f74"
         },
-        smooth: {
-          type: "dynamic"
-        }
+        smooth: getEdgeSmoothOptions(profile)
       }
     }
   );
@@ -327,13 +318,7 @@ function createNetwork() {
     render();
   });
 
-  state.network.once("stabilizationIterationsDone", () => {
-    state.network.setOptions({
-      physics: false
-    });
-  });
-
-  syncNetworkSize();
+  syncNetworkSize(true);
 }
 
 function destroyNetwork() {
@@ -341,18 +326,14 @@ function destroyNetwork() {
     state.network.destroy();
   }
   state.network = null;
+  state.networkSizeKey = null;
+  state.networkFitAfterStabilizeHandler = null;
   state.visNodes = null;
   state.visEdges = null;
 }
 
 function ensureNetwork() {
-  const width = Math.max(320, Math.round(el.network.clientWidth || 0));
-  const height = Math.max(260, Math.round(el.network.clientHeight || 0));
-  const frameKey = `${width}x${height}`;
-
-  if (!state.network || state.networkFrameKey !== frameKey) {
-    destroyNetwork();
-    state.networkFrameKey = frameKey;
+  if (!state.network) {
     createNetwork();
   }
 }
@@ -584,6 +565,7 @@ function render() {
   }
 
   const filtered = buildVisibleSubgraph();
+  const profile = state.performanceProfile || buildPerformanceProfile();
   applyAdaptiveCanvasHeight(filtered.nodes.length);
   ensureNetwork();
   syncNetworkSize();
@@ -593,34 +575,28 @@ function render() {
   state.visEdges.add(filtered.edges);
 
   state.network.setOptions({
-    physics: {
-      enabled: true,
-      solver: "forceAtlas2Based",
-      forceAtlas2Based: {
-        gravitationalConstant: filtered.nodes.length <= 18 ? -120 : -80,
-        centralGravity: 0.02,
-        springLength: filtered.nodes.length <= 18 ? 210 : 170,
-        springConstant: 0.05,
-        damping: 0.7,
-        avoidOverlap: 1
-      },
-      stabilization: {
-        enabled: true,
-        iterations: 100,
-        fit: true
-      }
+    interaction: getInteractionOptions(profile),
+    physics: getPhysicsOptions(filtered.nodes.length, profile),
+    edges: {
+      smooth: getEdgeSmoothOptions(profile)
     }
   });
 
-  state.network.stabilize(80);
+  if (state.networkFitAfterStabilizeHandler) {
+    state.network.off("stabilizationIterationsDone", state.networkFitAfterStabilizeHandler);
+  }
+  state.networkFitAfterStabilizeHandler = () => {
+    if (!state.network) {
+      return;
+    }
+    syncNetworkSize(true);
+    fitNetwork(false);
+  };
+  state.network.on("stabilizationIterationsDone", state.networkFitAfterStabilizeHandler);
+  state.network.stabilize(profile.stabilizationIterations);
   requestAnimationFrame(() => {
     syncNetworkSize();
-    state.network.fit({
-      animation: {
-        duration: 350,
-        easingFunction: "easeInOutQuad"
-      }
-    });
+    fitNetwork(profile.animateFit);
   });
 
   el.statRenderedNodes.textContent = filtered.nodes.length;
@@ -1208,7 +1184,9 @@ function applyGraphResizeHandleStyles() {
 
   Object.assign(el.graphResizeHandle.style, {
     position: "absolute",
-    right: "10px",
+    left: "50%",
+    right: "auto",
+    transform: "translateX(-50%)",
     bottom: "10px",
     width: "24px",
     height: "24px",
@@ -1222,12 +1200,17 @@ function applyGraphResizeHandleStyles() {
   });
 }
 
-function syncNetworkSize() {
+function syncNetworkSize(force = false) {
   if (!state.network || !el.network) {
     return;
   }
   const width = Math.max(320, Math.round(el.network.clientWidth || 0));
   const height = Math.max(260, Math.round(el.network.clientHeight || 0));
+  const sizeKey = `${width}x${height}`;
+  if (!force && state.networkSizeKey === sizeKey) {
+    return;
+  }
+  state.networkSizeKey = sizeKey;
   state.network.setOptions({
     width: `${width}px`,
     height: `${height}px`
@@ -1240,7 +1223,7 @@ function syncNetworkSize() {
 function forceCanvasDimensions(width, height) {
   const wrapper = el.network.querySelector(".vis-network");
   const canvas = el.network.querySelector("canvas");
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = getCanvasPixelRatio();
 
   if (wrapper) {
     wrapper.style.width = `${width}px`;
@@ -1252,9 +1235,99 @@ function forceCanvasDimensions(width, height) {
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     canvas.style.minHeight = `${height}px`;
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
+    const nextCanvasWidth = Math.round(width * dpr);
+    const nextCanvasHeight = Math.round(height * dpr);
+    if (canvas.width !== nextCanvasWidth) {
+      canvas.width = nextCanvasWidth;
+    }
+    if (canvas.height !== nextCanvasHeight) {
+      canvas.height = nextCanvasHeight;
+    }
   }
+}
+
+function fitNetwork(animate) {
+  if (!state.network || !state.visNodes) {
+    return;
+  }
+  const nodeIds = state.visNodes.getIds();
+  if (!nodeIds.length) {
+    return;
+  }
+
+  state.network.fit({
+    nodes: nodeIds,
+    animation: animate ? {
+      duration: state.performanceProfile?.constrained ? 170 : 220,
+      easingFunction: "easeInOutQuad"
+    } : false
+  });
+}
+
+function getCanvasPixelRatio() {
+  const nativeRatio = window.devicePixelRatio || 1;
+  const profile = state.performanceProfile || buildPerformanceProfile();
+  return Math.min(nativeRatio, profile.maxCanvasPixelRatio);
+}
+
+function buildPerformanceProfile() {
+  const platform = navigator.userAgentData?.platform || navigator.platform || "";
+  const userAgent = navigator.userAgent || "";
+  const isApple = /(Mac|iPhone|iPad|iPod)/i.test(platform) || /(Macintosh|iPhone|iPad|iPod)/i.test(userAgent);
+  const isAndroid = /Android/i.test(userAgent);
+  const isWindows = /Win/i.test(platform) || /Windows/i.test(userAgent);
+  const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+  const constrained = !isApple && (isAndroid || isWindows || coarsePointer || reducedMotion);
+
+  return {
+    constrained,
+    animateFit: !reducedMotion,
+    hover: !coarsePointer,
+    maxCanvasPixelRatio: isApple ? 2 : constrained ? 1.1 : 1.35,
+    stabilizationIterations: constrained ? 110 : 180
+  };
+}
+
+function getInteractionOptions(profile) {
+  return {
+    hover: profile.hover,
+    navigationButtons: true,
+    keyboard: true,
+    hideEdgesOnDrag: false,
+    hideEdgesOnZoom: false
+  };
+}
+
+function getEdgeSmoothOptions(profile) {
+  return {
+    type: "dynamic"
+  };
+}
+
+function getPhysicsOptions(nodeCount, profile) {
+  const isCompact = nodeCount > 0 && nodeCount <= 18;
+
+  return {
+    enabled: true,
+    solver: "forceAtlas2Based",
+    adaptiveTimestep: true,
+    minVelocity: profile.constrained ? 1.2 : 0.85,
+    forceAtlas2Based: {
+      gravitationalConstant: isCompact ? -120 : (profile.constrained ? -68 : -80),
+      centralGravity: profile.constrained ? 0.035 : 0.02,
+      springLength: isCompact ? 210 : (profile.constrained ? 155 : 170),
+      springConstant: 0.05,
+      damping: profile.constrained ? 0.8 : 0.7,
+      avoidOverlap: isCompact ? 1 : 0.92
+    },
+    stabilization: {
+      enabled: true,
+      iterations: profile.stabilizationIterations,
+      updateInterval: profile.constrained ? 20 : 40,
+      fit: true
+    }
+  };
 }
 
 function findDefaultFocusNodeId() {
