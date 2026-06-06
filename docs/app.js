@@ -293,7 +293,7 @@ function createNetwork() {
         },
         stabilization: {
           enabled: true,
-          iterations: 220,
+          iterations: 100,
           fit: true
         }
       },
@@ -325,6 +325,12 @@ function createNetwork() {
     }
     state.selectedNodeId = params.nodes[0];
     render();
+  });
+
+  state.network.once("stabilizationIterationsDone", () => {
+    state.network.setOptions({
+      physics: false
+    });
   });
 
   syncNetworkSize();
@@ -600,13 +606,13 @@ function render() {
       },
       stabilization: {
         enabled: true,
-        iterations: 220,
+        iterations: 100,
         fit: true
       }
     }
   });
 
-  state.network.stabilize(220);
+  state.network.stabilize(80);
   requestAnimationFrame(() => {
     syncNetworkSize();
     state.network.fit({
@@ -1234,7 +1240,7 @@ function syncNetworkSize() {
 function forceCanvasDimensions(width, height) {
   const wrapper = el.network.querySelector(".vis-network");
   const canvas = el.network.querySelector("canvas");
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
   if (wrapper) {
     wrapper.style.width = `${width}px`;
