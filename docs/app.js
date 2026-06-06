@@ -1287,7 +1287,7 @@ function buildPerformanceProfile() {
     constrained,
     chromeConstrained,
     animateFit: !reducedMotion && !chromeConstrained,
-    hover: !coarsePointer && !chromeConstrained,
+    hover: !coarsePointer,
     maxCanvasPixelRatio: isApple ? 2 : chromeConstrained ? 1 : constrained ? 1.1 : 1.35,
     stabilizationIterations: chromeConstrained ? 84 : constrained ? 110 : 180
   };
@@ -1298,19 +1298,12 @@ function getInteractionOptions(profile) {
     hover: profile.hover,
     navigationButtons: true,
     keyboard: true,
-    hideEdgesOnDrag: profile.chromeConstrained,
-    hideEdgesOnZoom: profile.chromeConstrained
+    hideEdgesOnDrag: false,
+    hideEdgesOnZoom: false
   };
 }
 
 function getEdgeSmoothOptions(profile) {
-  if (profile.chromeConstrained) {
-    return {
-      type: "continuous",
-      roundness: 0.16
-    };
-  }
-
   return {
     type: "dynamic"
   };
@@ -1323,19 +1316,19 @@ function getPhysicsOptions(nodeCount, profile) {
     enabled: true,
     solver: "forceAtlas2Based",
     adaptiveTimestep: true,
-    minVelocity: profile.chromeConstrained ? 1.35 : profile.constrained ? 1.2 : 0.85,
+    minVelocity: profile.chromeConstrained ? 1.2 : profile.constrained ? 1.2 : 0.85,
     forceAtlas2Based: {
-      gravitationalConstant: isCompact ? -120 : (profile.chromeConstrained ? -64 : profile.constrained ? -68 : -80),
-      centralGravity: profile.chromeConstrained ? 0.04 : profile.constrained ? 0.035 : 0.02,
-      springLength: isCompact ? 210 : (profile.chromeConstrained ? 148 : profile.constrained ? 155 : 170),
+      gravitationalConstant: isCompact ? -120 : (profile.chromeConstrained ? -74 : profile.constrained ? -68 : -80),
+      centralGravity: profile.chromeConstrained ? 0.028 : profile.constrained ? 0.035 : 0.02,
+      springLength: isCompact ? 210 : (profile.chromeConstrained ? 166 : profile.constrained ? 155 : 170),
       springConstant: 0.05,
-      damping: profile.chromeConstrained ? 0.84 : profile.constrained ? 0.8 : 0.7,
+      damping: profile.chromeConstrained ? 0.78 : profile.constrained ? 0.8 : 0.7,
       avoidOverlap: isCompact ? 1 : 0.92
     },
     stabilization: {
       enabled: true,
       iterations: profile.stabilizationIterations,
-      updateInterval: profile.chromeConstrained ? 12 : profile.constrained ? 20 : 40,
+      updateInterval: profile.chromeConstrained ? 16 : profile.constrained ? 20 : 40,
       fit: true
     }
   };
