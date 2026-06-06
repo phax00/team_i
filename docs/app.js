@@ -90,7 +90,7 @@ const SEARCHABLE_LABELS = new Set(["Person", "Role", "Repository", "JiraIssue", 
 const BROWSE_LABEL_ORDER = ["Person", "Role", "Skill", "Topic", "System", "Department", "Team", "Country", "Site", "JobDescription", "Repository", "JiraIssue", "Project"];
 
 const state = {
-  datasetKey: "core",
+  datasetKey: "school",
   graphCache: {},
   raw: null,
   nodeMap: new Map(),
@@ -108,6 +108,7 @@ const state = {
   manualNetworkHeight: null,
   appliedNetworkHeight: null,
   programmaticHeightSync: false,
+  postLoadRenderTimer: null,
   resizeObserver: null,
   network: null,
   networkFrameKey: null,
@@ -121,6 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   cacheElements();
   bindUI();
   await loadDataset(state.datasetKey);
+  schedulePostLoadRender();
 });
 
 function cacheElements() {
@@ -373,6 +375,21 @@ async function loadDataset(datasetKey) {
   updateDatasetButtons();
   updatePresetButtons();
   applyPreset(state.activePreset);
+  schedulePostLoadRender();
+}
+
+function schedulePostLoadRender() {
+  if (state.postLoadRenderTimer) {
+    window.clearTimeout(state.postLoadRenderTimer);
+  }
+  state.postLoadRenderTimer = window.setTimeout(() => {
+    if (!state.raw) {
+      return;
+    }
+    syncNetworkSize();
+    render();
+    state.postLoadRenderTimer = null;
+  }, 80);
 }
 
 function reindexGraph() {
@@ -394,11 +411,11 @@ function reindexGraph() {
   }
 
   const sources = state.raw.meta.generated_from.map((value) => value.split("/").pop()).join(" + ");
-  el.metaDataset.textContent = DATASETS[state.datasetKey].name;
-  el.metaSource.textContent = sources;
-  el.metaScope.textContent = state.raw.meta.graph_scope;
-  el.statNodes.textContent = state.raw.meta.node_count;
-  el.statRelationships.textContent = state.raw.meta.relationship_count;
+  if (el.metaDataset) el.metaDataset.textContent = DATASETS[state.datasetKey].name;
+  if (el.metaSource) el.metaSource.textContent = sources;
+  if (el.metaScope) el.metaScope.textContent = state.raw.meta.graph_scope;
+  if (el.statNodes) el.statNodes.textContent = state.raw.meta.node_count;
+  if (el.statRelationships) el.statRelationships.textContent = state.raw.meta.relationship_count;
 }
 
 function updateDatasetButtons() {
