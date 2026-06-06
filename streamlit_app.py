@@ -1,3 +1,5 @@
+import base64
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 import json
 import os
 import re
@@ -18,11 +20,79 @@ from google.genai import types
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "docs" / "data"
 CHAT_DIR = ROOT / "chat"
+SKILLWIKI_LOGO_ICON_FILE = ROOT / "skillwiki_logo_icon.png"
+SKILLWIKI_LOGO_FILE = ROOT / "skillwiki_logo.jpeg"
 GRAPH_OPTIONS = {
     "Basic Graph": DATA_DIR / "knowledge_graph_core_normalized.json",
     "Detailed Graph": DATA_DIR / "knowledge_graph_school_mvp_normalized.json",
 }
 DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_MODEL_TIMEOUT_SECONDS = 60
+SKILLWIKI_LOGO_SVG = """
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="#8B3DFF" stroke-linecap="round" stroke-width="6.5">
+    <path d="M64 66 C53 58 43 54 32 49"/>
+    <path d="M64 66 C49 67 39 66 26 70"/>
+    <path d="M64 66 C50 74 42 82 34 93"/>
+    <path d="M64 66 C59 82 57 94 58 108"/>
+    <path d="M64 66 C73 80 80 90 90 100"/>
+    <path d="M64 66 C79 72 90 74 104 74"/>
+    <path d="M64 66 C78 58 87 51 95 40"/>
+    <path d="M64 66 C67 49 67 37 65 23"/>
+    <path d="M64 66 C56 52 49 43 37 35"/>
+    <path d="M64 66 C78 65 89 62 101 56"/>
+
+    <path d="M44 55 C39 49 35 44 29 39"/>
+    <path d="M44 55 C46 48 45 43 43 35"/>
+    <path d="M44 55 C52 53 58 50 64 45"/>
+
+    <path d="M36 73 C30 79 26 86 23 95"/>
+    <path d="M36 73 C29 72 22 73 15 76"/>
+    <path d="M36 73 C39 83 40 92 39 102"/>
+
+    <path d="M79 48 C86 44 92 40 98 34"/>
+    <path d="M79 48 C80 39 82 31 87 24"/>
+    <path d="M79 48 C88 50 96 50 106 47"/>
+
+    <path d="M85 78 C92 80 99 79 108 76"/>
+    <path d="M85 78 C89 86 94 92 101 97"/>
+    <path d="M85 78 C82 87 82 95 85 105"/>
+
+    <path d="M58 87 C51 89 44 93 38 99"/>
+    <path d="M58 87 C58 95 56 103 51 110"/>
+    <path d="M58 87 C64 92 69 97 73 104"/>
+  </g>
+  <g fill="#A855F7">
+    <circle cx="64" cy="66" r="7.2"/>
+    <circle cx="32" cy="49" r="4.6"/>
+    <circle cx="26" cy="70" r="4.6"/>
+    <circle cx="34" cy="93" r="4.6"/>
+    <circle cx="58" cy="108" r="4.6"/>
+    <circle cx="90" cy="100" r="4.6"/>
+    <circle cx="104" cy="74" r="4.6"/>
+    <circle cx="95" cy="40" r="4.6"/>
+    <circle cx="65" cy="23" r="4.6"/>
+    <circle cx="37" cy="35" r="4.6"/>
+    <circle cx="101" cy="56" r="4.6"/>
+
+    <circle cx="29" cy="39" r="4.1"/>
+    <circle cx="43" cy="35" r="4.1"/>
+    <circle cx="64" cy="45" r="4.1"/>
+    <circle cx="23" cy="95" r="4.1"/>
+    <circle cx="15" cy="76" r="4.1"/>
+    <circle cx="39" cy="102" r="4.1"/>
+    <circle cx="98" cy="34" r="4.1"/>
+    <circle cx="87" cy="24" r="4.1"/>
+    <circle cx="106" cy="47" r="4.1"/>
+    <circle cx="108" cy="76" r="4.1"/>
+    <circle cx="101" cy="97" r="4.1"/>
+    <circle cx="85" cy="105" r="4.1"/>
+    <circle cx="38" cy="99" r="4.1"/>
+    <circle cx="51" cy="110" r="4.1"/>
+    <circle cx="73" cy="104" r="4.1"/>
+  </g>
+</svg>
+""".strip()
 STOPWORDS = {
     "a",
     "an",
@@ -116,12 +186,6 @@ QUERY_STRUCTURE_VOCAB = {
 
 
 load_dotenv(ROOT / ".env")
-st.set_page_config(
-    page_title="SkillWiki",
-    page_icon="K",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 
 def inject_styles() -> None:
@@ -148,7 +212,7 @@ def inject_styles() -> None:
         }
 
         .block-container {
-            padding-top: 2rem;
+            padding-top: 3rem;
             padding-bottom: 2rem;
             max-width: 1380px;
         }
@@ -189,17 +253,80 @@ def inject_styles() -> None:
             margin: 0 0 0.55rem 0;
         }
 
-        .skillwiki-logo {
-            font-size: 2.25rem;
-            line-height: 1;
-            font-weight: 900;
-            letter-spacing: -0.04em;
-            margin: 0 0 0.55rem 0;
-            color: #141414;
+        .skillwiki-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.72rem;
+            width: max-content;
+            max-width: 100%;
+            overflow: visible;
         }
 
-        .skillwiki-logo span {
+        .skillwiki-brand--sidebar {
+            margin-bottom: 0.9rem;
+        }
+
+        .skillwiki-brand--compact {
+            gap: 0.55rem;
+        }
+
+        .skillwiki-icon {
+            width: 2.35rem;
+            height: 2.35rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .skillwiki-icon svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .skillwiki-icon img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .skillwiki-logo {
+            font-size: 2.25rem;
+            line-height: 1.15;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            margin: 0;
+            color: #141414;
+            display: inline-block;
+            padding-top: 0.03rem;
+            padding-bottom: 0.03rem;
+        }
+
+        .skillwiki-logo span,
+        .skillwiki-wordmark span {
             color: var(--primary);
+        }
+
+        .skillwiki-wordmark {
+            font-size: 1.18rem;
+            line-height: 1.15;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: #141414;
+            display: inline-block;
+            padding-top: 0.03rem;
+            padding-bottom: 0.03rem;
+        }
+
+        .skillwiki-brand--compact .skillwiki-icon {
+            width: 1.95rem;
+            height: 1.95rem;
+        }
+
+        .skillwiki-brand--compact .skillwiki-wordmark {
+            font-size: 1rem;
         }
 
         .hero-subtitle {
@@ -258,6 +385,12 @@ def inject_styles() -> None:
             font-weight: 800;
             color: var(--text);
             margin-bottom: 0.22rem;
+        }
+
+        .section-title-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
         }
 
         .section-subtitle {
@@ -557,6 +690,26 @@ def format_human_list(items: list[str]) -> str:
     return f"{', '.join(unique_items[:-1])} and {unique_items[-1]}"
 
 
+def skillwiki_logo_src() -> str:
+    if SKILLWIKI_LOGO_ICON_FILE.exists():
+        return "data:image/png;base64," + base64.b64encode(SKILLWIKI_LOGO_ICON_FILE.read_bytes()).decode("ascii")
+    if SKILLWIKI_LOGO_FILE.exists():
+        return "data:image/jpeg;base64," + base64.b64encode(SKILLWIKI_LOGO_FILE.read_bytes()).decode("ascii")
+    return "data:image/svg+xml;base64," + base64.b64encode(SKILLWIKI_LOGO_SVG.encode("utf-8")).decode("ascii")
+
+
+def skillwiki_brand_html(compact: bool = False, include_logo_text_class: bool = False) -> str:
+    brand_class = "skillwiki-brand skillwiki-brand--compact" if compact else "skillwiki-brand"
+    wordmark_class = "skillwiki-logo" if include_logo_text_class else "skillwiki-wordmark"
+    logo_src = skillwiki_logo_src()
+    return (
+        f'<div class="{brand_class}">'
+        f'<span class="skillwiki-icon"><img src="{logo_src}" alt="SkillWiki logo"/></span>'
+        f'<span class="{wordmark_class}">Skill<span>Wiki</span></span>'
+        "</div>"
+    )
+
+
 def format_role_names(role_names: list[str]) -> str:
     cleaned = [re.sub(r"\s*/\s*", " / ", str(role)).strip() for role in role_names if role]
     return format_human_list(cleaned)
@@ -830,6 +983,8 @@ Available roles:
             else:
                 continue
         except Exception as error:
+            if is_timeout_error(error):
+                note_internal_model_use(backend, "timed out")
             if backend == "gemini" and is_gemini_quota_error(error):
                 mark_gemini_unavailable("Gemini is temporarily unavailable because the API quota or rate limit was reached.")
             continue
@@ -1207,7 +1362,35 @@ def try_reverse_reporting_answer(
             "relationships": relationships[:18],
         }
         return "\n".join(answer_lines), evidence, "Graph Search"
+def try_greeting_or_intro_answer(question: str) -> tuple[str, dict[str, Any], str] | None:
+    normalized = expand_query(question).strip().casefold()
+    if not normalized:
+        return None
 
+    greeting_patterns = [
+        r"^(hi|hello|hey|good morning|good afternoon|good evening)\s*!?\s*$",
+        r"^(hi|hello|hey)\s+there\s*!?\s*$",
+    ]
+    intro_patterns = [
+        r"^(who are you|what are you|introduce yourself|tell me about yourself)\??\s*$",
+        r"^(what can you do|what do you do|how can you help|help)\??\s*$",
+    ]
+
+    if any(re.fullmatch(pattern, normalized) for pattern in greeting_patterns):
+        answer = (
+            "Hi, I'm SkillWiki. I help you explore the company knowledge graph in a natural way. "
+            "You can ask me about people, roles, reporting lines, departments, locations, skills, systems, and relationships between nodes."
+        )
+        return answer, {"top_nodes": [], "related_nodes": [], "relationships": []}, "Graph Search"
+
+    if any(re.fullmatch(pattern, normalized) for pattern in intro_patterns):
+        answer = (
+            "I'm SkillWiki, a graph-grounded assistant for navigating people, roles, teams, skills, systems, sites, and reporting structure. "
+            "I can help with questions like who reports to whom, who works in a department, who knows a system, where someone is based, or how two nodes are connected."
+        )
+        return answer, {"top_nodes": [], "related_nodes": [], "relationships": []}, "Graph Search"
+
+    return None
 
 
 def try_identity_answer(question: str, indexes: dict[str, Any]) -> tuple[str, dict[str, Any], str] | None:
@@ -2845,6 +3028,7 @@ def try_person_work_with_answer(
             "related_nodes": list(seen_top.values()),
             "relationships": relationships[:18],
         }
+
         return answer, evidence, "Graph Search"
 
     if best_label in {"Skill", "Topic", "System"}:
@@ -3349,6 +3533,18 @@ def clear_gemini_unavailable() -> None:
         pass
 
 
+def get_model_timeout_seconds() -> int:
+    try:
+        value = int(st.session_state.get("model_timeout_seconds", DEFAULT_MODEL_TIMEOUT_SECONDS))
+    except Exception:
+        value = DEFAULT_MODEL_TIMEOUT_SECONDS
+    return max(5, min(120, value))
+
+
+def is_timeout_error(error: Exception) -> bool:
+    return isinstance(error, TimeoutError) or "timed out" in str(error).casefold()
+
+
 def provider_chain(runtime_mode: str, use_model: bool, ollama_available: bool, gemini_ready: bool) -> list[str]:
     if not use_model:
         return ["search"]
@@ -3684,6 +3880,8 @@ User question:
             else:
                 continue
         except Exception as error:
+            if is_timeout_error(error):
+                note_internal_model_use(backend, "timed out")
             if backend == "gemini" and is_gemini_quota_error(error):
                 mark_gemini_unavailable("Gemini is temporarily unavailable because the API quota or rate limit was reached.")
             continue
@@ -3707,16 +3905,27 @@ User question:
 
 def call_gemini(prompt: str, model_name: str) -> str:
     client = genai.Client(api_key=get_api_key() or None)
-    response = client.models.generate_content(
-        model=model_name,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            temperature=0.2,
-            top_p=0.9,
-            max_output_tokens=700,
-        ),
-    )
-    return (response.text or "").strip()
+
+    def _run() -> str:
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.2,
+                top_p=0.9,
+                max_output_tokens=700,
+            ),
+        )
+        return (response.text or "").strip()
+
+    executor = ThreadPoolExecutor(max_workers=1)
+    future = executor.submit(_run)
+    try:
+        return future.result(timeout=get_model_timeout_seconds())
+    except FuturesTimeoutError as error:
+        raise TimeoutError(f"Gemini timed out after {get_model_timeout_seconds()} seconds.") from error
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
 
 
 def call_ollama(prompt: str, model_name: str, host: str) -> str:
@@ -3736,7 +3945,7 @@ def call_ollama(prompt: str, model_name: str, host: str) -> str:
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    with urllib.request.urlopen(request, timeout=60) as response:
+    with urllib.request.urlopen(request, timeout=get_model_timeout_seconds()) as response:
         body = json.loads(response.read().decode("utf-8"))
     return str(body.get("response", "")).strip()
 
@@ -3852,6 +4061,11 @@ def answer_question(
     fallback_question = resolve_followup_question(question, conversation_focus)
 
     def dispatch_safe(question_text: str) -> tuple[str, dict[str, Any], str, dict[str, Any] | None, str] | None:
+        greeting_answer = try_greeting_or_intro_answer(question_text)
+        if greeting_answer:
+            answer, evidence, backend = greeting_answer
+            return answer, evidence, backend, None, "Structured app handler: greeting/introduction"
+
         person_location_answer = try_person_location_answer(question_text, indexes, last_query_state)
         if person_location_answer:
             answer, evidence, backend, query_state = person_location_answer
@@ -4151,7 +4365,9 @@ def answer_question(
                         return answer, evidence, "Ollama", None, make_answer_trace("Ollama", "LLM answer over retrieved graph context", interpreter_backend, validation_reason)
                     fallback_answer = natural_search_answer(question, evidence)
                     return fallback_answer, evidence, "Graph Search", None, make_answer_trace("Graph Search", "Validator fallback after unsupported Ollama answer", interpreter_backend, validation_reason)
-            except Exception:
+            except Exception as error:
+                if is_timeout_error(error):
+                    note_internal_model_use("Ollama", "timed out")
                 continue
 
         if backend == "gemini":
@@ -4166,14 +4382,18 @@ def answer_question(
                     fallback_answer = natural_search_answer(question, evidence)
                     return fallback_answer, evidence, "Graph Search", None, make_answer_trace("Graph Search", "Validator fallback after unsupported Gemini answer", interpreter_backend, validation_reason)
             except Exception as error:
+                if is_timeout_error(error):
+                    note_internal_model_use("Gemini", "timed out")
                 if is_gemini_quota_error(error):
                     mark_gemini_unavailable("Gemini is temporarily unavailable because the API quota or rate limit was reached.")
                 continue
 
         if backend == "search":
-            return natural_search_answer(question, evidence), evidence, "Graph Search", None, make_answer_trace("Graph Search", "Graph-only fallback over retrieved evidence", interpreter_backend)
+            resolution = "Graph-only fallback after model timeout" if "timed out" in get_internal_model_usage_trace().casefold() else "Graph-only fallback over retrieved evidence"
+            return natural_search_answer(question, evidence), evidence, "Graph Search", None, make_answer_trace("Graph Search", resolution, interpreter_backend)
 
-    return natural_search_answer(question, evidence), evidence, "Graph Search", None, make_answer_trace("Graph Search", "Graph-only fallback over retrieved evidence", interpreter_backend)
+    resolution = "Graph-only fallback after model timeout" if "timed out" in get_internal_model_usage_trace().casefold() else "Graph-only fallback over retrieved evidence"
+    return natural_search_answer(question, evidence), evidence, "Graph Search", None, make_answer_trace("Graph Search", resolution, interpreter_backend)
 
 
 def render_hero(dataset_name: str, graph_payload: dict[str, Any], backend_order: list[str]) -> None:
@@ -4188,8 +4408,8 @@ def render_hero(dataset_name: str, graph_payload: dict[str, Any], backend_order:
     )
     stat_html = f"""
     <div class="hero-card">
-      <div class="hero-eyebrow">Enterprise Assistant</div>
-      <div class="skillwiki-logo">Skill<span>Wiki</span></div>
+      <div class="hero-eyebrow">Graph-grounded workspace</div>
+      {skillwiki_brand_html(include_logo_text_class=True)}
       <div class="hero-subtitle">
         Explore people, roles, skills, systems, teams, and evidence through a clear conversational layer.
         The app retrieves graph context first, then answers through the best available model path.
@@ -4278,6 +4498,8 @@ def init_state() -> None:
     st.session_state.setdefault("messages", [])
     st.session_state.setdefault("last_evidence", {"top_nodes": [], "related_nodes": [], "relationships": []})
     st.session_state.setdefault("prompt_queue", None)
+    st.session_state.setdefault("pending_prompt", None)
+    st.session_state.setdefault("is_processing", False)
     st.session_state.setdefault("last_backend", None)
     st.session_state.setdefault("last_answer_trace", None)
     st.session_state.setdefault("last_focus", None)
@@ -4288,12 +4510,25 @@ def init_state() -> None:
 
 def sidebar_controls() -> tuple[str, str, str, str, bool, list[str], list[str], str]:
     with st.sidebar:
+        st.markdown(
+            skillwiki_brand_html(compact=True),
+            unsafe_allow_html=True,
+        )
         st.markdown("## Workspace")
         dataset_options = list(GRAPH_OPTIONS.keys())
         default_dataset_index = dataset_options.index("Detailed Graph") if "Detailed Graph" in dataset_options else 0
         dataset_name = st.selectbox("Dataset", dataset_options, index=default_dataset_index)
         ollama_model_name = st.text_input("Ollama model", value=get_secret_or_env("OLLAMA_MODEL", "llama3.2"))
         ollama_host = st.text_input("Ollama host", value=get_secret_or_env("OLLAMA_HOST", "http://127.0.0.1:11434"))
+        timeout_value = st.number_input(
+            "Model timeout (s)",
+            min_value=5,
+            max_value=120,
+            value=int(st.session_state.get("model_timeout_seconds", DEFAULT_MODEL_TIMEOUT_SECONDS)),
+            step=5,
+            help="If model assistance takes longer than this, the app stops waiting for the model step and falls back safely.",
+        )
+        st.session_state["model_timeout_seconds"] = int(timeout_value)
         selected_payload = load_graph(str(GRAPH_OPTIONS[dataset_name]))
         ollama_available = is_ollama_available(ollama_host)
         runtime_mode = detect_runtime_mode(ollama_available)
@@ -4371,7 +4606,9 @@ def render_chat(messages: list[dict[str, str]]) -> None:
         """
         <div class="section-card">
           <div class="section-header">
-            <div class="section-title">Conversation</div>
+            <div class="section-title section-title-brand">"""
+        + skillwiki_brand_html(compact=True)
+        + """</div>
             <div class="section-subtitle">Ask free-form questions over the graph. Answers stay grounded in retrieved graph evidence.</div>
           </div>
           <div class="section-body">
@@ -4390,6 +4627,12 @@ def render_chat(messages: list[dict[str, str]]) -> None:
 
 
 def main() -> None:
+    st.set_page_config(
+        page_title="SkillWiki",
+        page_icon="K",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
     inject_styles()
     init_state()
 
@@ -4404,14 +4647,30 @@ def main() -> None:
 
     with col_chat:
         render_chat(st.session_state["messages"])
-        prompt = st.chat_input("Ask about people, roles, skills, systems, or reporting lines")
+        if st.session_state.get("is_processing") and st.session_state.get("pending_prompt"):
+            with st.chat_message("user"):
+                st.markdown(st.session_state["pending_prompt"])
+            with st.chat_message("assistant"):
+                st.markdown("Thinking...")
+        prompt = st.chat_input(
+            "Ask about people, roles, skills, systems, or reporting lines",
+            disabled=bool(st.session_state.get("is_processing")),
+        )
 
     queued_prompt = st.session_state.get("prompt_queue")
-    active_prompt = prompt or queued_prompt
-    if queued_prompt:
+    if queued_prompt and not st.session_state.get("is_processing"):
         st.session_state["prompt_queue"] = None
+        st.session_state["pending_prompt"] = queued_prompt
+        st.session_state["is_processing"] = True
+        st.rerun()
 
-    if active_prompt:
+    if prompt and not st.session_state.get("is_processing"):
+        st.session_state["pending_prompt"] = prompt
+        st.session_state["is_processing"] = True
+        st.rerun()
+
+    active_prompt = st.session_state.get("pending_prompt")
+    if st.session_state.get("is_processing") and active_prompt:
         recent_messages = st.session_state["messages"][-4:]
         st.session_state["messages"].append({"role": "user", "content": active_prompt})
         with col_chat:
@@ -4435,6 +4694,8 @@ def main() -> None:
         st.session_state["last_answer_trace"] = answer_trace
         st.session_state["last_focus"] = infer_focus_entity(evidence)
         st.session_state["last_query_state"] = query_state
+        st.session_state["pending_prompt"] = None
+        st.session_state["is_processing"] = False
         st.rerun()
 
     with col_evidence:

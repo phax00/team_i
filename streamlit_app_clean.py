@@ -28,7 +28,7 @@ def inject_clean_styles() -> None:
 
         .block-container {
             max-width: 980px;
-            padding-top: 1.6rem;
+            padding-top: 2.4rem;
             padding-bottom: 2.2rem;
         }
 
@@ -37,54 +37,67 @@ def inject_clean_styles() -> None:
             border-right: 1px solid var(--border);
         }
 
-        .clean-hero {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 22px;
-            padding: 1.15rem 1.3rem 1rem 1.3rem;
-            margin-bottom: 1.1rem;
-            box-shadow: 0 14px 32px rgba(123, 58, 237, 0.08);
+        .skillwiki-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.68rem;
+            width: max-content;
+            max-width: 100%;
+            overflow: visible;
         }
 
-        .clean-eyebrow {
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            font-size: 0.72rem;
-            font-weight: 700;
-            margin-bottom: 0.45rem;
+        .skillwiki-brand--compact {
+            gap: 0.5rem;
         }
 
-        .clean-title {
-            font-size: 2rem;
-            line-height: 1.05;
-            font-weight: 800;
-            margin-bottom: 0.4rem;
+        .skillwiki-icon {
+            width: 2.1rem;
+            height: 2.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .skillwiki-icon svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .skillwiki-icon img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .skillwiki-logo,
+        .skillwiki-wordmark {
+            line-height: 1.15;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: #141414;
+            display: inline-block;
+            padding-top: 0.03rem;
+            padding-bottom: 0.03rem;
         }
 
         .skillwiki-logo {
             font-size: 2.05rem;
-            line-height: 1;
-            font-weight: 900;
-            letter-spacing: -0.04em;
-            margin-bottom: 0.45rem;
-            color: #141414;
         }
 
-        .skillwiki-logo span {
+        .skillwiki-wordmark {
+            font-size: 1.02rem;
+        }
+
+        .skillwiki-logo span,
+        .skillwiki-wordmark span {
             color: var(--primary);
         }
 
-        .clean-subtitle {
-            color: var(--muted);
-            font-size: 0.98rem;
-            line-height: 1.55;
-        }
-
-        .conversation {
-            display: flex;
-            flex-direction: column;
-            gap: 0.9rem;
+        .sidebar-brand {
+            margin-bottom: 0.95rem;
         }
 
         .msg-row {
@@ -109,6 +122,8 @@ def inject_clean_styles() -> None:
             font-weight: 800;
             color: var(--muted);
             padding: 0 0.15rem;
+            line-height: 1.25;
+            overflow: visible;
         }
 
         .msg-bubble {
@@ -149,6 +164,52 @@ def inject_clean_styles() -> None:
 
         .msg-body li {
             margin: 0.18rem 0;
+        }
+
+        .msg-label.assistant {
+            display: block;
+            color: var(--muted);
+            padding-top: 0.42rem;
+            padding-bottom: 0.1rem;
+            min-height: 1.9rem;
+        }
+
+        .assistant-label-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            line-height: 1.1;
+            overflow: visible;
+            transform: translateY(2px);
+        }
+
+        .assistant-label-icon {
+            width: 1.08rem;
+            height: 1.08rem;
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .assistant-label-icon img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .assistant-label-text {
+            font-size: 0.9rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            text-transform: none;
+            color: #141414;
+            display: inline-block;
+            line-height: 1.15;
+        }
+
+        .assistant-label-text span {
+            color: var(--primary);
         }
 
         .inline-tag {
@@ -271,13 +332,25 @@ def format_message_html(text: str) -> str:
 
 def build_sidebar() -> tuple[str, str, str, str]:
     with st.sidebar:
-        st.markdown("### SkillWiki")
+        st.markdown(
+            f'<div class="sidebar-brand">{core.skillwiki_brand_html(compact=True)}</div>',
+            unsafe_allow_html=True,
+        )
 
         dataset_options = list(core.GRAPH_OPTIONS.keys())
         default_dataset_index = dataset_options.index("Detailed Graph") if "Detailed Graph" in dataset_options else 0
         dataset_name = st.selectbox("Dataset", dataset_options, index=default_dataset_index)
         ollama_model_name = core.get_secret_or_env("OLLAMA_MODEL", "llama3.2")
         ollama_host = core.get_secret_or_env("OLLAMA_HOST", "http://127.0.0.1:11434")
+        timeout_value = st.number_input(
+            "Model timeout (s)",
+            min_value=5,
+            max_value=120,
+            value=int(st.session_state.get("model_timeout_seconds", core.DEFAULT_MODEL_TIMEOUT_SECONDS)),
+            step=5,
+            help="If model assistance takes longer than this, the app stops waiting for the model step and falls back safely.",
+        )
+        st.session_state["model_timeout_seconds"] = int(timeout_value)
 
         ollama_available = core.is_ollama_available(ollama_host)
         runtime_mode = core.detect_runtime_mode(ollama_available)
@@ -306,6 +379,8 @@ def build_sidebar() -> tuple[str, str, str, str]:
             st.session_state["last_evidence"] = {"top_nodes": [], "related_nodes": [], "relationships": []}
             st.session_state["last_query_state"] = None
             st.session_state["last_answer_trace"] = None
+            st.session_state["pending_prompt"] = None
+            st.session_state["is_processing"] = False
             st.rerun()
 
         st.caption(f"Runtime: {runtime_mode.title()}")
@@ -320,22 +395,6 @@ def build_sidebar() -> tuple[str, str, str, str]:
             st.warning(str(st.session_state.get("gemini_model_disabled_reason", "Gemini is temporarily unavailable.")))
 
     return dataset_name, effective_gemini_model, effective_ollama_model, ollama_host
-
-
-def render_header(dataset_name: str) -> None:
-    st.markdown(
-        f"""
-        <div class="clean-hero">
-          <div class="clean-eyebrow">Enterprise Assistant</div>
-          <div class="skillwiki-logo">Skill<span>Wiki</span></div>
-          <div class="clean-subtitle">
-            Ask direct questions about people, roles, skills, systems, locations, and reporting lines.
-            Answers stay grounded in the selected graph.
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 
 
 def render_trace_html(trace: dict[str, str] | None) -> str:
@@ -358,17 +417,39 @@ def render_trace_html(trace: dict[str, str] | None) -> str:
     )
 
 
+def render_assistant_label_html() -> str:
+    logo_src = core.skillwiki_logo_src()
+    return (
+        '<span class="assistant-label-brand">'
+        f'<span class="assistant-label-icon"><img src="{logo_src}" alt="SkillWiki logo"/></span>'
+        '<span class="assistant-label-text">Skill<span>Wiki</span></span>'
+        "</span>"
+    )
+
+
 def render_message(role: str, content: str, trace: dict[str, str] | None = None) -> None:
-    label = "You" if role == "user" else "SkillWiki"
-    role_class = "user" if role == "user" else "assistant"
     body_html = format_message_html(content)
     trace_html = render_trace_html(trace) if role == "assistant" else ""
 
+    if role == "user":
+        st.markdown(
+            f"""
+            <div class="msg-row user">
+              <div class="msg-label">You</div>
+              <div class="msg-bubble user">
+                <div class="msg-body">{body_html}</div>
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        return
+
     st.markdown(
         f"""
-        <div class="msg-row {role_class}">
-          <div class="msg-label">{label}</div>
-          <div class="msg-bubble {role_class}">
+        <div class="msg-row assistant">
+          <div class="msg-label assistant">{render_assistant_label_html()}</div>
+          <div class="msg-bubble assistant">
             <div class="msg-body">{body_html}</div>
             {trace_html}
           </div>
@@ -379,6 +460,12 @@ def render_message(role: str, content: str, trace: dict[str, str] | None = None)
 
 
 def main() -> None:
+    st.set_page_config(
+        page_title="SkillWiki",
+        page_icon="K",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
     inject_clean_styles()
     dataset_name, gemini_model_name, ollama_model_name, ollama_host = build_sidebar()
 
@@ -391,37 +478,53 @@ def main() -> None:
     st.session_state.setdefault("last_evidence", {"top_nodes": [], "related_nodes": [], "relationships": []})
     st.session_state.setdefault("last_query_state", None)
     st.session_state.setdefault("last_answer_trace", None)
-
-    render_header(dataset_name)
+    st.session_state.setdefault("pending_prompt", None)
+    st.session_state.setdefault("is_processing", False)
 
     if not st.session_state["messages"]:
-        st.info("Try a question like `Who reports to the COO?`, `Who knows Azure?`, or `How is Petra related to Filip?`")
+        welcome_message = (
+            "Hi, I'm SkillWiki. I can help you explore people, roles, reporting lines, departments, locations, "
+            "skills, systems, and relationships across the company graph.\n\n"
+            "Try something like:\n"
+            "- Who reports to the COO?\n"
+            "- Who knows Azure?\n"
+            "- Who works in Slovakia?"
+        )
+        st.session_state["messages"].append({"role": "assistant", "content": welcome_message, "trace": None})
 
-    st.markdown('<div class="conversation">', unsafe_allow_html=True)
     for message in st.session_state["messages"]:
         render_message(message["role"], message["content"], message.get("trace"))
-    st.markdown("</div>", unsafe_allow_html=True)
 
-    prompt = st.chat_input("Ask about people, roles, skills, systems, or reporting lines")
-    if not prompt:
+    if st.session_state.get("is_processing") and st.session_state.get("pending_prompt"):
+        render_message("user", str(st.session_state["pending_prompt"]))
+        st.markdown(
+            f"""
+            <div class="msg-row assistant">
+              <div class="msg-label assistant">{render_assistant_label_html()}</div>
+              <div class="thinking-card">Thinking...</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    prompt = st.chat_input(
+        "Ask about people, roles, skills, systems, or reporting lines",
+        disabled=bool(st.session_state.get("is_processing")),
+    )
+    if prompt and not st.session_state.get("is_processing"):
+        st.session_state["pending_prompt"] = prompt
+        st.session_state["is_processing"] = True
+        st.rerun()
+
+    if not (st.session_state.get("is_processing") and st.session_state.get("pending_prompt")):
         return
 
-    st.session_state["messages"].append({"role": "user", "content": prompt})
-    render_message("user", prompt)
-
-    thinking_placeholder = st.empty()
-    thinking_placeholder.markdown(
-        """
-        <div class="msg-row assistant">
-          <div class="msg-label">SkillWiki</div>
-          <div class="thinking-card">Thinking...</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    prompt_text = str(st.session_state["pending_prompt"])
+    recent_messages = st.session_state["messages"][-4:]
+    st.session_state["messages"].append({"role": "user", "content": prompt_text})
 
     answer, evidence, backend_used, query_state, answer_trace = core.answer_question(
-        prompt,
+        prompt_text,
         dataset_name,
         graph_payload,
         indexes,
@@ -429,12 +532,10 @@ def main() -> None:
         ollama_model_name,
         ollama_host,
         conversation_focus=st.session_state.get("last_focus"),
-        recent_messages=st.session_state.get("messages"),
+        recent_messages=recent_messages,
         last_query_state=st.session_state.get("last_query_state"),
         last_evidence=st.session_state.get("last_evidence"),
     )
-    thinking_placeholder.empty()
-    render_message("assistant", answer, answer_trace)
 
     st.session_state["messages"].append(
         {
@@ -447,6 +548,9 @@ def main() -> None:
     st.session_state["last_query_state"] = query_state
     st.session_state["last_focus"] = core.infer_focus_entity(evidence)
     st.session_state["last_answer_trace"] = answer_trace
+    st.session_state["pending_prompt"] = None
+    st.session_state["is_processing"] = False
+    st.rerun()
 
 
 if __name__ == "__main__":
