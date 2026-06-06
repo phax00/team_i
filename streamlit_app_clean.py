@@ -506,7 +506,7 @@ def render_message(role: str, content: str, trace: dict[str, str] | None = None)
         st.markdown(
             f"""
             <div class="msg-row user">
-              <div class="msg-label">You</div>
+              <div class="msg-label user">You</div>
               <div class="msg-bubble user">
                 <div class="msg-body">{body_html}</div>
               </div>
