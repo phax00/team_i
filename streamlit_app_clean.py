@@ -191,6 +191,12 @@ def inject_clean_styles() -> None:
             overflow: visible;
         }
 
+        .msg-label.user {
+            padding-top: 0.42rem;
+            padding-bottom: 0.1rem;
+            min-height: 1.9rem;
+        }
+
         .msg-bubble {
             width: min(100%, 780px);
             border-radius: 20px;
