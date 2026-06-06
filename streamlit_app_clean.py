@@ -1,9 +1,74 @@
+import base64
 import html
 import re
+from pathlib import Path
 
 import streamlit as st
 
 import streamlit_app as core
+
+
+ROOT = Path(__file__).resolve().parent
+LOCAL_LOGO_ICON = ROOT / "skillwiki_logo_icon.png"
+LOCAL_LOGO_JPEG = ROOT / "skillwiki_logo.jpeg"
+LOCAL_DEFAULT_MODEL_TIMEOUT_SECONDS = 60
+LOCAL_FALLBACK_LOGO_SVG = """
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="#8B3DFF" stroke-linecap="round" stroke-width="6.5">
+    <path d="M64 66 C53 58 43 54 32 49"/>
+    <path d="M64 66 C49 67 39 66 26 70"/>
+    <path d="M64 66 C50 74 42 82 34 93"/>
+    <path d="M64 66 C59 82 57 94 58 108"/>
+    <path d="M64 66 C73 80 80 90 90 100"/>
+    <path d="M64 66 C79 72 90 74 104 74"/>
+    <path d="M64 66 C78 58 87 51 95 40"/>
+    <path d="M64 66 C67 49 67 37 65 23"/>
+    <path d="M64 66 C56 52 49 43 37 35"/>
+    <path d="M64 66 C78 65 89 62 101 56"/>
+  </g>
+  <g fill="#A855F7">
+    <circle cx="64" cy="66" r="7.2"/>
+    <circle cx="32" cy="49" r="4.6"/>
+    <circle cx="26" cy="70" r="4.6"/>
+    <circle cx="34" cy="93" r="4.6"/>
+    <circle cx="58" cy="108" r="4.6"/>
+    <circle cx="90" cy="100" r="4.6"/>
+    <circle cx="104" cy="74" r="4.6"/>
+    <circle cx="95" cy="40" r="4.6"/>
+    <circle cx="65" cy="23" r="4.6"/>
+    <circle cx="37" cy="35" r="4.6"/>
+    <circle cx="101" cy="56" r="4.6"/>
+  </g>
+</svg>
+""".strip()
+
+
+def clean_logo_src() -> str:
+    if hasattr(core, "skillwiki_logo_src"):
+        try:
+            return core.skillwiki_logo_src()
+        except Exception:
+            pass
+    if LOCAL_LOGO_ICON.exists():
+        return "data:image/png;base64," + base64.b64encode(LOCAL_LOGO_ICON.read_bytes()).decode("ascii")
+    if LOCAL_LOGO_JPEG.exists():
+        return "data:image/jpeg;base64," + base64.b64encode(LOCAL_LOGO_JPEG.read_bytes()).decode("ascii")
+    return "data:image/svg+xml;base64," + base64.b64encode(LOCAL_FALLBACK_LOGO_SVG.encode("utf-8")).decode("ascii")
+
+
+def clean_brand_html(compact: bool = False) -> str:
+    if hasattr(core, "skillwiki_brand_html"):
+        try:
+            return core.skillwiki_brand_html(compact=compact)
+        except Exception:
+            pass
+    brand_class = "skillwiki-brand skillwiki-brand--compact" if compact else "skillwiki-brand"
+    return (
+        f'<div class="{brand_class}">'
+        f'<span class="skillwiki-icon"><img src="{clean_logo_src()}" alt="SkillWiki logo"/></span>'
+        '<span class="skillwiki-wordmark">Skill<span>Wiki</span></span>'
+        "</div>"
+    )
 
 
 def inject_clean_styles() -> None:
@@ -333,7 +398,7 @@ def format_message_html(text: str) -> str:
 def build_sidebar() -> tuple[str, str, str, str]:
     with st.sidebar:
         st.markdown(
-            f'<div class="sidebar-brand">{core.skillwiki_brand_html(compact=True)}</div>',
+            f'<div class="sidebar-brand">{clean_brand_html(compact=True)}</div>',
             unsafe_allow_html=True,
         )
 
@@ -346,7 +411,7 @@ def build_sidebar() -> tuple[str, str, str, str]:
             "Model timeout (s)",
             min_value=5,
             max_value=120,
-            value=int(st.session_state.get("model_timeout_seconds", core.DEFAULT_MODEL_TIMEOUT_SECONDS)),
+            value=int(st.session_state.get("model_timeout_seconds", getattr(core, "DEFAULT_MODEL_TIMEOUT_SECONDS", LOCAL_DEFAULT_MODEL_TIMEOUT_SECONDS))),
             step=5,
             help="If model assistance takes longer than this, the app stops waiting for the model step and falls back safely.",
         )
@@ -418,7 +483,7 @@ def render_trace_html(trace: dict[str, str] | None) -> str:
 
 
 def render_assistant_label_html() -> str:
-    logo_src = core.skillwiki_logo_src()
+    logo_src = clean_logo_src()
     return (
         '<span class="assistant-label-brand">'
         f'<span class="assistant-label-icon"><img src="{logo_src}" alt="SkillWiki logo"/></span>'
