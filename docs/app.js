@@ -102,6 +102,7 @@ const state = {
   relationshipFilter: new Set(),
   searchTerm: "",
   selectedNodeId: null,
+  focusedNodeId: null,
   browseLabel: "Person",
   depth: 2,
   defaultFocusNodeId: null,
@@ -180,10 +181,12 @@ function bindUI() {
     state.searchTerm = el.searchInput.value.trim().toLowerCase();
     if (!state.searchTerm) {
       state.selectedNodeId = state.defaultFocusNodeId;
+      state.focusedNodeId = state.defaultFocusNodeId;
     } else {
       const bestMatch = findBestSearchMatch(state.searchTerm);
       if (bestMatch) {
         state.selectedNodeId = bestMatch.id;
+        state.focusedNodeId = bestMatch.id;
       }
     }
     render();
@@ -198,6 +201,7 @@ function bindUI() {
     state.searchTerm = "";
     el.searchInput.value = "";
     state.selectedNodeId = state.defaultFocusNodeId;
+    state.focusedNodeId = state.defaultFocusNodeId;
     state.depth = 2;
     el.depthSelect.value = "2";
     applyPreset("org");
@@ -223,6 +227,7 @@ function bindUI() {
       return;
     }
     state.selectedNodeId = nextId;
+    state.focusedNodeId = nextId;
     state.searchTerm = "";
     el.searchInput.value = "";
     render();
@@ -250,6 +255,7 @@ function bindUI() {
       return;
     }
     state.selectedNodeId = button.dataset.nodeId;
+    state.focusedNodeId = button.dataset.nodeId;
     render();
   });
 
@@ -261,11 +267,17 @@ function bindUI() {
     if (action.dataset.action === "focus-selection") {
       state.searchTerm = "";
       el.searchInput.value = "";
+      state.focusedNodeId = state.selectedNodeId;
       render();
     }
     if (action.dataset.action === "jump-node" && action.dataset.nodeId) {
       state.selectedNodeId = action.dataset.nodeId;
-      render();
+      if (state.visNodes?.get?.(action.dataset.nodeId)) {
+        updateSelectionUI();
+      } else {
+        state.focusedNodeId = action.dataset.nodeId;
+        render();
+      }
     }
   });
 
@@ -303,7 +315,8 @@ function createNetwork() {
         width: 1.4,
         color: {
           color: "rgba(24, 50, 71, 0.16)",
-          highlight: "#145f74"
+          highlight: "rgba(123, 58, 237, 0.72)",
+          hover: "rgba(123, 58, 237, 0.72)"
         },
         smooth: getEdgeSmoothOptions(profile)
       }
@@ -315,7 +328,33 @@ function createNetwork() {
       return;
     }
     state.selectedNodeId = params.nodes[0];
-    render();
+    updateSelectionUI();
+  });
+
+  state.network.on("doubleClick", (params) => {
+    if (!params.nodes.length) {
+      return;
+    }
+    const nextNodeId = params.nodes[0];
+    const currentSubgraph = buildVisibleSubgraph();
+    const previewSubgraph = buildVisibleSubgraph({
+      focusedNodeId: nextNodeId,
+      searchTerm: ""
+    });
+    const subgraphChanged = !areSubgraphsEquivalent(currentSubgraph, previewSubgraph);
+
+    state.selectedNodeId = nextNodeId;
+    if (!subgraphChanged) {
+      updateSelectionUI();
+      return;
+    }
+
+    state.focusedNodeId = nextNodeId;
+    state.searchTerm = "";
+    if (el.searchInput) {
+      el.searchInput.value = "";
+    }
+    render({ preserveViewport: false });
   });
 
   syncNetworkSize(true);
@@ -352,6 +391,7 @@ async function loadDataset(datasetKey) {
   reindexGraph();
   state.defaultFocusNodeId = findDefaultFocusNodeId();
   state.selectedNodeId = state.defaultFocusNodeId;
+  state.focusedNodeId = state.defaultFocusNodeId;
   state.searchTerm = "";
   el.searchInput.value = "";
 
@@ -431,8 +471,11 @@ function applyPreset(presetKey) {
   state.labelFilter = new Set(labels.filter((value) => state.labelCounts.has(value)));
   state.relationshipFilter = new Set(relationships.filter((value) => state.relationshipCounts.has(value)));
 
+  if (!state.focusedNodeId || !nodeMatchesActivePreset(state.focusedNodeId)) {
+    state.focusedNodeId = findBestFocusNodeIdForPreset(presetKey) || state.defaultFocusNodeId;
+  }
   if (!state.selectedNodeId || !nodeMatchesActivePreset(state.selectedNodeId)) {
-    state.selectedNodeId = findBestFocusNodeIdForPreset(presetKey) || state.defaultFocusNodeId;
+    state.selectedNodeId = state.focusedNodeId;
   }
 
   buildFilterControls();
@@ -559,7 +602,7 @@ function buildQuickPicks() {
   }
 }
 
-function render() {
+function render(options = {}) {
   if (!state.raw) {
     return;
   }
@@ -590,27 +633,74 @@ function render() {
       return;
     }
     syncNetworkSize(true);
-    fitNetwork(false);
+    if (!options.preserveViewport) {
+      fitNetwork(false);
+    }
+    syncSelectedNodeInNetwork();
   };
   state.network.on("stabilizationIterationsDone", state.networkFitAfterStabilizeHandler);
   state.network.stabilize(profile.stabilizationIterations);
   requestAnimationFrame(() => {
     syncNetworkSize();
-    fitNetwork(profile.animateFit);
+    if (!options.preserveViewport) {
+      fitNetwork(profile.animateFit);
+    }
+    syncSelectedNodeInNetwork();
   });
 
   el.statRenderedNodes.textContent = filtered.nodes.length;
   el.statRenderedRelationships.textContent = filtered.edges.length;
   el.graphCaption.textContent = `${PRESETS[state.activePreset].name} - ${filtered.nodes.length} nodes - ${filtered.edges.length} relationships`;
 
+  updateSelectionUI();
+}
+
+function updateSelectionUI() {
+  refreshVisibleGraphStyles();
+  syncSelectedNodeInNetwork();
   buildBrowseControls();
   buildQuickPicks();
-
   if (state.selectedNodeId && state.nodeMap.has(state.selectedNodeId)) {
     renderDetails(state.selectedNodeId);
   } else {
     renderEmptyDetails();
   }
+}
+
+function refreshVisibleGraphStyles() {
+  if (!state.visNodes || !state.visEdges) {
+    return;
+  }
+
+  const refreshedNodes = state.visNodes.getIds()
+    .map((nodeId) => state.nodeMap.get(nodeId))
+    .filter(Boolean)
+    .map((node) => decorateNode(node));
+
+  const refreshedEdges = state.visEdges.get().map((edge) => decorateEdge(edge));
+
+  if (refreshedNodes.length) {
+    state.visNodes.update(refreshedNodes);
+  }
+  if (refreshedEdges.length) {
+    state.visEdges.update(refreshedEdges);
+  }
+}
+
+function syncSelectedNodeInNetwork() {
+  if (!state.network) {
+    return;
+  }
+  if (!state.selectedNodeId) {
+    state.network.unselectAll();
+    return;
+  }
+  const hasNode = state.visNodes?.get?.(state.selectedNodeId);
+  if (!hasNode) {
+    state.network.unselectAll();
+    return;
+  }
+  state.network.selectNodes([state.selectedNodeId], false);
 }
 
 function findBestSearchMatch(term) {
@@ -646,20 +736,22 @@ function findBestSearchMatch(term) {
   return bestNode;
 }
 
-function buildVisibleSubgraph() {
+function buildVisibleSubgraph(options = {}) {
   const visibleNodeIds = new Set();
   const visibleEdges = [];
+  const focusedNodeId = options.focusedNodeId ?? state.focusedNodeId;
+  const searchTerm = options.searchTerm ?? state.searchTerm;
 
   const allowedNode = (nodeId) => {
     const node = state.nodeMap.get(nodeId);
     return node && state.labelFilter.has(node.label);
   };
   const allowedEdge = (rel) => state.relationshipFilter.has(rel.type);
-  const matchesSearch = (node) => !state.searchTerm || JSON.stringify(node).toLowerCase().includes(state.searchTerm);
+  const matchesSearch = (node) => !searchTerm || JSON.stringify(node).toLowerCase().includes(searchTerm);
 
   const rootIds = [];
-  if (state.selectedNodeId) {
-    rootIds.push(state.selectedNodeId);
+  if (focusedNodeId) {
+    rootIds.push(focusedNodeId);
   } else {
     for (const node of state.raw.nodes) {
       if (allowedNode(node.id) && matchesSearch(node)) {
@@ -715,6 +807,36 @@ function buildVisibleSubgraph() {
   return { nodes, edges };
 }
 
+function areSubgraphsEquivalent(left, right) {
+  if (!left || !right) {
+    return false;
+  }
+
+  const leftNodeIds = left.nodes.map((node) => node.id).sort();
+  const rightNodeIds = right.nodes.map((node) => node.id).sort();
+  if (leftNodeIds.length !== rightNodeIds.length) {
+    return false;
+  }
+  for (let index = 0; index < leftNodeIds.length; index += 1) {
+    if (leftNodeIds[index] !== rightNodeIds[index]) {
+      return false;
+    }
+  }
+
+  const leftEdgeIds = left.edges.map((edge) => edge.id).sort();
+  const rightEdgeIds = right.edges.map((edge) => edge.id).sort();
+  if (leftEdgeIds.length !== rightEdgeIds.length) {
+    return false;
+  }
+  for (let index = 0; index < leftEdgeIds.length; index += 1) {
+    if (leftEdgeIds[index] !== rightEdgeIds[index]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function decorateNode(node) {
   const isSelected = node.id === state.selectedNodeId;
   const color = getColor(node.label);
@@ -746,12 +868,29 @@ function decorateNode(node) {
 }
 
 function decorateEdge(rel) {
+  const start = rel.start ?? rel.from;
+  const end = rel.end ?? rel.to;
+  const type = rel.type ?? rel.title;
+  const isConnectedToSelection = Boolean(state.selectedNodeId && (start === state.selectedNodeId || end === state.selectedNodeId));
+
   return {
-    id: `${rel.start}-${rel.type}-${rel.end}`,
-    from: rel.start,
-    to: rel.end,
-    title: rel.type,
-    arrows: "to"
+    id: `${start}-${type}-${end}`,
+    from: start,
+    to: end,
+    title: type,
+    width: isConnectedToSelection ? 2.6 : 1.4,
+    color: {
+      color: isConnectedToSelection ? "rgba(123, 58, 237, 0.58)" : "rgba(24, 50, 71, 0.16)",
+      highlight: "rgba(123, 58, 237, 0.72)",
+      hover: "rgba(123, 58, 237, 0.72)",
+      inherit: false
+    },
+    arrows: {
+      to: {
+        enabled: true,
+        scaleFactor: isConnectedToSelection ? 0.95 : 0.75
+      }
+    }
   };
 }
 
@@ -1298,6 +1437,7 @@ function getInteractionOptions(profile) {
     hover: profile.hover,
     navigationButtons: true,
     keyboard: true,
+    selectConnectedEdges: true,
     hideEdgesOnDrag: false,
     hideEdgesOnZoom: false
   };
