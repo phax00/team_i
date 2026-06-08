@@ -1420,15 +1420,15 @@ function buildPerformanceProfile() {
   const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
   const constrained = !isApple && (isAndroid || isWindows || coarsePointer || reducedMotion);
-  const chromeConstrained = isChrome && !isApple;
+  const chromiumConstrained = (isChrome || isEdge) && !isApple;
 
   return {
     constrained,
-    chromeConstrained,
-    animateFit: !reducedMotion && !chromeConstrained,
+    chromeConstrained: chromiumConstrained,
+    animateFit: !reducedMotion && !chromiumConstrained,
     hover: !coarsePointer,
-    maxCanvasPixelRatio: isApple ? 2 : chromeConstrained ? 1 : constrained ? 1.1 : 1.35,
-    stabilizationIterations: chromeConstrained ? 84 : constrained ? 110 : 180
+    maxCanvasPixelRatio: isApple ? 2 : chromiumConstrained ? 1 : constrained ? 1.1 : 1.35,
+    stabilizationIterations: chromiumConstrained ? 84 : constrained ? 110 : 180
   };
 }
 
