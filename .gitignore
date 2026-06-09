@@ -1,0 +1,25 @@
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Streamlit / local runtime
+*.log
+
+# Temporary render outputs
+_tmp_render/
+_report_render/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local virtual environments
+.venv/
+venv/
+env/
