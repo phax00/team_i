@@ -66,8 +66,8 @@ http://127.0.0.1:8000/docs/
 
 ## Documentation Map
 
-- Architecture diagram: `drawio_diagrams/ARCHITECTURE_DIAGRAM.drawio`
-- Data lineage diagram: `drawio_diagrams/DATA_LINEAGE.drawio`
+- Architecture diagram: `drawio_diagrams/ARCHITECTURE_DIAGRAM.drawio` and `drawio_diagrams/ARCHITECTURE_DIAGRAM.png` 
+- Data lineage diagram: `drawio_diagrams/DATA_LINEAGE.drawio` and `drawio_diagrams/DATA_LINEAGE.png`
 
 ## Technical Standards
 
