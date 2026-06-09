@@ -1,0 +1,302 @@
+<mxfile host="app.diagrams.net" agent="Codex">
+  <diagram id="skillwiki-data-lineage-final" name="SkillWiki Data Lineage Final">
+    <mxGraphModel dx="2802" dy="1329" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#111827;" value="SkillWiki Data Lineage" vertex="1">
+          <mxGeometry height="30" width="430" x="40" y="64" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#4b5563;" value="End-to-end lineage from source job descriptions and person master data to normalized graph assets, visualizer, and chat application" vertex="1">
+          <mxGeometry height="20" width="900" x="40" y="96" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d1d5db;" value="" vertex="1">
+          <mxGeometry height="126" width="590" x="1980" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#111827;" value="Legend" vertex="1">
+          <mxGeometry height="20" width="100" x="2000" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-source" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontSize=11;fontColor=#111827;" value="Source documents / curated inputs" vertex="1">
+          <mxGeometry height="26" width="180" x="2000" y="74" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-person" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fde68a;strokeColor=#ca8a04;fontSize=11;fontColor=#111827;" value="Person modeling outputs" vertex="1">
+          <mxGeometry height="26" width="150" x="2195" y="74" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-graph" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontSize=11;fontColor=#111827;" value="Graph products" vertex="1">
+          <mxGeometry height="26" width="120" x="2360" y="74" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-runtime" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7B3AED;fontSize=11;fontColor=#111827;" value="Published / consumed assets" vertex="1">
+          <mxGeometry height="26" width="180" x="2000" y="108" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-activity" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#db2777;fontSize=11;fontColor=#111827;" value="Detailed enrichment branch" vertex="1">
+          <mxGeometry height="26" width="150" x="2195" y="108" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-normalize" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontSize=11;fontColor=#111827;" value="Normalization / governance" vertex="1">
+          <mxGeometry height="26" width="160" x="2360" y="108" as="geometry" />
+        </mxCell>
+        <mxCell id="lane1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffdf7;strokeColor=#e5e7eb;" value="" vertex="1">
+          <mxGeometry height="1210" width="360" x="40" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lane1-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#111827;" value="1. Source Inputs" vertex="1">
+          <mxGeometry height="22" width="150" x="145" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="lane2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffdf7;strokeColor=#e5e7eb;" value="" vertex="1">
+          <mxGeometry height="1210" width="430" x="450" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lane2-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#111827;" value="2. Structuring and Person Modeling" vertex="1">
+          <mxGeometry height="22" width="300" x="525" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="lane3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fffb;strokeColor=#e5e7eb;" value="" vertex="1">
+          <mxGeometry height="1210" width="520" x="930" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lane3-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#111827;" value="3. Graph Construction" vertex="1">
+          <mxGeometry height="22" width="180" x="1100" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="lane4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fcff;strokeColor=#e5e7eb;" value="" vertex="1">
+          <mxGeometry height="1210" width="510" x="1500" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lane4-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#111827;" value="4. Normalization and Publishing" vertex="1">
+          <mxGeometry height="22" width="260" x="1625" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="lane5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafaff;strokeColor=#e5e7eb;" value="" vertex="1">
+          <mxGeometry height="1210" width="470" x="2060" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lane5-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#111827;" value="5. Consumption Layer" vertex="1">
+          <mxGeometry height="22" width="180" x="2205" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="jd-docs" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#111827;fontSize=13;" value="Source Word job descriptions&#xa;job_descriptions/source_docs/Job Descriptions" vertex="1">
+          <mxGeometry height="100" width="280" x="80" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="jd-generated" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#111827;fontSize=13;" value="Curated generated Word job descriptions&#xa;job_descriptions/generated_final/Generated Job Descriptions Final" vertex="1">
+          <mxGeometry height="100" width="280" x="80" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="person-master" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fde68a;strokeColor=#ca8a04;fontColor=#111827;fontSize=13;" value="Curated upstream person source&#xa;people/data/Person_Profiles_Master.json" vertex="1">
+          <mxGeometry height="90" width="280" x="80" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="gh-activity" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#db2777;fontColor=#111827;fontSize=13;" value="GitHub activity evidence&#xa;activity/github/data/github_activity_mapped.json" vertex="1">
+          <mxGeometry height="90" width="280" x="80" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="jira-activity" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#db2777;fontColor=#111827;fontSize=13;" value="Synthetic Jira activity evidence&#xa;activity/jira/data/jira_synthetic.json" vertex="1">
+          <mxGeometry height="90" width="280" x="80" y="1040" as="geometry" />
+        </mxCell>
+        <mxCell id="rules" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#111827;fontSize=13;" value="Normalization rules&#xa;graphs/normalization/normalization_rules.json" vertex="1">
+          <mxGeometry height="90" width="280" x="80" y="1190" as="geometry" />
+        </mxCell>
+        <mxCell id="extract" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#111827;fontSize=13;" value="Parser&#xa;job_descriptions/scripts/extract_jd_catalog.py" vertex="1">
+          <mxGeometry height="80" width="320" x="500" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="catalog" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#111827;fontSize=13;" value="Structured JD baseline&#xa;job_descriptions/catalog/JD_Catalog.json" vertex="1">
+          <mxGeometry height="90" width="320" x="500" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="rebuild" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#111827;fontSize=13;" value="Person rebuild&#xa;people/scripts/rebuild_person_profiles_from_jd.py" vertex="1">
+          <mxGeometry height="80" width="320" x="505" y="565" as="geometry" />
+        </mxCell>
+        <mxCell id="lean" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fde68a;strokeColor=#ca8a04;fontColor=#111827;fontSize=13;" value="Reference person export&#xa;people/data/Person_Profiles_Lean.json" vertex="1">
+          <mxGeometry height="80" width="320" x="505" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="graph-input" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fde68a;strokeColor=#ca8a04;fontColor=#111827;fontSize=13;" value="Graph-ready person export&#xa;people/data/Person_Profiles_Graph_Input.json" vertex="1">
+          <mxGeometry height="80" width="320" x="505" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="model-note" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9ca3af;fontColor=#374151;fontSize=12;dashed=1;" value="Modeling decision&#xa;JD_Catalog stores role baseline. Graph_Input stores person-specific data plus materialized fields needed by graph generation." vertex="1">
+          <mxGeometry height="110" width="320" x="505" y="1260" as="geometry" />
+        </mxCell>
+        <mxCell id="core-gen" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#111827;fontSize=13;" value="Core graph builder&#xa;graphs/scripts/generate_core_knowledge_graph.py" vertex="1">
+          <mxGeometry height="80" width="360" x="1010" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="core-graph" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#111827;fontSize=13;" value="Core graph product&#xa;graphs/core/knowledge_graph_core.json" vertex="1">
+          <mxGeometry height="90" width="360" x="1010" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="school-gen" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#111827;fontSize=13;" value="Detailed enrichment builder&#xa;graphs/scripts/generate_school_mvp_graph.py" vertex="1">
+          <mxGeometry height="80" width="360" x="1010" y="960" as="geometry" />
+        </mxCell>
+        <mxCell id="school-graph" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#db2777;fontColor=#111827;fontSize=13;" value="Detailed graph product&#xa;graphs/school_mvp/knowledge_graph_school_mvp.json" vertex="1">
+          <mxGeometry height="90" width="360" x="1010" y="1090" as="geometry" />
+        </mxCell>
+        <mxCell id="graph-note" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9ca3af;fontColor=#374151;fontSize=12;dashed=1;" value="The core graph is structurally complete. The detailed graph extends it with optional evidence from GitHub and Jira activity." vertex="1">
+          <mxGeometry height="110" width="360" x="1010" y="1260" as="geometry" />
+        </mxCell>
+        <mxCell id="normalize" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#111827;fontSize=13;" value="Taxonomy normalizer&#xa;graphs/normalization/normalize_graph_taxonomy.py" vertex="1">
+          <mxGeometry height="80" width="320" x="1595" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="core-normalized" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#111827;fontSize=13;" value="Normalized basic graph&#xa;graphs/core/knowledge_graph_core_normalized.json" vertex="1">
+          <mxGeometry height="90" width="320" x="1595" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="school-normalized" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#111827;fontSize=13;" value="Normalized detailed graph&#xa;graphs/school_mvp/knowledge_graph_school_mvp_normalized.json" vertex="1">
+          <mxGeometry height="90" width="410" x="1550" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="publish" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7B3AED;fontColor=#111827;fontSize=13;" value="Viewer asset publisher&#xa;viewer/build_graph_viewer_assets.py" vertex="1">
+          <mxGeometry height="80" width="320" x="1595" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="docs-data" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7B3AED;fontColor=#111827;fontSize=13;" value="Published runtime assets&#xa;docs/data/knowledge_graph_core_normalized.json&#xa;docs/data/knowledge_graph_school_mvp_normalized.json&#xa;docs/data/graph_summary.json" vertex="1">
+          <mxGeometry height="120" width="380" x="1565" y="1150" as="geometry" />
+        </mxCell>
+        <mxCell id="visualizer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7B3AED;fontColor=#111827;fontSize=13;" value="Knowledge graph visualizer&#xa;docs/index.html&#xa;docs/app.js&#xa;docs/styles.css" vertex="1">
+          <mxGeometry height="100" width="300" x="2145" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="chat-full" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7B3AED;fontColor=#111827;fontSize=13;" value="SkillWiki main chat app&#xa;streamlit_app.py" vertex="1">
+          <mxGeometry height="80" width="300" x="2145" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="chat-clean" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7B3AED;fontColor=#111827;fontSize=13;" value="SkillWiki clean chat app&#xa;streamlit_app_clean.py" vertex="1">
+          <mxGeometry height="80" width="300" x="2145" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="consumption-note" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9ca3af;fontColor=#374151;fontSize=12;dashed=1;" value="Both user-facing consumers read the same published graph assets. The visualizer shows graph structure directly, while the chat app adds graph-grounded query handling and optional model assistance." vertex="1">
+          <mxGeometry height="110" width="320" x="2135" y="1250" as="geometry" />
+        </mxCell>
+        <mxCell id="e-jdsource-extract1" edge="1" parent="1" source="jd-docs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d97706;" target="extract">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-jdsource-extract2" edge="1" parent="1" source="jd-generated" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d97706;" target="extract">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="430" y="450" />
+              <mxPoint x="430" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-extract-catalog" edge="1" parent="1" source="extract" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d97706;" target="catalog">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-personmaster-rebuild" edge="1" parent="1" source="person-master" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ca8a04;" target="rebuild">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-catalog-rebuild" edge="1" parent="1" source="catalog" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d97706;" target="rebuild">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="520" />
+              <mxPoint x="660" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-rebuild-lean" edge="1" parent="1" source="rebuild" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ca8a04;" target="lean">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-rebuild-graphinput" edge="1" parent="1" source="rebuild" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ca8a04;" target="graph-input">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="860" y="605" />
+              <mxPoint x="860" y="810" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-catalog-coregen" edge="1" parent="1" source="catalog" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;" target="core-gen">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="890" y="430" />
+              <mxPoint x="890" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-graphinput-coregen" edge="1" parent="1" source="graph-input" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;" target="core-gen">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="900" y="830" />
+              <mxPoint x="900" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-coregen-coregraph" edge="1" parent="1" source="core-gen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;" target="core-graph">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-core-schoolgen" edge="1" parent="1" source="core-graph" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#db2777;" target="school-gen">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1190" y="730" />
+              <mxPoint x="1190" y="730" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-gh-schoolgen" edge="1" parent="1" source="gh-activity" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#db2777;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="school-gen">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="960" />
+              <mxPoint x="900" y="960" />
+              <mxPoint x="900" y="1000" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-jira-schoolgen" edge="1" parent="1" source="jira-activity" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#db2777;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="school-gen">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="1080" />
+              <mxPoint x="900" y="1080" />
+              <mxPoint x="900" y="1000" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-schoolgen-schoolgraph" edge="1" parent="1" source="school-gen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#db2777;" target="school-graph">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-rules-normalize" edge="1" parent="1" source="rules" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284c7;" target="normalize">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1480" y="1235" />
+              <mxPoint x="1480" y="640" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-core-normalize" edge="1" parent="1" source="core-graph" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284c7;" target="normalize">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1490" y="515" />
+              <mxPoint x="1490" y="620" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-school-normalize" edge="1" parent="1" source="school-graph" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284c7;" target="normalize">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1470" y="1135" />
+              <mxPoint x="1470" y="640" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-normalize-core" edge="1" parent="1" source="normalize" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;" target="core-normalized">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-normalize-school" edge="1" parent="1" source="normalize" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;" target="school-normalized">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1980" y="640" />
+              <mxPoint x="1980" y="885" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-corenorm-publish" edge="1" parent="1" source="core-normalized" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B3AED;" target="publish">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1530" y="765" />
+              <mxPoint x="1530" y="1070" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-schoolnorm-publish" edge="1" parent="1" source="school-normalized" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B3AED;" target="publish">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-publish-docsdata" edge="1" parent="1" source="publish" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B3AED;" target="docs-data">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-docsdata-visualizer" edge="1" parent="1" source="docs-data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B3AED;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="visualizer">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2090" y="1210" />
+              <mxPoint x="2090" y="460" />
+            </Array>
+            <mxPoint x="1960" y="1210" as="sourcePoint" />
+            <mxPoint x="2110" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-docsdata-chatfull" edge="1" parent="1" source="docs-data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B3AED;" target="chat-full">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2490" y="1210" />
+              <mxPoint x="2490" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-docsdata-chatclean" edge="1" parent="1" source="docs-data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B3AED;" target="chat-clean">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
