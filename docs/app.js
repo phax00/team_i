@@ -625,6 +625,8 @@ function render(options = {}) {
     }
   });
 
+
+
   if (state.networkFitAfterStabilizeHandler) {
     state.network.off("stabilizationIterationsDone", state.networkFitAfterStabilizeHandler);
   }
@@ -639,7 +641,24 @@ function render(options = {}) {
     syncSelectedNodeInNetwork();
   };
   state.network.on("stabilizationIterationsDone", state.networkFitAfterStabilizeHandler);
-  state.network.stabilize(profile.stabilizationIterations);
+  
+
+
+
+  if (!options.preserveViewport) {
+    state.network.stabilize(profile.stabilizationIterations);
+
+    state.network.once("stabilizationIterationsDone", () => {
+      state.network.setOptions({
+        physics: {
+          stabilization: false
+        }
+      });
+
+      state.network.startSimulation();
+    });
+  };
+  
   requestAnimationFrame(() => {
     syncNetworkSize();
     if (!options.preserveViewport) {
@@ -647,6 +666,9 @@ function render(options = {}) {
     }
     syncSelectedNodeInNetwork();
   });
+
+  
+
 
   el.statRenderedNodes.textContent = filtered.nodes.length;
   el.statRenderedRelationships.textContent = filtered.edges.length;
@@ -1456,20 +1478,17 @@ function getPhysicsOptions(nodeCount, profile) {
     enabled: true,
     solver: "forceAtlas2Based",
     adaptiveTimestep: true,
-    minVelocity: profile.chromeConstrained ? 1.2 : profile.constrained ? 1.2 : 0.85,
+    minVelocity: 0.02,
     forceAtlas2Based: {
       gravitationalConstant: isCompact ? -120 : (profile.chromeConstrained ? -74 : profile.constrained ? -68 : -80),
       centralGravity: profile.chromeConstrained ? 0.028 : profile.constrained ? 0.035 : 0.02,
       springLength: isCompact ? 210 : (profile.chromeConstrained ? 166 : profile.constrained ? 155 : 170),
       springConstant: 0.05,
-      damping: profile.chromeConstrained ? 0.78 : profile.constrained ? 0.8 : 0.7,
+      damping: 0.97,
       avoidOverlap: isCompact ? 1 : 0.92
     },
     stabilization: {
-      enabled: true,
-      iterations: profile.stabilizationIterations,
-      updateInterval: profile.chromeConstrained ? 16 : profile.constrained ? 20 : 40,
-      fit: true
+      enabled: false
     }
   };
 }
