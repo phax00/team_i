@@ -64,16 +64,10 @@ Then open:
 http://127.0.0.1:8000/docs/
 ```
 
-### Run lightweight tests
-
-```powershell
-python -m unittest discover -s tests -v
-```
-
 ## Documentation Map
 
-- Architecture diagram: `ARCHITECTURE_DIAGRAM.drawio`
-- Data lineage diagram: `DATA_LINEAGE.drawio`
+- Architecture diagram: `drawio_diagrams/ARCHITECTURE_DIAGRAM.drawio`
+- Data lineage diagram: `drawio_diagrams/DATA_LINEAGE.drawio`
 
 ## Technical Standards
 
@@ -89,15 +83,6 @@ Secrets must stay outside Git. Use `.env` for local development and Streamlit se
 
 The project uses synthetic organizational data to reduce GDPR and personal-data risk during development and demonstration. Production use would require access control, audit logging, and validation against approved HR or enterprise data sources.
 
-### Testing and Reliability
-
-The repository includes lightweight smoke tests for key graph assets and submission artifacts:
-
-```powershell
-python -m unittest discover -s tests -v
-```
-
-These tests verify that required files and baseline graph entities exist. A stronger future test suite should add golden-query tests over the chat answering pipeline, including negative tests for missing roles and follow-up questions.
 
 ### Version Control and Maintainability
 
@@ -107,3 +92,4 @@ Generated cache files, local secrets, and temporary render outputs should remain
 ## Links
 - Knowledge Graph: https://phax00.github.io/team_i/
 - SkillWiki Chat: https://skillwiki.streamlit.app/
+
