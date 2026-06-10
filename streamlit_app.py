@@ -1,4 +1,4 @@
-import base64
+﻿import base64
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 import json
 import os
@@ -589,6 +589,13 @@ def correct_query_structure_typos(text: str) -> str:
         "htey": "they",
         "theyr": "their",
         "thier": "their",
+        "woth": "with",
+        "wiht": "with",
+        "wih": "with",
+        "worrks": "works",
+        "wroks": "works",
+        "wokrs": "works",
+        "localitz": "location",
     }
     parts = re.split(r"(\W+)", text.casefold())
     corrected: list[str] = []
@@ -603,7 +610,7 @@ def correct_query_structure_typos(text: str) -> str:
         if len(part) < 3 or part in vocab:
             corrected.append(part)
             continue
-        matches = get_close_matches(part, sorted(vocab), n=1, cutoff=0.72)
+        matches = get_close_matches(part, sorted(vocab), n=1, cutoff=0.84)
         corrected.append(matches[0] if matches else part)
     return "".join(corrected)
 
@@ -756,7 +763,12 @@ def name_match_score(name: str, normalized_query: str, tokens: list[str]) -> flo
     token_hits = 0
     fuzzy_token_hits = 0
     for token in tokens:
-        if token in candidate:
+        if len(token) <= 4:
+            token_pattern = rf"(?<![a-z0-9]){re.escape(token)}(?![a-z0-9])"
+            has_token_match = token in candidate_tokens or re.search(token_pattern, candidate) is not None
+        else:
+            has_token_match = token in candidate
+        if has_token_match:
             token_hits += 1
             score += 12
             continue
@@ -1061,7 +1073,7 @@ def build_closest_match_suggestion(
                 evidence = {
                     "top_nodes": list(seen.values()),
                     "related_nodes": list(seen.values()),
-                    "relationships": relationships[:18],
+                    "relationships": relationships,
                 }
                 return "\n".join(answer_lines), evidence, "Graph Search"
 
@@ -1120,7 +1132,7 @@ def build_closest_match_suggestion(
     evidence = {
         "top_nodes": list(seen.values()),
         "related_nodes": list(seen.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return "\n".join(answer_lines), evidence, "Graph Search"
 
@@ -1274,7 +1286,7 @@ def try_reporting_answer(
     evidence = {
         "top_nodes": [dict(node, _score=10.0) if "_score" not in node else node for node in seen_top.values()],
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return "\n".join(answer_lines), evidence, "Graph Search"
 
@@ -1359,7 +1371,7 @@ def try_reverse_reporting_answer(
         evidence = {
             "top_nodes": [dict(node, _score=10.0) if "_score" not in node else node for node in seen_top.values()],
             "related_nodes": list(seen_top.values()),
-            "relationships": relationships[:18],
+            "relationships": relationships,
         }
         return "\n".join(answer_lines), evidence, "Graph Search"
 def try_greeting_or_intro_answer(question: str) -> tuple[str, dict[str, Any], str] | None:
@@ -1451,7 +1463,7 @@ def try_identity_answer(question: str, indexes: dict[str, Any]) -> tuple[str, di
     evidence = {
         "top_nodes": [dict(node, _score=10.0) if "_score" not in node else node for node in seen_top.values()],
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return "\n".join(answers), evidence, "Graph Search"
 
@@ -1568,7 +1580,7 @@ def try_person_location_answer(
     evidence = {
         "top_nodes": list(seen_top.values()),
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:24],
+        "relationships": relationships,
     }
     query_state = {
         "kind": "person_location",
@@ -1666,11 +1678,11 @@ def try_person_summary_answer(question: str, indexes: dict[str, Any]) -> tuple[s
         if managers:
             summary_parts.append(f"They report to {format_human_list(sorted(set(managers)))}.")
         if skills:
-            summary_parts.append(f"Key skills include {format_human_list(sorted(set(skills))[:5])}.")
+            summary_parts.append(f"Skills include {format_human_list(sorted(set(skills)))}.")
         if topics:
-            summary_parts.append(f"Owned topics include {format_human_list(sorted(set(topics))[:4])}.")
+            summary_parts.append(f"Owned topics include {format_human_list(sorted(set(topics)))}.")
         if systems:
-            summary_parts.append(f"Known systems include {format_human_list(sorted(set(systems))[:4])}.")
+            summary_parts.append(f"Known systems include {format_human_list(sorted(set(systems)))}.")
 
         answers.append(" ".join(summary_parts))
 
@@ -1683,7 +1695,7 @@ def try_person_summary_answer(question: str, indexes: dict[str, Any]) -> tuple[s
     evidence = {
         "top_nodes": list(seen_top.values()),
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:28],
+        "relationships": relationships,
     }
     return "\n".join(answers), evidence, "Graph Search"
 
@@ -1713,7 +1725,7 @@ def try_location_people_and_sites_answer(question: str, indexes: dict[str, Any])
         answer = (
             f"I could not find the exact location `{display_query_term(target_phrase)}` in the current graph. "
             f"Available countries are {format_human_list(countries)}. "
-            f"Available sites include {format_human_list(sites[:8])}."
+            f"Available sites include {format_human_list(sites)}."
         )
         return answer, empty_evidence, "Graph Search"
 
@@ -1783,15 +1795,15 @@ def try_location_people_and_sites_answer(question: str, indexes: dict[str, Any])
 
     answer = ". ".join(part[:1].upper() + part[1:] for part in answer_parts if part) + "."
     top_nodes = [dict(best, _score=best.get("_score", 10.0))]
-    top_nodes.extend(dict(person, _score=10.0) for person in people[:10])
-    top_nodes.extend(dict(site, _score=10.0) for site in site_nodes[:8])
+    top_nodes.extend(dict(person, _score=10.0) for person in people)
+    top_nodes.extend(dict(site, _score=10.0) for site in site_nodes)
     seen_top = {}
     for node in top_nodes:
         seen_top[node["id"]] = node
     evidence = {
         "top_nodes": list(seen_top.values()),
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:24],
+        "relationships": relationships,
     }
     return answer, evidence, "Graph Search"
 
@@ -1825,7 +1837,7 @@ def try_membership_answer(
         answer = (
             f"I could not find the exact team, department, or location `{display_query_term(target_phrase)}` in the current graph. "
             f"Available countries are {format_human_list(countries)}. "
-            f"Available sites include {format_human_list(sites[:6])}."
+            f"Available sites include {format_human_list(sites)}."
         )
         return answer, empty_evidence, "Graph Search"
 
@@ -1879,18 +1891,18 @@ def try_membership_answer(
         empty_evidence = {"top_nodes": [dict(best, _score=best.get("_score", 10.0))], "related_nodes": [best], "relationships": []}
         return f"I found `{best['name']}`, but the current graph does not show people directly linked to it.", empty_evidence, "Graph Search"
 
-    people_names = [person["name"] for person in people[:8]]
+    people_names = [person["name"] for person in people]
     verb = "is" if len(people_names) == 1 else "are"
     answer = f"{format_human_list(people_names)} {verb} in `{best['name']}`."
     top_nodes = [dict(best, _score=best.get("_score", 10.0))]
-    top_nodes.extend(dict(person, _score=10.0) for person in people[:8])
+    top_nodes.extend(dict(person, _score=10.0) for person in people)
     seen_top = {}
     for node in top_nodes:
         seen_top[node["id"]] = node
     evidence = {
         "top_nodes": list(seen_top.values()),
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return answer, evidence, "Graph Search"
 
@@ -1931,12 +1943,12 @@ def try_list_entities_answer(question: str, indexes: dict[str, Any]) -> tuple[st
         top_nodes = [dict(node, _score=10.0) for node in indexes["nodes_by_id"].values() if node.get("label") == "Department"]
     else:
         roles = sorted(node["name"] for node in nodes if node.get("label") == "Role")
-        answer = f"The graph currently includes these roles: {format_human_list(roles[:20])}."
+        answer = f"The graph currently includes these roles: {format_human_list(roles)}."
         top_nodes = [dict(node, _score=10.0) for node in indexes["nodes_by_id"].values() if node.get("label") == "Role"]
 
     evidence = {
-        "top_nodes": top_nodes[:18],
-        "related_nodes": top_nodes[:18],
+        "top_nodes": top_nodes,
+        "related_nodes": top_nodes,
         "relationships": [],
     }
     return answer, evidence, "Graph Search"
@@ -1970,7 +1982,7 @@ def try_knows_answer(
             ollama_host,
         )
     best_score = matched_nodes[0]["_score"]
-    matched_nodes = [node for node in matched_nodes if node["_score"] >= best_score - 5][:3]
+    matched_nodes = [node for node in matched_nodes if node["_score"] >= best_score - 5]
 
     nodes_by_id = indexes["nodes_by_id"]
     adjacency = indexes["adjacency"]
@@ -1978,12 +1990,14 @@ def try_knows_answer(
     top_nodes = []
     relationships = []
 
+    normalized_target = strip_diacritics(normalize_target_phrase(target_phrase).casefold())
+    records = []
     for node in matched_nodes:
         label = node.get("label")
         inverse_rel = "INVERSE_KNOWS_SYSTEM" if label == "System" else "INVERSE_HAS_SKILL"
-        relation_name = "know" if label == "System" else "have as a skill"
         holder_names = []
-        top_nodes.append(node)
+        node_relationships = []
+        people_nodes = []
 
         for rel in adjacency.get(node["id"], []):
             if rel["type"] != inverse_rel:
@@ -1991,9 +2005,51 @@ def try_knows_answer(
             person_node = nodes_by_id.get(rel["end"])
             if person_node:
                 holder_names.append(person_node["name"])
-                top_nodes.append(person_node)
-                relationships.append({"start": rel["end"], "type": "KNOWS_SYSTEM" if label == "System" else "HAS_SKILL", "end": node["id"]})
+                people_nodes.append(person_node)
+                node_relationships.append({"start": rel["end"], "type": "KNOWS_SYSTEM" if label == "System" else "HAS_SKILL", "end": node["id"]})
 
+        node_name_normalized = strip_diacritics(normalize_target_phrase(str(node.get("name", ""))).casefold())
+        records.append(
+            {
+                "node": node,
+                "label": label,
+                "holder_names": holder_names,
+                "people_nodes": people_nodes,
+                "relationships": node_relationships,
+                "is_exact": node_name_normalized == normalized_target,
+            }
+        )
+
+    positive_records = [record for record in records if record["holder_names"]]
+    exact_system_records = [
+        record for record in positive_records if record["label"] == "System" and record["is_exact"]
+    ]
+    system_records = [record for record in positive_records if record["label"] == "System"]
+    exact_skill_records = [
+        record for record in positive_records if record["label"] == "Skill" and record["is_exact"]
+    ]
+
+    if exact_system_records:
+        selected_records = exact_system_records
+    elif system_records:
+        selected_records = system_records
+    elif exact_skill_records:
+        selected_records = exact_skill_records
+    elif positive_records:
+        selected_records = positive_records
+    else:
+        exact_empty_system_records = [
+            record for record in records if record["label"] == "System" and record["is_exact"]
+        ]
+        selected_records = exact_empty_system_records or records[:1]
+
+    for record in selected_records:
+        node = record["node"]
+        label = record["label"]
+        holder_names = record["holder_names"]
+        top_nodes.append(node)
+        top_nodes.extend(record["people_nodes"])
+        relationships.extend(record["relationships"])
         if holder_names:
             verb = "knows" if len(holder_names) == 1 and label == "System" else "know"
             if label == "Skill":
@@ -2009,7 +2065,7 @@ def try_knows_answer(
     evidence = {
         "top_nodes": [dict(node, _score=node.get("_score", 10.0)) for node in seen_top.values()],
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return "\n".join(answer_lines), evidence, "Graph Search"
 
@@ -2050,9 +2106,9 @@ def try_skill_answer(
     best_score = matched_skills[0]["_score"]
     if is_short_generic:
         broader_matches = find_named_nodes(indexes, target_phrase, {"Skill"}, limit=8, min_score=18)
-        matched_skills = broader_matches[:5] if broader_matches else matched_skills[:3]
+        matched_skills = broader_matches if broader_matches else matched_skills
     else:
-        matched_skills = [node for node in matched_skills if node["_score"] >= best_score - 5][:3]
+        matched_skills = [node for node in matched_skills if node["_score"] >= best_score - 5]
 
     nodes_by_id = indexes["nodes_by_id"]
     adjacency = indexes["adjacency"]
@@ -2080,8 +2136,7 @@ def try_skill_answer(
         else:
             empty_lines.append(f"The graph contains the skill `{skill_node['name']}`, but no people are currently linked to it.")
 
-    answer_lines.extend(positive_lines)
-    answer_lines.extend(empty_lines)
+    answer_lines.extend(positive_lines if positive_lines else empty_lines)
 
     seen_top = {}
     for node in top_nodes:
@@ -2089,7 +2144,7 @@ def try_skill_answer(
     evidence = {
         "top_nodes": [dict(node, _score=node.get("_score", 10.0)) for node in seen_top.values()],
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return "\n".join(answer_lines), evidence, "Graph Search"
 
@@ -2152,10 +2207,10 @@ def try_people_for_keyword_answer(
         key=lambda node: (person_scores[node["id"]], node.get("name", "")),
         reverse=True,
     )
-    top_people = ranked_people[:5]
+    top_people = ranked_people
     top_names = [node["name"] for node in top_people]
     explanation_parts = []
-    for person in top_people[:3]:
+    for person in top_people:
         reasons = person_reasons.get(person["name"], [])
         unique_reasons = []
         seen_reasons = set()
@@ -2164,7 +2219,7 @@ def try_people_for_keyword_answer(
                 seen_reasons.add(reason)
                 unique_reasons.append(reason)
         if unique_reasons:
-            explanation_parts.append(f"{person['name']} because of {format_human_list(unique_reasons[:3])}")
+            explanation_parts.append(f"{person['name']} because of {format_human_list(unique_reasons)}")
         else:
             explanation_parts.append(f"{person['name']} through broader graph relevance")
 
@@ -2176,14 +2231,14 @@ def try_people_for_keyword_answer(
         answer += " " + "; ".join(explanation_parts) + "."
 
     top_nodes = [dict(node, _score=round(person_scores[node["id"]], 2)) for node in top_people]
-    top_nodes.extend(list(supporting_nodes.values())[:4])
+    top_nodes.extend(list(supporting_nodes.values()))
     seen_top = {}
     for node in top_nodes:
         seen_top[node["id"]] = node
     evidence = {
         "top_nodes": list(seen_top.values()),
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     query_state = {
         "kind": "people_for_keyword",
@@ -2272,7 +2327,7 @@ def try_why_followup_answer(
     for person_name in shown_people:
         reasons = person_reasons.get(person_name, [])
         if reasons:
-            lines.append(f"- {person_name}: {format_human_list(reasons[:3])}.")
+            lines.append(f"- {person_name}: {format_human_list(reasons)}.")
         else:
             lines.append(f"- {person_name}: appears through broader graph relevance around `{display_query_term(target)}`.")
 
@@ -2369,7 +2424,7 @@ def try_group_location_followup_answer(
     evidence = {
         "top_nodes": list(seen_top.values()),
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:24],
+        "relationships": relationships,
     }
     query_state = {
         "kind": "person_location",
@@ -2427,7 +2482,7 @@ def try_person_keyword_followup_answer(
     top_nodes = [dict(person_node, _score=10.0)]
     relationships: list[dict[str, Any]] = []
     related_nodes: list[dict[str, Any]] = [dict(person_node, _score=10.0)]
-    for kind, node_name, rel in supporting[:4]:
+    for kind, node_name, rel in supporting:
         node = nodes_by_id.get(rel["end"])
         if node:
             top_nodes.append(dict(node, _score=9.0))
@@ -2437,11 +2492,11 @@ def try_person_keyword_followup_answer(
     evidence = {
         "top_nodes": top_nodes,
         "related_nodes": related_nodes,
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
 
     if supporting:
-        reason_text = "; ".join(f"{person_node['name']} because of {kind} `{name}`" for kind, name, _ in supporting[:3])
+        reason_text = "; ".join(f"{person_node['name']} because of {kind} `{name}`" for kind, name, _ in supporting)
         answer = f"Yes. {reason_text}."
     else:
         answer = f"The current graph does not show strong `{display_query_term(concept_target)}` links for {person_node['name']}."
@@ -2519,7 +2574,7 @@ def try_group_keyword_followup_answer(
                 if reason not in seen:
                     seen.add(reason)
                     reasons.append(reason)
-            support_parts.append(f"{name} because of {format_human_list(reasons[:3])}")
+            support_parts.append(f"{name} because of {format_human_list(reasons)}")
         answer = (
             f"Partly. {format_human_list(supported)} has direct `{display_query_term(target_phrase)}` evidence in the graph; "
             + "; ".join(support_parts)
@@ -2534,7 +2589,7 @@ def try_group_keyword_followup_answer(
                 if reason not in seen:
                     seen.add(reason)
                     reasons.append(reason)
-            support_parts.append(f"{name} because of {format_human_list(reasons[:3])}")
+            support_parts.append(f"{name} because of {format_human_list(reasons)}")
         answer = (
             f"Yes. {format_human_list(supported)} all show direct `{display_query_term(target_phrase)}` evidence in the graph: "
             + "; ".join(support_parts)
@@ -2542,14 +2597,14 @@ def try_group_keyword_followup_answer(
         )
 
     top_nodes = [dict(node, _score=10.0) for node in person_nodes.values()]
-    top_nodes.extend(list(supporting_nodes.values())[:4])
+    top_nodes.extend(list(supporting_nodes.values()))
     seen_top = {}
     for node in top_nodes:
         seen_top[node["id"]] = node
     evidence = {
         "top_nodes": list(seen_top.values()),
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return answer, evidence, "Graph Search", last_query_state
 
@@ -2635,9 +2690,9 @@ def try_person_concept_answer(
     evidence = {
         "top_nodes": top_nodes,
         "related_nodes": top_nodes,
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
-    return " ".join(support_lines[:3]), evidence, "Graph Search"
+    return " ".join(support_lines), evidence, "Graph Search"
 
 
 def try_group_relationship_followup_answer(
@@ -2737,7 +2792,7 @@ def try_group_relationship_followup_answer(
     evidence = {
         "top_nodes": list(seen_top.values()),
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return answer, evidence, "Graph Search", last_query_state
 
@@ -2834,7 +2889,7 @@ def try_relationship_followup_answer(
     evidence = {
         "top_nodes": list(top_nodes.values()),
         "related_nodes": list(top_nodes.values()),
-        "relationships": relationships[:24],
+        "relationships": relationships,
     }
     query_state = {
         "kind": "relationship_pair",
@@ -2893,8 +2948,8 @@ def try_other_people_with_name_answer(
 
     remaining = [person for person in matched_people if str(person["id"]) not in already_shown_ids]
     focus_people = remaining or matched_people
-    people_names = [str(person["name"]) for person in focus_people[:8]]
-    top_nodes = [dict(person, _score=10.0) for person in focus_people[:8]]
+    people_names = [str(person["name"]) for person in focus_people]
+    top_nodes = [dict(person, _score=10.0) for person in focus_people]
     evidence = {"top_nodes": top_nodes, "related_nodes": top_nodes, "relationships": []}
 
     if remaining:
@@ -2903,7 +2958,7 @@ def try_other_people_with_name_answer(
     elif len(matched_people) == 1:
         answer = f"I could not find any other people named `{display_query_term(target)}` in the current graph. The only match is {matched_people[0]['name']}."
     else:
-        answer = f"I could not find additional people beyond {format_human_list([str(person['name']) for person in matched_people[:8]])} with the first name `{display_query_term(target)}` in the current graph."
+        answer = f"I could not find additional people beyond {format_human_list([str(person['name']) for person in matched_people])} with the first name `{display_query_term(target)}` in the current graph."
 
     query_state = {
         "kind": "name_listing",
@@ -3015,18 +3070,18 @@ def try_person_work_with_answer(
         if not people:
             return None
 
-        people_names = [person["name"] for person in people[:8]]
+        people_names = [person["name"] for person in people]
         verb = "is" if len(people_names) == 1 else "are"
         answer = f"{format_human_list(people_names)} {verb} most directly associated in the graph with `{best_entity['name']}`."
         top_nodes = [dict(best_entity, _score=best_entity.get("_score", 10.0))]
-        top_nodes.extend(dict(person, _score=10.0) for person in people[:8])
+        top_nodes.extend(dict(person, _score=10.0) for person in people)
         seen_top = {}
         for node in top_nodes:
             seen_top[node["id"]] = node
         evidence = {
             "top_nodes": list(seen_top.values()),
             "related_nodes": list(seen_top.values()),
-            "relationships": relationships[:18],
+            "relationships": relationships,
         }
 
         return answer, evidence, "Graph Search"
@@ -3096,7 +3151,7 @@ def try_person_work_with_answer(
 
         collaborator_names = list(collaborators.keys())
         reason_parts = []
-        for collaborator_name in collaborator_names[:5]:
+        for collaborator_name in collaborator_names:
             reasons = []
             seen = set()
             for reason in collaborators[collaborator_name]:
@@ -3106,7 +3161,7 @@ def try_person_work_with_answer(
             reason_parts.append(f"{collaborator_name} through {format_human_list(reasons)}")
 
         answer_lines.append(
-            f"{person_name} is most directly connected in the graph to {format_human_list(collaborator_names[:5])}. "
+            f"{person_name} is most directly connected in the graph to {format_human_list(collaborator_names)}. "
             + "; ".join(reason_parts)
             + "."
         )
@@ -3120,7 +3175,7 @@ def try_person_work_with_answer(
     evidence = {
         "top_nodes": [dict(node, _score=10.0) if "_score" not in node else node for node in seen_top.values()],
         "related_nodes": list(seen_top.values()),
-        "relationships": relationships[:20],
+        "relationships": relationships,
     }
     return "\n".join(answer_lines), evidence, "Graph Search"
 
@@ -3220,7 +3275,7 @@ def try_node_relationship_answer(
         evidence = {
             "top_nodes": list(top_nodes.values()),
             "related_nodes": list(top_nodes.values()),
-            "relationships": relationships[:24],
+            "relationships": relationships,
         }
         return answer, evidence, "Graph Search"
 
@@ -3306,7 +3361,7 @@ def try_node_relationship_answer(
     evidence = {
         "top_nodes": list(top_nodes.values()),
         "related_nodes": list(top_nodes.values()),
-        "relationships": compact_relationships[:18],
+        "relationships": compact_relationships,
     }
     return answer, evidence, "Graph Search"
 
@@ -3387,7 +3442,7 @@ def build_similar_role_suggestion(
     evidence = {
         "top_nodes": list(seen.values()),
         "related_nodes": list(seen.values()),
-        "relationships": relationships[:18],
+        "relationships": relationships,
     }
     return "\n".join(answer_lines), evidence, "Graph Search"
 
@@ -3560,9 +3615,9 @@ def natural_search_answer(question: str, evidence: dict[str, Any]) -> str:
     if not top_nodes:
         return "I could not find a confident match for that question in the current graph."
 
-    people = [node["name"] for node in top_nodes if node.get("label") == "Person"][:3]
-    skills = [node["name"] for node in top_nodes if node.get("label") == "Skill"][:3]
-    roles = [node["name"] for node in top_nodes if node.get("label") == "Role"][:3]
+    people = [node["name"] for node in top_nodes if node.get("label") == "Person"]
+    skills = [node["name"] for node in top_nodes if node.get("label") == "Skill"]
+    roles = [node["name"] for node in top_nodes if node.get("label") == "Role"]
 
     lines = []
     if people:
@@ -3570,14 +3625,14 @@ def natural_search_answer(question: str, evidence: dict[str, Any]) -> str:
     elif roles:
         lines.append(f"The strongest role matches are {', '.join(roles)}.")
     else:
-        lines.append(f"The strongest graph matches are {', '.join(node['name'] for node in top_nodes[:3])}.")
+        lines.append(f"The strongest graph matches are {', '.join(node['name'] for node in top_nodes)}.")
 
     if skills:
         lines.append(f"Related skill evidence in this result set includes {', '.join(skills)}.")
 
     if relationships:
         lines.append("The graph also shows direct links around these matches, such as:")
-        for rel in relationships[:3]:
+        for rel in relationships:
             start_label, relation_label, end_label = format_relation_endpoints(evidence, rel)
             lines.append(f"- {relation_label} between {start_label} and {end_label}")
     else:
@@ -4715,3 +4770,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
