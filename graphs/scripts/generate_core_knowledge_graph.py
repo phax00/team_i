@@ -1,7 +1,5 @@
-import csv
 import json
 import re
-from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -10,7 +8,6 @@ ROOT = Path(__file__).resolve().parents[2]
 JD_CATALOG = ROOT / "job_descriptions" / "catalog" / "JD_Catalog.json"
 PERSON_RESOLVED = ROOT / "people" / "data" / "Person_Profiles_Graph_Input.json"
 OUTPUT_JSON = ROOT / "graphs" / "core" / "knowledge_graph_core.json"
-OUTPUT_DIR = ROOT / "graphs" / "core" / "csv" / "knowledge_graph_core_csv"
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -79,15 +76,6 @@ def split_country_from_location(location: str | None) -> tuple[str | None, str |
             site = location.replace(country, "").strip(" ,-/")
             return (site or None), country
     return location, None
-
-
-def write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({k: row.get(k) for k in fieldnames})
 
 
 def main() -> None:
@@ -275,21 +263,8 @@ def main() -> None:
     }
     save_json(OUTPUT_JSON, payload)
 
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    grouped_nodes: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for node in payload["nodes"]:
-        grouped_nodes[node["label"]].append(node)
-
-    for label, rows in grouped_nodes.items():
-        fieldnames = sorted({key for row in rows for key in row.keys()})
-        write_csv(OUTPUT_DIR / f"nodes_{label.lower()}.csv", rows, fieldnames)
-
-    rel_fieldnames = sorted({key for row in unique_rels for key in row.keys()})
-    write_csv(OUTPUT_DIR / "relationships.csv", unique_rels, rel_fieldnames)
-
     print(f"Wrote {OUTPUT_JSON}")
-    print(f"Node types: {', '.join(sorted(grouped_nodes.keys()))}")
+    print(f"Node types: {', '.join(sorted({node['label'] for node in payload['nodes']}))}")
     print(f"Nodes: {len(nodes)}")
     print(f"Relationships: {len(unique_rels)}")
 
